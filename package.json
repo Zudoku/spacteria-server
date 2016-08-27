@@ -1,0 +1,9 @@
+{
+  "name": "spacteria-server",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "express": "^4.14.0",
+    "socket.io": "^1.4.8"
+  }
+}
