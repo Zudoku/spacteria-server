@@ -63,6 +63,16 @@ module.exports = {
         }
       });
 
+      socket.on(evts.incoming.UPDATE_POSITION,function(payload){
+        if(module.exports.checkIfIdentified(socket.id) && module.exports.checkIfInRoom(socket.id)){
+          currentPlayers[socket.id].x = payload.x;
+          currentPlayers[socket.id].y = payload.y;
+          socket.broadcast.to(currentPlayers[socket.id].room).emit(evts.outgoing.CORRECT_PLAYER_POSITION, { id : socket.id, x : payload.x, y : payload.y });
+        } else {
+          return;
+        }
+      });
+
       socket.on('disconnect', function(){
         var disconnectedId = socket.id;
         var disconnectedPlayer = currentPlayers[disconnectedId];
@@ -86,8 +96,8 @@ module.exports = {
       room : "",
       charactername : identifyInfo.player.charactername,
       characterClass : identifyInfo.player.characterClass,
-      x : 0,
-      y : 0
+      x : 128,
+      y : 128
     };
     currentPlayers[socket.id] = userInstance;
     socket.emit(evts.outgoing.SEND_ROOMLIST,rooms);
@@ -99,8 +109,8 @@ module.exports = {
       difficulty : 1,
       mapDescription : {
         filename : "temp.tmx",
-        startX : 0,
-        startY : 0
+        startX : 128,
+        startY : 128
       }
     };
     currentRoomID++;
