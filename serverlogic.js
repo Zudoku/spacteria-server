@@ -114,6 +114,7 @@ module.exports = {
           projectile.collideToTerrain = true;
           projectile.angle = payload.projectile.angle % 360;
           projectile.maxTravelDistance = payload.projectile.maxTravelDistance;
+          projectile.travelDistance = 0;
           projectile.damage = 50;
           projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y), 2, 2);
 

@@ -82,7 +82,7 @@ module.exports = {
     }
   },
 
-  defaultMove(target, room, type, ioref) {
+  defaultMove(target, room, type) {
     /* eslint no-param-reassign: "off"*/
     // console.log("moving projectile " + target.id);
     if (target.deltaX === 0 && target.deltaY === 0) {
@@ -102,14 +102,28 @@ module.exports = {
           if (!module.exports.collidesToTerrain(copiedShape.toPolygon(), room)) {
             target.x += ((target.deltaX > 0) ? 0.1 : -0.1);
             target.shape.pos = new SAT.Vector(target.x, target.y);
+            if (type === 'projectile') {
+              target.travelDistance += 0.1;
+              if (target.travelDistance > target.maxTravelDistance) {
+                module.exports.removeBulletFromGame(target, room);
+                return;
+              }
+            }
           } else {
-            module.exports.objectCollidedWithTerrain(target, room, type, ioref);
+            module.exports.objectCollidedWithTerrain(target, room, type);
             collidedX = true;
             // console.log(`projectile collided with terrain ${target.guid}`);
           }
         } else {
           target.x += ((target.deltaX > 0) ? 0.1 : -0.1);
           target.shape.pos = new SAT.Vector(target.x, target.y);
+          if (type === 'projectile') {
+            target.travelDistance += 0.1;
+            if (target.travelDistance > target.maxTravelDistance) {
+              module.exports.removeBulletFromGame(target, room);
+              return;
+            }
+          }
         }
       }
       // Move in Y
@@ -120,14 +134,28 @@ module.exports = {
           if (!module.exports.collidesToTerrain(copiedShape.toPolygon(), room)) {
             target.y += ((target.deltaY > 0) ? 0.1 : -0.1);
             target.shape.pos = new SAT.Vector(target.x, target.y);
+            if (type === 'projectile') {
+              target.travelDistance += 0.1;
+              if (target.travelDistance > target.maxTravelDistance) {
+                module.exports.removeBulletFromGame(target, room);
+                return;
+              }
+            }
           } else {
-            module.exports.objectCollidedWithTerrain(target, room, type, ioref);
+            module.exports.objectCollidedWithTerrain(target, room, type);
             collidedY = true;
             // console.log(`projectile collided with terrain ${target.guid}`);
           }
         } else {
           target.y += ((target.deltaY > 0) ? 0.1 : -0.1);
           target.shape.pos = new SAT.Vector(target.x, target.y);
+          if (type === 'projectile') {
+            target.travelDistance += 0.1;
+            if (target.travelDistance > target.maxTravelDistance) {
+              module.exports.objectCollidedWithTerrain(target, room, type);
+              return;
+            }
+          }
         }
       }
     }
@@ -153,17 +181,19 @@ module.exports = {
     return false;
   },
   objectCollidedWithTerrain(target, room, type) {
-    // console.log(`projectile collided with terrain ${target.guid}`);
     if (type === 'projectile') {
-      // console.log(`projectile collided with terrain ${target.guid}`);
       // Remove bullet from server
-      const index = room.projectiles.indexOf(target);
-      if (index !== -1) {
-        room.projectiles.splice(index, 1);
-      }
-      // Send remove event
-      serverlogic.removeProjectile(target.guid, room);
+      module.exports.removeBulletFromGame(target, room);
     }
+  },
+  removeBulletFromGame(target, room) {
+    // Remove bullet from server
+    const index = room.projectiles.indexOf(target);
+    if (index !== -1) {
+      room.projectiles.splice(index, 1);
+    }
+    // Send remove event
+    serverlogic.removeProjectile(target.guid, room);
   },
 
 };
