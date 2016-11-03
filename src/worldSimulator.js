@@ -1,9 +1,11 @@
 let roomsRef;
+
 const SAT = require('sat');
-const tmxparser = require('tmx-parser');
+const enemies = require('./enemies.js');
+const enemySimulator = require('./enemySimulator.js');
+const terrainCollision = require('./terraincollision.js');
 
 let serverlogic;
-const tilemaps = {};
 const DELTA = 1000 / 60;
 
 /*
@@ -25,24 +27,17 @@ var room = {
 */
 
 module.exports = {
-  init(filename) {
-    tmxparser.parseFile(`maps/${filename}`, (err, map) => {
-      const collisionMap = new Array(map.width);
-      collisionMap.collision = (xPos, yPos) => collisionMap[xPos][yPos];
-      if (err) {
-        console.log(err);
-      } else {
-        const blocking = [1];
-        for (let x = 0; x < map.width; x++) {
-          collisionMap[x] = new Array(map.height);
-          for (let y = 0; y < map.height; y++) {
-            collisionMap[x][y] = blocking.indexOf(map.layers[0].tiles[(y * map.width) + x].id) !== -1;
-          }
-        }
-
-        tilemaps[filename] = collisionMap;
-      }
-    });
+  init(filename, room) {
+    const result = terrainCollision.initializeMap(filename);
+    if (result) {
+      console.log('works');
+    }
+    // INIT MONSTERS
+    const dummy = enemies.getMonster('dummy_small', room.difficulty, 3 * 126, 124);
+    const smallGuy = enemies.getMonster('small_guy', room.difficulty, 126, 3 * 124);
+    room.enemies.push(dummy);
+    room.enemies.push(smallGuy);
+    serverlogic.updateroomdescription(room);
   },
   initialize(serlogic) {
     serverlogic = serlogic;
@@ -56,23 +51,10 @@ module.exports = {
     }
   },
   simulateRoom(room, ioref) {
-    // console.log("simulating room " + room);
     // Give projectiles momentum
     for (let i = 0; i < room.projectiles.length; i++) {
       const projectile = room.projectiles[i];
-
-      const angleInRadians = (projectile.angle / 360) * (2 * Math.PI);
-      const scaler = ((projectile.speed * DELTA) / 200);
-
-      let deltaX = -Math.sin(angleInRadians);
-      let deltaY = -Math.cos(angleInRadians);
-
-      deltaX *= scaler;
-      deltaY *= scaler;
-
-      projectile.deltaX = deltaX;
-      projectile.deltaY = deltaY;
-      // console.log("simulating rojectile " + projectile.guid);
+      module.exports.giveMomentum(projectile, projectile.angle, projectile.speed);
     }
 
     // Move projectiles
@@ -80,11 +62,36 @@ module.exports = {
       const projectile = room.projectiles[i];
       module.exports.defaultMove(projectile, room, 'projectile', ioref);
     }
+    // Simulate enemies
+    for (let i = 0; i < room.enemies.length; i++) {
+      const enemy = room.enemies[i];
+      // Set move target, shoot at players, look for target here
+      enemySimulator.simulate(enemy, room);
+      // If we need to move, move
+      if (enemy.moveTarget !== undefined) {
+        // Give momentum
+        const angle = module.exports.angleBetweenTwoPoints(enemy.shape.pos, enemy.moveTarget);
+        module.exports.giveMomentum(enemy, angle, enemy.stats.speed);
+        // Move enemies
+        module.exports.defaultMove(enemy, room, 'enemy');
+      }
+    }
   },
+  giveMomentum(target, angle, speed) {
+    const angleInRadians = (angle / 360) * (2 * Math.PI);
+    const scaler = ((speed * DELTA) / 200);
 
+    let deltaX = -Math.sin(angleInRadians);
+    let deltaY = -Math.cos(angleInRadians);
+
+    deltaX *= scaler;
+    deltaY *= scaler;
+
+    target.deltaX = deltaX;
+    target.deltaY = deltaY;
+  },
   defaultMove(target, room, type) {
     /* eslint no-param-reassign: "off"*/
-    // console.log("moving projectile " + target.id);
     if (target.deltaX === 0 && target.deltaY === 0) {
       return;
     }
@@ -99,7 +106,7 @@ module.exports = {
         const copiedShape = new SAT.Box(new SAT.Vector(target.shape.pos.x, target.shape.pos.y), target.shape.w, target.shape.h);
         copiedShape.pos.x += (target.deltaX > 0) ? 0.1 : -0.1;
         if (target.collideToTerrain) {
-          if (!module.exports.collidesToTerrain(copiedShape.toPolygon(), room)) {
+          if (!terrainCollision.collidesToTerrain(copiedShape.toPolygon(), room)) {
             target.x += ((target.deltaX > 0) ? 0.1 : -0.1);
             target.shape.pos = new SAT.Vector(target.x, target.y);
             if (type === 'projectile') {
@@ -108,11 +115,14 @@ module.exports = {
                 module.exports.removeBulletFromGame(target, room);
                 return;
               }
+              if (module.exports.projectileCollidesToObjects(target, room)) {
+                module.exports.removeBulletFromGame(target, room);
+                return;
+              }
             }
           } else {
             module.exports.objectCollidedWithTerrain(target, room, type);
             collidedX = true;
-            // console.log(`projectile collided with terrain ${target.guid}`);
           }
         } else {
           target.x += ((target.deltaX > 0) ? 0.1 : -0.1);
@@ -120,6 +130,10 @@ module.exports = {
           if (type === 'projectile') {
             target.travelDistance += 0.1;
             if (target.travelDistance > target.maxTravelDistance) {
+              module.exports.removeBulletFromGame(target, room);
+              return;
+            }
+            if (module.exports.projectileCollidesToObjects(target, room)) {
               module.exports.removeBulletFromGame(target, room);
               return;
             }
@@ -131,7 +145,7 @@ module.exports = {
         const copiedShape = new SAT.Box(new SAT.Vector(target.shape.pos.x, target.shape.pos.y), target.shape.w, target.shape.h);
         copiedShape.pos.y += (target.deltaY > 0) ? 0.1 : -0.1;
         if (target.collideToTerrain) {
-          if (!module.exports.collidesToTerrain(copiedShape.toPolygon(), room)) {
+          if (!terrainCollision.collidesToTerrain(copiedShape.toPolygon(), room)) {
             target.y += ((target.deltaY > 0) ? 0.1 : -0.1);
             target.shape.pos = new SAT.Vector(target.x, target.y);
             if (type === 'projectile') {
@@ -144,7 +158,6 @@ module.exports = {
           } else {
             module.exports.objectCollidedWithTerrain(target, room, type);
             collidedY = true;
-            // console.log(`projectile collided with terrain ${target.guid}`);
           }
         } else {
           target.y += ((target.deltaY > 0) ? 0.1 : -0.1);
@@ -163,22 +176,34 @@ module.exports = {
     target.deltaX = 0;
     target.deltaY = 0;
   },
-  collidesToTerrain(shape, room) {
-    for (let i = 0; i < shape.points.length; i++) {
-      const vector = shape.points[i];
-
-
-      const arrayPosX = Math.floor((shape.pos.x + vector.x) / 64);
-      const arrayPosY = Math.floor((shape.pos.y + vector.y) / 64);
-      // console.log(`Checking at: ${shape.pos.x + vector.x},${shape.pos.y + vector.y} (${arrayPosX},${arrayPosY})`);
-      const collided = tilemaps[room.mapDescription.filename].collision(arrayPosX, arrayPosY);
-
-      if (collided) {
-        // console.log(`Collision at: ${shape.pos.x + vector.x},${shape.pos.y + vector.y} (${arrayPosX},${arrayPosY})`);
-        return true;
+  projectileCollidesToObjects(target, room) {
+    if (target.team === 1) {
+      for (let i = 0; i < room.enemies.length; i++) {
+        const foundEnemy = room.enemies[i];
+        if (SAT.testPolygonPolygon(target.shape.toPolygon(), foundEnemy.shape.toPolygon())) {
+          module.exports.takeDamage(foundEnemy, 'enemy', target.damage);
+          return true;
+        }
       }
+      return false;
+    } else if (target.team === 2) {
+      for (let i = 0; i < room.players.length; i++) {
+        const foundPlayer = room.players[i];
+        if (SAT.testPolygonPolygon(target.shape.toPolygon(), foundPlayer.shape.toPolygon())) {
+          module.exports.takeDamage(foundPlayer, 'player', target.damage);
+          return true;
+        }
+      }
+      return false;
     }
     return false;
+  },
+  takeDamage(target, type, damage) {
+    if (type === 'enemy') {
+      target.stats.health -= damage;
+    } else if (type === 'player') {
+      target.stats.health -= damage;
+    }
   },
   objectCollidedWithTerrain(target, room, type) {
     if (type === 'projectile') {
@@ -194,6 +219,16 @@ module.exports = {
     }
     // Send remove event
     serverlogic.removeProjectile(target.guid, room);
+  },
+  angleBetweenTwoPoints(p1, p2) {
+    const dy = p1.y - p2.y;
+    const dx = p1.x - p2.x;
+    let angle = Math.atan2(dy, dx);
+    angle *= 180 / Math.PI;
+    if (angle < 0) {
+      angle = 360 + angle;
+    }
+    return angle;
   },
 
 };

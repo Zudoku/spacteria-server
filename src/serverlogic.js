@@ -43,12 +43,13 @@ module.exports = {
           currentPlayers[socket.id].y = generatedRoom.mapDescription.startY;
           generatedRoom.players.push(currentPlayers[socket.id]);
           // Add the map to worldsimulator if it isnt there yet
-          worldSimulator.init(generatedRoom.mapDescription.filename);
 
           socket.join(generatedRoom.name, (err) => {
             if (err) {
-              console.log(err);
+              // console.log(err);
             }
+            worldSimulator.init(generatedRoom.mapDescription.filename, generatedRoom);
+            // console.log(generatedRoom.enemies);
             socket.emit(evts.outgoing.JOIN_ROOM, module.exports.serilializeRoom(generatedRoom));
             module.exports.updateObservers();
           });
@@ -118,8 +119,6 @@ module.exports = {
           projectile.damage = 50;
           projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y), 2, 2);
 
-
-          // console.log(`Angle: ${projectile.angle} Position: (${projectile.x},${projectile.y})`);
           foundRoom.projectiles.push(projectile);
           socket.broadcast.to(currentPlayers[socket.id].room).emit(evts.outgoing.SPAWN_PROJECTILE, { projectile: payload.projectile });
         } else {
@@ -194,8 +193,8 @@ module.exports = {
   callSimulation() {
     worldSimulator.simulate(rooms, ioref);
   },
-  callmethod(key) {
-    console.log(key);
+  updateroomdescription(room) {
+    ioref.to(room.name).emit(evts.outgoing.REFRESH_ROOM_DESCRIPTION, { desc: room, forceUpdate: true });
   },
 
 };

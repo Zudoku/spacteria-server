@@ -6,7 +6,8 @@ module.exports = {
   getMonster(monsterID, level, initX, initY) {
     const foundMonster = enemyList[monsterID];
 
-    foundMonster.shape.translate(initX, initY);
+    foundMonster.shape.pos.x = initX;
+    foundMonster.shape.pos.y = initY;
 
     // Scale stats based on level
 

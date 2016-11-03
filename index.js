@@ -2,13 +2,14 @@ const app = require('express')();
 /* eslint new-cap: ["error", { "capIsNew": false }]*/
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const path = require('path');
 
-const config = require('./config.js');
+const config = require('./src/config.js');
 
-const serverlogic = require('./serverlogic');
+const serverlogic = require('./src/serverlogic');
 
 app.get('/', (req, res) => {
-  res.sendfile('index.html');
+  res.sendfile(path.join(__dirname, 'public', 'index.html'));
 });
 serverlogic.init(io);
 

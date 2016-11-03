@@ -16,5 +16,6 @@ module.exports = {
     CORRECT_PLAYER_POSITION: 'correctplayerposition',
     SPAWN_PROJECTILE: 'newprojectilespawned',
     DESPAWN_PROJECTILE: 'despawnprojectile',
+    REFRESH_ROOM_DESCRIPTION: 'refreshroomdesc',
   },
 };
