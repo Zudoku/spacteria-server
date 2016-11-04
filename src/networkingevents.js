@@ -13,9 +13,10 @@ module.exports = {
     PLAYER_JOINED_YOUR_GAME: 'playerjoin',
     PLAYER_LEFT_YOUR_GAME: 'playerleft',
     OBSERVER_SEND_INFO: 'info',
-    CORRECT_PLAYER_POSITION: 'correctplayerposition',
+    CORRECT_PLAYER_POSITION: 'correctnpcposition',
     SPAWN_PROJECTILE: 'newprojectilespawned',
     DESPAWN_PROJECTILE: 'despawnprojectile',
     REFRESH_ROOM_DESCRIPTION: 'refreshroomdesc',
+    UPDATE_NPC_POSITION: 'correctnpcposition',
   },
 };

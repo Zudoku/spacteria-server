@@ -70,10 +70,15 @@ module.exports = {
       // If we need to move, move
       if (enemy.moveTarget !== undefined) {
         // Give momentum
-        const angle = module.exports.angleBetweenTwoPoints(enemy.shape.pos, enemy.moveTarget);
+        let angle = module.exports.angleBetweenTwoPoints(enemy.shape.pos, enemy.moveTarget);
+        angle %= 360;
+        // console.log(`${enemy.moveTarget.x},${enemy.moveTarget.y}-${enemy.shape.pos.x},${enemy.shape.pos.y}-${angle}`);
         module.exports.giveMomentum(enemy, angle, enemy.stats.speed);
+        // console.log(`${enemy.deltaX},${enemy.deltaY}`);
         // Move enemies
         module.exports.defaultMove(enemy, room, 'enemy');
+        // Test if we should broadcast new position
+        module.exports.checkIfBroadcastNPC(enemy, room);
       }
     }
   },
@@ -220,10 +225,22 @@ module.exports = {
     // Send remove event
     serverlogic.removeProjectile(target.guid, room);
   },
+  checkIfBroadcastNPC(enemy, room) {
+    const deltaX = Math.abs(enemy.shape.pos.x - enemy.lastBroadCastedPosition.x);
+    const deltaY = Math.abs(enemy.shape.pos.y - enemy.lastBroadCastedPosition.y);
+
+    if (deltaX + deltaY >= 2) {
+      enemy.lastBroadCastedPosition = { x: enemy.shape.pos.x, y: enemy.shape.pos.y };
+      serverlogic.updateNPCPosition(enemy.hash, enemy.lastBroadCastedPosition, room);
+    }
+  },
   angleBetweenTwoPoints(p1, p2) {
     const dy = p1.y - p2.y;
     const dx = p1.x - p2.x;
-    let angle = Math.atan2(dy, dx);
+    const vlength = Math.sqrt((dx * dx) + (dy * dy));
+    const ny = dy * vlength;
+    const nx = dx * vlength;
+    let angle = Math.atan2(1, 0) - Math.atan2(ny, nx);
     angle *= 180 / Math.PI;
     if (angle < 0) {
       angle = 360 + angle;

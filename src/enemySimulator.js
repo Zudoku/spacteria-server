@@ -44,13 +44,13 @@ module.exports = {
           const arrayPosY = Math.floor(((enemy.shape.pos.y - (enemy.shape.h / 2)) / 64) + getRandomIntInclusive(0, 2) - 1);
 
           if (!terrainCollision.isBlocked(arrayPosX, arrayPosY, room)) {
-            enemy.moveTarget = { x: arrayPosX * 64, y: arrayPosY * 64 };
-            console.log('movetarget found');
+            enemy.moveTarget = { x: (arrayPosX * 64) + 32, y: (arrayPosY * 64) + 32 };
+            console.log(`movetarget found: ${enemy.moveTarget.x},${enemy.moveTarget.y}`);
           }
         } else {
           // if we are close, set moveTarget to undefined
-          const deltaX = Math.abs(Math.abs(enemy.moveTarget.x * 64 + 32) - Math.abs(enemy.shape.pos.x + (enemy.shape.w / 2)));
-          const deltaY = Math.abs(Math.abs(enemy.moveTarget.y * 64 + 32) - Math.abs(enemy.shape.pos.y + (enemy.shape.h / 2)));
+          const deltaX = Math.abs(Math.abs(enemy.moveTarget.x) - Math.abs(enemy.shape.pos.x));
+          const deltaY = Math.abs(Math.abs(enemy.moveTarget.y) - Math.abs(enemy.shape.pos.y));
           if (deltaX + deltaY < 6) {
             enemy.moveTarget = undefined;
           }

@@ -190,6 +190,9 @@ module.exports = {
   removeProjectile(hash, room) {
     ioref.to(room.name).emit(evts.outgoing.DESPAWN_PROJECTILE, { id: hash });
   },
+  updateNPCPosition(hash, position, room) {
+    ioref.to(room.name).emit(evts.outgoing.UPDATE_NPC_POSITION, { id: hash, x: position.x, y: position.y });
+  },
   callSimulation() {
     worldSimulator.simulate(rooms, ioref);
   },
