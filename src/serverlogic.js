@@ -41,6 +41,8 @@ module.exports = {
           currentPlayers[socket.id].room = generatedRoom.name;
           currentPlayers[socket.id].x = generatedRoom.mapDescription.startX;
           currentPlayers[socket.id].y = generatedRoom.mapDescription.startY;
+          currentPlayers[socket.id].shape = new SAT.Box(new SAT.Vector(currentPlayers[socket.id].x,
+            currentPlayers[socket.id].y), 32, 32);
           generatedRoom.players.push(currentPlayers[socket.id]);
           // Add the map to worldsimulator if it isnt there yet
 
@@ -69,6 +71,8 @@ module.exports = {
             currentPlayers[socket.id].room = foundRoom.name;
             currentPlayers[socket.id].x = foundRoom.mapDescription.startX;
             currentPlayers[socket.id].y = foundRoom.mapDescription.startY;
+            currentPlayers[socket.id].shape = new SAT.Box(new SAT.Vector(currentPlayers[socket.id].x,
+              currentPlayers[socket.id].y), 32, 32);
             foundRoom.players.push(currentPlayers[socket.id]);
             socket.join(foundRoom.name, (err) => {
               if (err) {
@@ -90,6 +94,8 @@ module.exports = {
          && module.exports.checkIfInRoom(socket.id)) {
           currentPlayers[socket.id].x = payload.x;
           currentPlayers[socket.id].y = payload.y;
+          currentPlayers[socket.id].shape.pos.x = payload.x;
+          currentPlayers[socket.id].shape.pos.y = payload.y;
           socket.broadcast.to(currentPlayers[socket.id].room)
           .emit(evts.outgoing.CORRECT_PLAYER_POSITION,
              { id: socket.id, x: payload.x, y: payload.y });

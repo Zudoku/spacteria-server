@@ -1,7 +1,6 @@
 const PF = require('pathfinding');
 const SAT = require('sat');
 const terrainCollision = require('./terraincollision.js');
-const finder = new PF.AStarFinder();
 
 function getRandomIntInclusive(min, max) {
   /* eslint no-mixed-operators: "off"*/
@@ -47,7 +46,7 @@ module.exports = {
 
           if (!terrainCollision.isBlocked(arrayPosX, arrayPosY, room)) {
             enemy.moveTarget = { x: (arrayPosX * 64) + 32, y: (arrayPosY * 64) + 32 };
-            console.log(`movetarget found: ${enemy.moveTarget.x},${enemy.moveTarget.y}`);
+            // console.log(`movetarget found: ${enemy.moveTarget.x},${enemy.moveTarget.y}`);
           }
         } else {
           // if we are close, set moveTarget to undefined
@@ -63,14 +62,24 @@ module.exports = {
         // Move towards target
         const arrayPosXE = Math.floor(enemy.shape.pos.x / 64);
         const arrayPosYE = Math.floor(enemy.shape.pos.y / 64);
-        const arrayPosXT = Math.floor(enemy.target.x / 64);
-        const arrayPosYT = Math.floor(enemy.target.y / 64);
-        var path = finder.findPath(arrayPosXE, arrayPosYE, arrayPosXT, arrayPosYT, pathfinding.getMapClone(room));
+        const arrayPosXT = Math.floor(enemy.target.shape.pos.x / 64);
+        const arrayPosYT = Math.floor(enemy.target.shape.pos.y / 64);
+        let finder = new PF.AStarFinder();
+        let grid = new PF.Grid(terrainCollision.getMapClone(room));
+        let path = finder.findPath(arrayPosXE, arrayPosYE, arrayPosXT, arrayPosYT, grid);
+
+        // console.log(path);
+
         if (path.length === 1) {
-          enemy.moveTarget = { x: path[0][0], y: path[0][1] };
+          enemy.moveTarget = { x: (path[0][0] * 64) + 32, y: (path[0][1] * 64) + 32 };
         }
         if (path.length > 1) {
-          enemy.moveTarget = { x: path[1][0], y: path[1][1] };
+          if (arrayPosXE === path[0][0] && arrayPosYE === path[0][1]){
+            enemy.moveTarget = { x: (path[1][0] * 64) + 32, y: (path[1][1] * 64) + 32 };
+          } else {
+            enemy.moveTarget = { x: (path[0][0] * 64) + 32, y: (path[0][1] * 64) + 32 };
+          }
+
         }
         if (path === undefined || path.length === 0) {
           enemy.moveTarget = undefined;
@@ -88,8 +97,11 @@ module.exports = {
     // Go through every player and check if they are in radius
     for(var i = 0; i < room.players.length; i++) {
       let currentCheckedPlayer = room.players[i];
-      const circle = SAT.circle(new SAT.Vector(enemy.x + (enemy.shape.w / 2), enemy.y + (enemy.shape.h / 2)), 100);
-      if (SAT.testPolygonCircle(currentCheckedPlayer.shape.toPolygon(), circle)
+      const circle = new SAT.Circle(new SAT.Vector(enemy.x + (enemy.shape.w / 2), enemy.y + (enemy.shape.h / 2)), 100);
+      if (currentCheckedPlayer.shape !== undefined && SAT.testPolygonCircle(currentCheckedPlayer.shape.toPolygon(), circle)) {
+        enemy.target = currentCheckedPlayer;
+        return true;
+      }
     }
 
     return false;
