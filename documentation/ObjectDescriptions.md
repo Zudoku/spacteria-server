@@ -13,8 +13,29 @@
  - lastShotTime: INTEGER
  - lastBroadCastedPosition: {x, y}
  - hash: STRING
+ - projectileType: STRING
 
 
 ## Player
+ - shape: SAT.Box
+ - stats: { health, vitality, strength, dexterity, defence, speed }
+ - id: STRING
+ - x: DOUBLE
+ - y: DOUBLE
+ - room: STRING
+ - charactername: STRING
+ - characterClass: STRING
+ 
 
 ## Projectile
+ - image: STRING
+ - angle: DOUBLE
+ - speed: INTEGER
+ - currentTravelDistance: DOUBLE
+ - maxTravelDistance: DOUBLE
+ - path: STRING
+ - damage: INTEGER
+ - guid: STRING
+ - team: INTEGER
+ - collideToTerrain: BOOLEAN
+ - shape: SAT.Box
