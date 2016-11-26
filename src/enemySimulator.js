@@ -1,6 +1,7 @@
 const PF = require('pathfinding');
 const SAT = require('sat');
 const terrainCollision = require('./terraincollision.js');
+const SF = require('./staticFuncs.js');
 
 function getRandomIntInclusive(min, max) {
   /* eslint no-mixed-operators: "off"*/
@@ -85,6 +86,18 @@ module.exports = {
           enemy.moveTarget = undefined;
         }
         // Shoot at target
+
+        if (enemy.target !== undefined) {
+          const timeDiff = new Date().getTime() - enemy.lastShotTime;
+          const shootSpeed = enemy.stats.dexterity * 10
+          if (timeDiff > shootSpeed) {
+            enemy.lastShotTime = new Date().getTime();
+
+            module.exports.shootProjectiles(enemy);
+          }
+
+        }
+
         break;
       }
       default: {
@@ -105,5 +118,24 @@ module.exports = {
     }
 
     return false;
+  },
+
+  shootProjectiles(enemy, index, room){
+    // Calculate the angle between the two
+    const angle = SF.angleBetweenTwoPoints(enemy.shape.pos, enemy.target.shape.pos);
+
+    const projectile = { x: enemy.x, y: enemy.y, deltaX: 0, deltaY: 0 };
+    projectile.image = enemy.projectiles[index].image;
+    projectile.team = 2;
+    projectile.path = enemy.projectiles[index].path;
+    projectile.speed = enemy.projectiles[index].speed;
+    projectile.guid = FS.guid();
+    projectile.collideToTerrain = enemy.projectiles[index].collideToTerrain;
+    projectile.angle = angle;
+    projectile.maxTravelDistance = enemy.projectiles[index].maxTravelDistance;
+    projectile.travelDistance = 0;
+    projectile.damage = enemy.projectiles[index].damage;
+    projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y), 2, 2);
+
   },
 };

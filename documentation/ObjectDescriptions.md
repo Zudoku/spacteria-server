@@ -14,6 +14,7 @@
  - lastBroadCastedPosition: {x, y}
  - hash: STRING
  - projectileType: STRING
+ - projectiles: [Projectile objects]
 
 
 ## Player
@@ -25,7 +26,7 @@
  - room: STRING
  - charactername: STRING
  - characterClass: STRING
- 
+
 
 ## Projectile
  - image: STRING

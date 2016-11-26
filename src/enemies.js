@@ -1,5 +1,6 @@
 
 const enemyList = require('./enemylist.js');
+const SF = require('./staticFuncs.js');
 
 
 module.exports = {
@@ -12,16 +13,10 @@ module.exports = {
     foundMonster.x = initX;
     foundMonster.y = initY;
     foundMonster.lastBroadCastedPosition = { x: initX, y: initY };
-    foundMonster.hash = module.exports.guid();
+    foundMonster.hash = SF.guid();
 
     // Scale stats based on level
 
     return foundMonster;
-  },
-  guid() {
-    function s4() {
-      return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
-    }
-    return `${s4() + s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
   },
 };

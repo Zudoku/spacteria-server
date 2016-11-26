@@ -125,8 +125,7 @@ module.exports = {
           projectile.damage = 50;
           projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y), 2, 2);
 
-          foundRoom.projectiles.push(projectile);
-          socket.broadcast.to(currentPlayers[socket.id].room).emit(evts.outgoing.SPAWN_PROJECTILE, { projectile: payload.projectile });
+          module.exports.addProjectileToGame(projectile, currentPlayers[socket.id].room);
         } else {
           return;
         }
@@ -204,6 +203,10 @@ module.exports = {
   },
   updateroomdescription(room) {
     ioref.to(room.name).emit(evts.outgoing.REFRESH_ROOM_DESCRIPTION, { desc: room, forceUpdate: true });
+  },
+  addProjectileToGame(projectile, roomname) {
+    foundRoom.projectiles.push(projectile);
+    ioref.to(roomname).emit(evts.outgoing.SPAWN_PROJECTILE, { projectile: payload.projectile });
   },
 
 };

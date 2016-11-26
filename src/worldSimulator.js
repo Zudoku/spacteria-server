@@ -4,6 +4,7 @@ const SAT = require('sat');
 const enemies = require('./enemies.js');
 const enemySimulator = require('./enemySimulator.js');
 const terrainCollision = require('./terraincollision.js');
+const SF = require('./staticFuncs.js');
 
 let serverlogic;
 const DELTA = 1000 / 60;
@@ -70,7 +71,7 @@ module.exports = {
       // If we need to move, move
       if (enemy.moveTarget !== undefined) {
         // Give momentum
-        let angle = module.exports.angleBetweenTwoPoints(enemy.shape.pos, enemy.moveTarget);
+        let angle = SF.angleBetweenTwoPoints(enemy.shape.pos, enemy.moveTarget);
         angle %= 360;
         // console.log(`${enemy.moveTarget.x},${enemy.moveTarget.y}-${enemy.shape.pos.x},${enemy.shape.pos.y}-${angle}`);
         module.exports.giveMomentum(enemy, angle, enemy.stats.speed);
@@ -234,18 +235,6 @@ module.exports = {
       serverlogic.updateNPCPosition(enemy.hash, enemy.lastBroadCastedPosition, room);
     }
   },
-  angleBetweenTwoPoints(p1, p2) {
-    const dy = p1.y - p2.y;
-    const dx = p1.x - p2.x;
-    const vlength = Math.sqrt((dx * dx) + (dy * dy));
-    const ny = dy * vlength;
-    const nx = dx * vlength;
-    let angle = Math.atan2(1, 0) - Math.atan2(ny, nx);
-    angle *= 180 / Math.PI;
-    if (angle < 0) {
-      angle = 360 + angle;
-    }
-    return angle;
-  },
+
 
 };
