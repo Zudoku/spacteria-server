@@ -67,7 +67,7 @@ module.exports = {
     for (let i = 0; i < room.enemies.length; i++) {
       const enemy = room.enemies[i];
       // Set move target, shoot at players, look for target here
-      enemySimulator.simulate(enemy, room);
+      enemySimulator.simulate(enemy, room, serverlogic);
       // If we need to move, move
       if (enemy.moveTarget !== undefined) {
         // Give momentum

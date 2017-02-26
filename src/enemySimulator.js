@@ -11,7 +11,7 @@ function getRandomIntInclusive(min, max) {
 }
 
 module.exports = {
-  simulate(enemy, room, tilemap) {
+  simulate(enemy, room, serverlogic) {
     /* eslint no-param-reassign: "off"*/
     switch (enemy.type) {
       case 'dummy': {
@@ -20,7 +20,7 @@ module.exports = {
       }
       case 'wandering': {
         enemy.simulations++;
-        module.exports.wandering(enemy, room, tilemap);
+        module.exports.wandering(enemy, room, serverlogic);
         break;
       }
       default: {
@@ -28,7 +28,7 @@ module.exports = {
       }
     }
   },
-  wandering(enemy, room) {
+  wandering(enemy, room, serverlogic) {
     // console.log(enemy.state);
     switch (enemy.state) {
       case 0: {
@@ -36,7 +36,7 @@ module.exports = {
         if (enemy.simulations % 10 === 0) {
           if (module.exports.enemylookForTarget(enemy, room)) {
             enemy.state = 1;
-            console.log('returning');
+
             return;
           }
         }
@@ -65,9 +65,9 @@ module.exports = {
         const arrayPosYE = Math.floor(enemy.shape.pos.y / 64);
         const arrayPosXT = Math.floor(enemy.target.shape.pos.x / 64);
         const arrayPosYT = Math.floor(enemy.target.shape.pos.y / 64);
-        let finder = new PF.AStarFinder();
-        let grid = new PF.Grid(terrainCollision.getMapClone(room));
-        let path = finder.findPath(arrayPosXE, arrayPosYE, arrayPosXT, arrayPosYT, grid);
+        const finder = new PF.AStarFinder();
+        const grid = new PF.Grid(terrainCollision.getMapClone(room));
+        const path = finder.findPath(arrayPosXE, arrayPosYE, arrayPosXT, arrayPosYT, grid);
 
         // console.log(path);
 
@@ -75,27 +75,21 @@ module.exports = {
           enemy.moveTarget = { x: (path[0][0] * 64) + 32, y: (path[0][1] * 64) + 32 };
         }
         if (path.length > 1) {
-          if (arrayPosXE === path[0][0] && arrayPosYE === path[0][1]){
+          if (arrayPosXE === path[0][0] && arrayPosYE === path[0][1]) {
             enemy.moveTarget = { x: (path[1][0] * 64) + 32, y: (path[1][1] * 64) + 32 };
           } else {
             enemy.moveTarget = { x: (path[0][0] * 64) + 32, y: (path[0][1] * 64) + 32 };
           }
-
         }
         if (path === undefined || path.length === 0) {
           enemy.moveTarget = undefined;
         }
+
+        // module.exports.enemylookForTarget(enemy, room);
         // Shoot at target
 
         if (enemy.target !== undefined) {
-          const timeDiff = new Date().getTime() - enemy.lastShotTime;
-          const shootSpeed = enemy.stats.dexterity * 10
-          if (timeDiff > shootSpeed) {
-            enemy.lastShotTime = new Date().getTime();
-
-            module.exports.shootProjectiles(enemy);
-          }
-
+          module.exports.tryToShootProjectiles(enemy, room, serverlogic);
         }
 
         break;
@@ -105,11 +99,23 @@ module.exports = {
       }
     }
   },
+  tryToShootProjectiles(enemy, room, serverlogic) {
+    for (let i = 0; i < enemy.projectiles.length; i++) {
+      const currentProjectile = enemy.projectiles[i];
+      const thisTime = new Date().getTime();
+      const projectileTime = currentProjectile.lastShotTime + currentProjectile.cooldown;
+      // console.log(projectileTime);
+      // console.log(thisTime);
+      if (projectileTime < thisTime) {
+        module.exports.shootProjectile(enemy, i, room, serverlogic);
+        currentProjectile.lastShotTime = thisTime;
+      }
+    }
+  },
   enemylookForTarget(enemy, room) {
-
     // Go through every player and check if they are in radius
-    for(var i = 0; i < room.players.length; i++) {
-      let currentCheckedPlayer = room.players[i];
+    for (let i = 0; i < room.players.length; i++) {
+      const currentCheckedPlayer = room.players[i];
       const circle = new SAT.Circle(new SAT.Vector(enemy.x + (enemy.shape.w / 2), enemy.y + (enemy.shape.h / 2)), 100);
       if (currentCheckedPlayer.shape !== undefined && SAT.testPolygonCircle(currentCheckedPlayer.shape.toPolygon(), circle)) {
         enemy.target = currentCheckedPlayer;
@@ -120,7 +126,7 @@ module.exports = {
     return false;
   },
 
-  shootProjectiles(enemy, index, room){
+  shootProjectile(enemy, index, room, serverlogic) {
     // Calculate the angle between the two
     const angle = SF.angleBetweenTwoPoints(enemy.shape.pos, enemy.target.shape.pos);
 
@@ -129,7 +135,7 @@ module.exports = {
     projectile.team = 2;
     projectile.path = enemy.projectiles[index].path;
     projectile.speed = enemy.projectiles[index].speed;
-    projectile.guid = FS.guid();
+    projectile.guid = SF.guid();
     projectile.collideToTerrain = enemy.projectiles[index].collideToTerrain;
     projectile.angle = angle;
     projectile.maxTravelDistance = enemy.projectiles[index].maxTravelDistance;
@@ -137,5 +143,6 @@ module.exports = {
     projectile.damage = enemy.projectiles[index].damage;
     projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y), 2, 2);
 
+    serverlogic.addProjectileToGame(projectile, room.name);
   },
 };

@@ -10,7 +10,6 @@
  - simulations: INTEGER
  - moveTarget: {x, y}
  - target: player / gameobjects
- - lastShotTime: INTEGER
  - lastBroadCastedPosition: {x, y}
  - hash: STRING
  - projectileType: STRING
