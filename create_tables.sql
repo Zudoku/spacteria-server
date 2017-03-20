@@ -1,15 +1,15 @@
-CREATE TABLE User
+CREATE TABLE gameuser
 (
 uniqueid SERIAL,
 joined TIMESTAMP NOT NULL,
 username varchar(60) NOT NULL,
 password varchar(60) NOT NULL,
-email varchar(60) NOT NULL,
+email varchar(100) NOT NULL,
 PRIMARY KEY(uniqueid),
 UNIQUE(username)
 );
 
-CREATE TABLE Sessiontoken
+CREATE TABLE gamesessiontoken
 (
 uniqueid SERIAL,
 userid INTEGER REFERENCES User(uniqueid),
@@ -18,7 +18,7 @@ expires TIMESTAMP,
 PRIMARY KEY(uniqueid)
 );
 
-CREATE TABLE Character
+CREATE TABLE gamecharacter
 (
 uniqueid SERIAL,
 userid INTEGER REFERENCES User(uniqueid),
@@ -31,7 +31,7 @@ PRIMARY KEY(uniqueid),
 UNIQUE(name)
 );
 
-CREATE TABLE Equipment
+CREATE TABLE gameequipment
 (
 
 );
