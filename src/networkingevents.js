@@ -6,6 +6,9 @@ module.exports = {
     ROOMLIST_REQUEST: 'roomlist',
     UPDATE_POSITION: 'updateposition',
     SPAWN_PROJECTILE: 'spawnprojectile',
+    CREATE_CHARACTER: 'createcharacter',
+    LOAD_CHARACTER: 'loadcharacter',
+    DELETE_CHARACTER: 'deletecharacter',
   },
   outgoing: {
     SEND_ROOMLIST: 'displayroomlist',
@@ -18,5 +21,6 @@ module.exports = {
     DESPAWN_PROJECTILE: 'despawnprojectile',
     REFRESH_ROOM_DESCRIPTION: 'refreshroomdesc',
     UPDATE_NPC_POSITION: 'correctnpcposition',
+
   },
 };

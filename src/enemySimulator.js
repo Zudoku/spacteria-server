@@ -3,6 +3,11 @@ const SAT = require('sat');
 const terrainCollision = require('./terraincollision.js');
 const SF = require('./staticFuncs.js');
 
+
+
+const NO_TARGET_FOUND = 0;
+const TARGET_FOUND = 1;
+
 function getRandomIntInclusive(min, max) {
   /* eslint no-mixed-operators: "off"*/
   min = Math.ceil(min);
@@ -31,7 +36,7 @@ module.exports = {
   wandering(enemy, room, serverlogic) {
     // console.log(enemy.state);
     switch (enemy.state) {
-      case 0: {
+      case NO_TARGET_FOUND: {
         /* eslint no-mixed-operators: "off"*/
         if (enemy.simulations % 10 === 0) {
           if (module.exports.enemylookForTarget(enemy, room)) {
@@ -59,7 +64,7 @@ module.exports = {
         }
         break;
       }
-      case 1: {
+      case TARGET_FOUND: {
         // Move towards target
         const arrayPosXE = Math.floor(enemy.shape.pos.x / 64);
         const arrayPosYE = Math.floor(enemy.shape.pos.y / 64);
@@ -128,6 +133,7 @@ module.exports = {
 
   shootProjectile(enemy, index, room, serverlogic) {
     // Calculate the angle between the two
+    // TODO: add the option to shoot multiple projectiles with one shot, like a shotgun
     const angle = SF.angleBetweenTwoPoints(enemy.shape.pos, enemy.target.shape.pos);
 
     const projectile = { x: enemy.x, y: enemy.y, deltaX: 0, deltaY: 0 };

@@ -4,13 +4,15 @@ const worldContainer = require('./worldContainer.js');
 
 let ioref;
 
+const SIMULATION_INTERVAL = 1000 / 60;
+
 
 module.exports = {
   init(io) {
     ioref = io;
     worldSimulator.initialize(this);
 
-    setInterval(module.exports.callSimulation, 1000 / 60);
+    setInterval(module.exports.callSimulation, SIMULATION_INTERVAL);
 
     io.on('connection', (socket) => {
       socket.on(evts.incoming.IDENTIFY, (identifyInfo) => {
