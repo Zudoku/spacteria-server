@@ -1,17 +1,24 @@
 const evts = require('./networkingevents.js');
 const worldSimulator = require('./worldSimulator.js');
 const worldContainer = require('./worldContainer.js');
+const userlogin = require('./db/userlogin.js');
 
 let ioref;
 
 const SIMULATION_INTERVAL = 1000 / 60;
 
+let connectedUsers = {};
+
+isString (oobj) => {
+  return (oobj !== undefined && typeof oobj === 'string');
+}
 
 module.exports = {
   init(io) {
     ioref = io;
     worldSimulator.initialize(this);
 
+    //Simulate worlds
     setInterval(module.exports.callSimulation, SIMULATION_INTERVAL);
 
     io.on('connection', (socket) => {
@@ -20,9 +27,21 @@ module.exports = {
           return;
         }
         if (identifyInfo.type === 'game-client') {
+          if (!isString(identifyInfo.username) || !isString(identifyInfo.password)) {
+            return;
+          }
+          userlogin.login(identifyInfo.username, identifyInfo.password).then((result) => {
+            if(result.success) {
+              connectedUsers[socket.id] = result.uniqueid;
+              socket.emit(evts.outgoing.LOGIN_SUCCESS, {});
+            } else {
+              socket.emit(evts.outgoing.LOGIN_FAIL, { reason: result.msg });
+            }
+          });
+          /**
           worldContainer.addPlayer(socket.id, identifyInfo.player);
           socket.emit(evts.outgoing.SEND_ROOMLIST, worldContainer.getRooms());
-          module.exports.updateObservers();
+          module.exports.updateObservers(); **/
         }
         if (identifyInfo.type === 'browser') {
           const serializedRooms = worldContainer.getRooms().map(obj =>
@@ -35,7 +54,7 @@ module.exports = {
       });
 
       socket.on(evts.incoming.MAKE_NEW_ROOM, () => {
-        if (module.exports.checkIfIdentified(socket.id)
+        if (module.exports.checkIfPlayerSelected(socket.id)
         && !module.exports.checkIfInRoom(socket.id)) {
           const currentPlayer = worldContainer.getPlayers()[socket.id];
           const generatedRoom = worldContainer.makeRoom(currentPlayer);
@@ -58,7 +77,7 @@ module.exports = {
         socket.emit(evts.outgoing.SEND_ROOMLIST, worldContainer.getRooms());
       });
       socket.on(evts.incoming.ASK_TO_JOIN_GAME, (args) => {
-        if (module.exports.checkIfIdentified(socket.id)
+        if (module.exports.checkIfPlayerSelected(socket.id)
          && !module.exports.checkIfInRoom(socket.id)) {
           const currentPlayer = worldContainer.getPlayers()[socket.id];
           const foundRoom = worldContainer.getRooms().find(x => x.name === args.name);
@@ -80,8 +99,7 @@ module.exports = {
       });
 
       socket.on(evts.incoming.UPDATE_POSITION, (payload) => {
-        if (module.exports.checkIfIdentified(socket.id)
-         && module.exports.checkIfInRoom(socket.id)) {
+        if (module.exports.checkIfInRoom(socket.id)) {
           const currentPlayer = worldContainer.getPlayers()[socket.id];
           worldContainer.updatePlayerPosition(currentPlayer, payload.x, payload.y);
           socket.broadcast.to(currentPlayer.room)
@@ -93,7 +111,7 @@ module.exports = {
       });
 
       socket.on(evts.incoming.SPAWN_PROJECTILE, (payload) => {
-        if (module.exports.checkIfIdentified(socket.id)
+        if (module.exports.checkIfPlayerSelected(socket.id)
          && module.exports.checkIfInRoom(socket.id)) {
           const currentPlayer = worldContainer.getPlayers()[socket.id];
           const projectile = worldContainer.playerAttack(currentPlayer, payload);
@@ -107,24 +125,33 @@ module.exports = {
       socket.on('disconnect', () => {
         const disconnectedId = socket.id;
         const disconnectedPlayer = worldContainer.getPlayers()[disconnectedId];
-        if (module.exports.checkIfIdentified(disconnectedId) && module.exports.checkIfInRoom(disconnectedId)) {
-          const disconnectionRoom = worldContainer.getRooms().find(x => x.players.indexOf(disconnectedPlayer) !== -1);
-          worldContainer.removePlayerFromRoom(disconnectedPlayer, disconnectionRoom);
-          if (disconnectionRoom.players.length === 0) {
-            worldContainer.removeRoom(disconnectionRoom);
-          } else {
-            ioref.to(disconnectionRoom.name).emit(evts.outgoing.PLAYER_LEFT_YOUR_GAME, { id: disconnectedId });
+        if (module.exports.checkIfIdentified(disconnectedId) ) {
+          if (module.exports.checkIfPlayerSelected(disconnectedId)) {
+            if (module.exports.checkIfInRoom(disconnectedId)) {
+              const disconnectionRoom = worldContainer.getRooms().find(x => x.players.indexOf(disconnectedPlayer) !== -1);
+              worldContainer.removePlayerFromRoom(disconnectedPlayer, disconnectionRoom);
+              if (disconnectionRoom.players.length === 0) {
+                worldContainer.removeRoom(disconnectionRoom);
+              } else {
+                ioref.to(disconnectionRoom.name).emit(evts.outgoing.PLAYER_LEFT_YOUR_GAME, { id: disconnectedId });
+              }
+            }
+            worldContainer.removePlayer(disconnectedPlayer);
           }
+          module.exports.removeIdentification(disconnectedId);
         }
         module.exports.updateObservers();
       });
     });
   },
   checkIfIdentified(socketId) {
-    return (worldContainer.getPlayers()[socketId] !== undefined);
+    return (connectedUsers[socketId] !== undefined);
+  },
+  checkIfPlayerSelected(socketId) {
+    return checkIfIdentified(socketId) && (worldContainer.getPlayers()[socketId] !== undefined);
   },
   checkIfInRoom(socketId) {
-    return (module.exports.checkIfIdentified(socketId) && worldContainer.getPlayers()[socketId].room.length !== 0);
+    return (module.exports.checkIfPlayerSelected(socketId) && worldContainer.getPlayers()[socketId].room.length !== 0);
   },
   updateObservers() {
     const serializedRooms = worldContainer.getRooms();
@@ -147,6 +174,9 @@ module.exports = {
     const foundRoom = worldContainer.getRooms().find(x => x.name === roomname);
     foundRoom.projectiles.push(projectileObject);
     ioref.to(roomname).emit(evts.outgoing.SPAWN_PROJECTILE, { projectile: projectileObject });
+  },
+  removeIdentification(socketId) {
+    delete connectedUsers[socketId];
   },
 
 };

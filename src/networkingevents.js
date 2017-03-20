@@ -21,6 +21,8 @@ module.exports = {
     DESPAWN_PROJECTILE: 'despawnprojectile',
     REFRESH_ROOM_DESCRIPTION: 'refreshroomdesc',
     UPDATE_NPC_POSITION: 'correctnpcposition',
+    LOGIN_SUCCESS: 'loginsuccess',
+    LOGIN_FAIL: 'loginfail',
 
   },
 };

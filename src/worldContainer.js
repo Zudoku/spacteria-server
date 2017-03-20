@@ -70,6 +70,9 @@ module.exports = {
     room.players.splice(room.players.indexOf(player), 1);
     delete players[player.id];
   },
+  removePlayer(player) {
+    delete players[player.id];
+  },
   updatePlayerPosition(player, nx, ny) {
     /* eslint no-param-reassign: "off"*/
     player.x = nx;
