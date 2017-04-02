@@ -3,14 +3,14 @@ const dbHandler = require('./databaseHandler.js');
 module.exports = {
   login(username, password) {
     return new Promise((resolve) => {
-      dbHandler.then((connection) => {
+      dbHandler.getConnection().then((connection) => {
         if (connection.err) {
           resolve({ success: false });
         }
         connection.client.query('SELECT * FROM gameuser WHERE username = $1 AND password = $2', [username, password], (err, result) => {
           connection.done(err);
           if (err) {
-            resolve({ success: false });
+            resolve({ success: false, msg: 'DB connection error' });
           }
           if (result.rows.length <= 0) {
             resolve({ success: false, msg: 'Wrong user / pass' });
