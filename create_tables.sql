@@ -23,7 +23,7 @@ CREATE TABLE gamecharacter
 uniqueid SERIAL,
 userid INTEGER REFERENCES Gameuser(uniqueid),
 name varchar(60),
-class INTEGER NOT NULL,
+cclass INTEGER NOT NULL,
 level INTEGER NOT NULL,
 experience INTEGER NOT NULL,
 created TIMESTAMP NOT NULL,

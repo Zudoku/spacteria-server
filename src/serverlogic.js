@@ -2,23 +2,25 @@ const evts = require('./networkingevents.js');
 const worldSimulator = require('./worldSimulator.js');
 const worldContainer = require('./worldContainer.js');
 const userlogin = require('./db/userlogin.js');
+const characters = require('./db/characters.js');
 
 let ioref;
 
 const SIMULATION_INTERVAL = 1000 / 60;
 
-let connectedUsers = {};
+const connectedUsers = {};
 
-isString (oobj) => {
+function isString(oobj) {
   return (oobj !== undefined && typeof oobj === 'string');
 }
+
 
 module.exports = {
   init(io) {
     ioref = io;
     worldSimulator.initialize(this);
 
-    //Simulate worlds
+    // Simulate worlds
     setInterval(module.exports.callSimulation, SIMULATION_INTERVAL);
 
     io.on('connection', (socket) => {
@@ -31,7 +33,7 @@ module.exports = {
             return;
           }
           userlogin.login(identifyInfo.username, identifyInfo.password).then((result) => {
-            if(result.success) {
+            if (result.success) {
               connectedUsers[socket.id] = result.uniqueid;
               socket.emit(evts.outgoing.LOGIN_SUCCESS, {});
             } else {
@@ -47,7 +49,7 @@ module.exports = {
           const serializedRooms = worldContainer.getRooms().map(obj =>
             module.exports.serilializeRoom(obj)
           );
-          const payload = { rooms: serializedRooms, players: worldContainer.getCurrentPlayers() };
+          const payload = { connections: connectedUsers, rooms: serializedRooms, characters: worldContainer.getPlayers() };
           socket.emit(evts.outgoing.OBSERVER_SEND_INFO, payload);
           socket.join('observers');
         }
@@ -70,6 +72,26 @@ module.exports = {
           });
         } else {
           return;
+        }
+      });
+
+      socket.on(evts.incoming.CHARACTERLIST_REQUEST, () => {
+        if (module.exports.checkIfIdentified(socket.id)) {
+          characters.listCharacters(connectedUsers[socket.id]).then((charsObj) => {
+            if (charsObj.success) {
+              socket.emit(evts.outgoing.SEND_CHARACTERLIST, { chars: charsObj.characters });
+            } else {
+              console.log(charsObj.msg);
+            }
+          });
+        } else {
+          return;
+        }
+      });
+      socket.on(evts.incoming.LOAD_CHARACTER, (args) => {
+        if (module.exports.checkIfIdentified(socket.id) && !module.exports.checkIfPlayerSelected(socket.id)) {
+          const charID = args.charID;
+          // TODO:
         }
       });
 
@@ -125,7 +147,7 @@ module.exports = {
       socket.on('disconnect', () => {
         const disconnectedId = socket.id;
         const disconnectedPlayer = worldContainer.getPlayers()[disconnectedId];
-        if (module.exports.checkIfIdentified(disconnectedId) ) {
+        if (module.exports.checkIfIdentified(disconnectedId)) {
           if (module.exports.checkIfPlayerSelected(disconnectedId)) {
             if (module.exports.checkIfInRoom(disconnectedId)) {
               const disconnectionRoom = worldContainer.getRooms().find(x => x.players.indexOf(disconnectedPlayer) !== -1);
@@ -148,7 +170,7 @@ module.exports = {
     return (connectedUsers[socketId] !== undefined);
   },
   checkIfPlayerSelected(socketId) {
-    return checkIfIdentified(socketId) && (worldContainer.getPlayers()[socketId] !== undefined);
+    return module.exports.checkIfIdentified(socketId) && (worldContainer.getPlayers()[socketId] !== undefined);
   },
   checkIfInRoom(socketId) {
     return (module.exports.checkIfPlayerSelected(socketId) && worldContainer.getPlayers()[socketId].room.length !== 0);

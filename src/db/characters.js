@@ -11,7 +11,7 @@ module.exports = {
           connection.done(err);
           if (err) {
             resolve({ success: false, msg: 'DB error' });
-          }else {
+          } else {
             resolve({ success: true, characters: result.rows });
           }
         });
