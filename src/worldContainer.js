@@ -18,8 +18,7 @@ module.exports = {
     const userInstance = {
       id: socketID,
       room: '',
-      charactername: playerInfo.charactername,
-      characterClass: playerInfo.characterClass,
+      characterdata: playerInfo,
       x: 128,
       y: 128,
     };

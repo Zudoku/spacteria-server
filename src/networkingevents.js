@@ -6,14 +6,13 @@ module.exports = {
     ROOMLIST_REQUEST: 'roomlist',
     UPDATE_POSITION: 'updateposition',
     SPAWN_PROJECTILE: 'spawnprojectile',
-    CHARACTERLIST_REQUEST: 'characterlist',
+    LIST_CHARACTERS: 'listcharacters',
     CREATE_CHARACTER: 'createcharacter',
     LOAD_CHARACTER: 'loadcharacter',
     DELETE_CHARACTER: 'deletecharacter',
   },
   outgoing: {
     SEND_ROOMLIST: 'displayroomlist',
-    SEND_CHARACTERLIST: 'displaycharacterlist',
     JOIN_ROOM: 'joinroom',
     PLAYER_JOINED_YOUR_GAME: 'playerjoin',
     PLAYER_LEFT_YOUR_GAME: 'playerleft',
@@ -25,7 +24,7 @@ module.exports = {
     UPDATE_NPC_POSITION: 'correctnpcposition',
     LOGIN_SUCCESS: 'loginsuccess',
     LOGIN_FAIL: 'loginfail',
-    CHARACTER_LOADED: 'charloaded',
+    CHARACTER_LOAD_SUCCESSFUL : 'charloadsuccess',
 
   },
 };

@@ -23,8 +23,7 @@
  - x: DOUBLE
  - y: DOUBLE
  - room: STRING
- - charactername: STRING
- - characterClass: STRING
+ - characterdata: db {}
 
 
 ## Projectile
