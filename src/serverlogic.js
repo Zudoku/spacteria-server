@@ -2,15 +2,15 @@ const evts = require('./networkingevents.js');
 const worldSimulator = require('./worldSimulator.js');
 const worldContainer = require('./worldContainer.js');
 const userlogin = require('./db/userlogin.js');
-const characters = require('./db/characters.js')
+const characters = require('./db/characters.js');
 
 let ioref;
 
 const SIMULATION_INTERVAL = 1000 / 60;
 
-let connectedUsers = {};
+const connectedUsers = {};
 
-function isString (oobj) {
+function isString(oobj) {
   return (oobj !== undefined && typeof oobj === 'string');
 }
 
@@ -19,7 +19,7 @@ module.exports = {
     ioref = io;
     worldSimulator.initialize(this);
 
-    //Simulate worlds
+    // Simulate worlds
     setInterval(module.exports.callSimulation, SIMULATION_INTERVAL);
 
     io.on('connection', (socket) => {
@@ -32,7 +32,7 @@ module.exports = {
             return;
           }
           userlogin.login(identifyInfo.username, identifyInfo.password).then((result) => {
-            if(result.success) {
+            if (result.success) {
               connectedUsers[socket.id] = result.uniqueid;
               socket.emit(evts.outgoing.LOGIN_SUCCESS, {});
             } else {
@@ -56,13 +56,12 @@ module.exports = {
         if (module.exports.checkIfIdentified(socket.id)
         && !module.exports.checkIfPlayerSelected(socket.id)) {
           const characterID = payload.charID;
-          let character = undefined;
           characters.getCharacter(characterID).then((characterinfo) => {
-            if(characterinfo.success){
+            if (characterinfo.success) {
               const character = characterinfo.character;
-              if(module.exports.checkPlayerOwnsCharacter(socket.id, character)){
-                  worldContainer.addPlayer(socket.id, character);
-                  socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL,{});
+              if (module.exports.checkPlayerOwnsCharacter(socket.id, character)) {
+                worldContainer.addPlayer(socket.id, character);
+                socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL, {});
               } else {
                 return;
               }
@@ -97,17 +96,17 @@ module.exports = {
 
       socket.on(evts.incoming.CHARACTERLIST_REQUEST, () => {
         if (module.exports.checkIfIdentified(socket.id)) {
-           characters.listCharacters(connectedUsers[socket.id]).then((charsObj) => {
-             if (charsObj.success) {
-               socket.emit(evts.outgoing.SEND_CHARACTERLIST, { chars: charsObj.characters });
-             } else {
-               console.log(charsObj.msg);
-             }
-           });
-         } else {
-           return;
-         }
-       });
+          characters.listCharacters(connectedUsers[socket.id]).then((charsObj) => {
+            if (charsObj.success) {
+              socket.emit(evts.outgoing.SEND_CHARACTERLIST, { chars: charsObj.characters });
+            } else {
+              console.log(charsObj.msg);
+            }
+          });
+        } else {
+          return;
+        }
+      });
 
       socket.on(evts.incoming.ROOMLIST_REQUEST, () => {
         socket.emit(evts.outgoing.SEND_ROOMLIST, worldContainer.getRooms());
@@ -161,7 +160,7 @@ module.exports = {
       socket.on('disconnect', () => {
         const disconnectedId = socket.id;
         const disconnectedPlayer = worldContainer.getPlayers()[disconnectedId];
-        if (module.exports.checkIfIdentified(disconnectedId) ) {
+        if (module.exports.checkIfIdentified(disconnectedId)) {
           if (module.exports.checkIfPlayerSelected(disconnectedId)) {
             if (module.exports.checkIfInRoom(disconnectedId)) {
               const disconnectionRoom = worldContainer.getRooms().find(x => x.players.indexOf(disconnectedPlayer) !== -1);
@@ -190,7 +189,7 @@ module.exports = {
     return (module.exports.checkIfPlayerSelected(socketId) && worldContainer.getPlayers()[socketId].room.length !== 0);
   },
   checkPlayerOwnsCharacter(socketId, character) {
-    return (connectedUsers[socketId] == character.userid);
+    return (connectedUsers[socketId] === character.userid);
   },
   updateObservers() {
     const serializedRooms = worldContainer.getRooms();
@@ -214,8 +213,8 @@ module.exports = {
     foundRoom.projectiles.push(projectileObject);
     ioref.to(roomname).emit(evts.outgoing.SPAWN_PROJECTILE, { projectile: projectileObject });
   },
-  broadcastLootBagToGame(lootbagObject, hash, room, xa, ya) {
-    const payload = { lootbag: lootbagObject, guid: hash, x: xa, y: ya };
+  broadcastLootBagToGame(lootbagObject, hash, room) {
+    const payload = { lootbag: lootbagObject, guid: hash };
     console.log(payload);
     console.log(payload.lootbag);
     ioref.to(room.name).emit(evts.outgoing.SPAWN_LOOTBAG, payload);

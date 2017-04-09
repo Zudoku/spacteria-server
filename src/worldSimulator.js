@@ -234,7 +234,6 @@ module.exports = {
     // Kill it from the server
     const index = room.enemies.indexOf(target);
     if (index !== -1) {
-
       room.enemies.splice(index, 1);
       serverlogic.removeGameobject(target.hash, room);
       // Roll the loot
@@ -244,44 +243,43 @@ module.exports = {
     } else {
       // WTF?
     }
-
   },
   spawnLoot(lootTable, room, x, y) {
-    let lootContents = [];
-    let lootPromises = [];
+    const lootContents = [];
+    const lootPromises = [];
     let lootQuality = 1;
-    for(let i = 0; i < lootTable.length; i++){
+    for (let i = 0; i < lootTable.length; i++) {
       const roll = lootTable[i];
-      //Roll the dice on if we should roll this container
+      // Roll the dice on if we should roll this container
       const diceRoll = SF.getRandomIntInclusive(1, roll.chance);
-      if(diceRoll == 1) {
-        //Roll the container
-        const containerIndex = SF.getRandomIntInclusive(0, roll.items.length -1);
+      if (diceRoll === 1) {
+        // Roll the container
+        const containerIndex = SF.getRandomIntInclusive(0, roll.items.length - 1);
         const loot = roll.items[containerIndex];
-        if(loot.id < 0){
-          const addedLoot = { uniqueid : loot.id, amount: loot.amount };
+        if (loot.id < 0) {
+          const addedLoot = { uniqueid: loot.id, amount: loot.amount };
           lootContents.push(addedLoot);
         } else {
-          const lootPromise = { promise: itemHandler.getItem(loot.id), id: loot.id, amount: loot.amount};
+          const lootPromise = { promise: itemHandler.getItem(loot.id), id: loot.id, amount: loot.amount };
           lootPromises.push(lootPromise);
         }
       }
     }
 
-    //Promises
-    Promise.all(lootPromises.map((x) => {
-      return x.promise
+    // Promises
+    Promise.all(lootPromises.map((u) => {
+      return u.promise;
     })).then((data) => {
-      for(let index = 0; index < data.length; index++){
+      for (let index = 0; index < data.length; index++) {
         const result = data[index];
-        if(!result.success) {
+        if (!result.success) {
           console.log('WTF');
         } else {
           const lootItem = result.item;
-          if(lootItem.rarity > lootQuality){
+          if (lootItem.rarity > lootQuality) {
             lootQuality = lootItem.rarity;
           }
-          const origPromise = lootPromises.find( z => z.id === lootItem.uniqueid);
+          const origPromise = lootPromises.find(z => z.id === lootItem.uniqueid);
           const addedLoot = { uniqueid: lootItem.uniqueid, data: lootItem, amount: origPromise.amount };
           lootContents.push(addedLoot);
         }
@@ -291,15 +289,16 @@ module.exports = {
         type: 1,
         lootbag: {
           quality: lootQuality,
-          items: lootContents
+          items: lootContents,
+          x,
+          y,
         },
-        x: x,
-        y: y,
-        hash: SF.guid()
+        x,
+        y,
+        hash: SF.guid(),
       };
       room.gameobjects.push(lootBag);
-      serverlogic.broadcastLootBagToGame(lootBag.lootbag, lootBag.hash, room, x, y);
-
+      serverlogic.broadcastLootBagToGame(lootBag.lootbag, lootBag.hash, room);
     });
   },
   checkIfBroadcastNPC(enemy, room) {
