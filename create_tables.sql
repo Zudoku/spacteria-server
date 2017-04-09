@@ -47,15 +47,15 @@ PRIMARY KEY(uniqueid)
 
 CREATE TABLE gameitemattribute
 (
-itemid INTEGER REFERENCES Gameitem(uniqueid),
+itemid INTEGER REFERENCES gameitem(uniqueid),
 attributeid INTEGER NOT NULL,
 attributevalue INTEGER NOT NULL
 );
 
 CREATE TABLE gameequipment
 (
-characterid INTEGER REFERENCES Gamecharacter(uniqueid),
-itemid INTEGER REFERENCES Gameitem(uniqueid)
+characterid INTEGER REFERENCES gamecharacter(uniqueid),
+itemid INTEGER REFERENCES gameitem(uniqueid)
 );
 
 CREATE TABLE gameinventory

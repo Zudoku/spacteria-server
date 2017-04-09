@@ -5,6 +5,7 @@ const enemies = require('./enemies.js');
 const enemySimulator = require('./enemySimulator.js');
 const terrainCollision = require('./terraincollision.js');
 const SF = require('./staticFuncs.js');
+const itemHandler = require('./db/items.js');
 
 let serverlogic;
 const DELTA = 1000 / 60;
@@ -187,7 +188,7 @@ module.exports = {
       for (let i = 0; i < room.enemies.length; i++) {
         const foundEnemy = room.enemies[i];
         if (SAT.testPolygonPolygon(target.shape.toPolygon(), foundEnemy.shape.toPolygon())) {
-          module.exports.takeDamage(foundEnemy, 'enemy', target.damage);
+          module.exports.takeDamage(foundEnemy, 'enemy', target.damage, room);
           return true;
         }
       }
@@ -196,7 +197,7 @@ module.exports = {
       for (let i = 0; i < room.players.length; i++) {
         const foundPlayer = room.players[i];
         if (SAT.testPolygonPolygon(target.shape.toPolygon(), foundPlayer.shape.toPolygon())) {
-          module.exports.takeDamage(foundPlayer, 'player', target.damage);
+          module.exports.takeDamage(foundPlayer, 'player', target.damage, room);
           return true;
         }
       }
@@ -204,9 +205,12 @@ module.exports = {
     }
     return false;
   },
-  takeDamage(target, type, damage) {
+  takeDamage(target, type, damage, room) {
     if (type === 'enemy') {
       target.stats.health -= damage;
+      if (target.stats.health <= 0) {
+        module.exports.npcDie(target, room);
+      }
     } else if (type === 'player') {
       target.stats.health -= damage;
     }
@@ -224,7 +228,79 @@ module.exports = {
       room.projectiles.splice(index, 1);
     }
     // Send remove event
-    serverlogic.removeProjectile(target.guid, room);
+    serverlogic.removeGameobject(target.guid, room);
+  },
+  npcDie(target, room) {
+    // Kill it from the server
+    const index = room.enemies.indexOf(target);
+    if (index !== -1) {
+
+      room.enemies.splice(index, 1);
+      serverlogic.removeGameobject(target.hash, room);
+      // Roll the loot
+      module.exports.spawnLoot(target.loot, room, target.x, target.y);
+      // Give EXP
+      // TODO:
+    } else {
+      // WTF?
+    }
+
+  },
+  spawnLoot(lootTable, room, x, y) {
+    let lootContents = [];
+    let lootPromises = [];
+    let lootQuality = 1;
+    for(let i = 0; i < lootTable.length; i++){
+      const roll = lootTable[i];
+      //Roll the dice on if we should roll this container
+      const diceRoll = SF.getRandomIntInclusive(1, roll.chance);
+      if(diceRoll == 1) {
+        //Roll the container
+        const containerIndex = SF.getRandomIntInclusive(0, roll.items.length -1);
+        const loot = roll.items[containerIndex];
+        if(loot.id < 0){
+          const addedLoot = { uniqueid : loot.id, amount: loot.amount };
+          lootContents.push(addedLoot);
+        } else {
+          const lootPromise = { promise: itemHandler.getItem(loot.id), id: loot.id, amount: loot.amount};
+          lootPromises.push(lootPromise);
+        }
+      }
+    }
+
+    //Promises
+    Promise.all(lootPromises.map((x) => {
+      return x.promise
+    })).then((data) => {
+      for(let index = 0; index < data.length; index++){
+        const result = data[index];
+        if(!result.success) {
+          console.log('WTF');
+        } else {
+          const lootItem = result.item;
+          if(lootItem.rarity > lootQuality){
+            lootQuality = lootItem.rarity;
+          }
+          const origPromise = lootPromises.find( z => z.id === lootItem.uniqueid);
+          const addedLoot = { uniqueid: lootItem.uniqueid, data: lootItem, amount: origPromise.amount };
+          lootContents.push(addedLoot);
+        }
+      }
+      // Add the gameobject to the game
+      const lootBag = {
+        type: 1,
+        lootbag: {
+          quality: lootQuality,
+          items: lootContents
+        },
+        x: x,
+        y: y,
+        hash: SF.guid()
+      };
+      room.gameobjects.push(lootBag);
+      serverlogic.broadcastLootBagToGame(lootBag.lootbag, lootBag.hash, room, x, y);
+
+    });
   },
   checkIfBroadcastNPC(enemy, room) {
     const deltaX = Math.abs(enemy.shape.pos.x - enemy.lastBroadCastedPosition.x);

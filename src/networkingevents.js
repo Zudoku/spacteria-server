@@ -9,6 +9,7 @@ module.exports = {
     LIST_CHARACTERS: 'listcharacters',
     CREATE_CHARACTER: 'createcharacter',
     LOAD_CHARACTER: 'loadcharacter',
+    CHARACTERLIST_REQUEST: 'characterlist',
     DELETE_CHARACTER: 'deletecharacter',
   },
   outgoing: {
@@ -19,12 +20,15 @@ module.exports = {
     OBSERVER_SEND_INFO: 'info',
     CORRECT_PLAYER_POSITION: 'correctnpcposition',
     SPAWN_PROJECTILE: 'newprojectilespawned',
-    DESPAWN_PROJECTILE: 'despawnprojectile',
+    SPAWN_LOOTBAG: 'newlootbagspawned',
+    DESPAWN_GAMEOBJECT: 'despawngameobject',
     REFRESH_ROOM_DESCRIPTION: 'refreshroomdesc',
     UPDATE_NPC_POSITION: 'correctnpcposition',
     LOGIN_SUCCESS: 'loginsuccess',
     LOGIN_FAIL: 'loginfail',
     CHARACTER_LOAD_SUCCESSFUL : 'charloadsuccess',
+    SEND_CHARACTERLIST: 'displaycharacterlist',
+
 
   },
 };

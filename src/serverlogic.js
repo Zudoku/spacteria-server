@@ -10,7 +10,7 @@ const SIMULATION_INTERVAL = 1000 / 60;
 
 let connectedUsers = {};
 
-isString (oobj) => {
+function isString (oobj) {
   return (oobj !== undefined && typeof oobj === 'string');
 }
 
@@ -45,10 +45,8 @@ module.exports = {
           module.exports.updateObservers(); **/
         }
         if (identifyInfo.type === 'browser') {
-          const serializedRooms = worldContainer.getRooms().map(obj =>
-            module.exports.serilializeRoom(obj)
-          );
-          const payload = { rooms: serializedRooms, players: worldContainer.getCurrentPlayers() };
+          const serializedRooms = worldContainer.getRooms();
+          const payload = { connections: connectedUsers, rooms: serializedRooms, characters: worldContainer.getPlayers() };
           socket.emit(evts.outgoing.OBSERVER_SEND_INFO, payload);
           socket.join('observers');
         }
@@ -64,7 +62,7 @@ module.exports = {
               const character = characterinfo.character;
               if(module.exports.checkPlayerOwnsCharacter(socket.id, character)){
                   worldContainer.addPlayer(socket.id, character);
-                  socket.emit(CHARACTER_LOAD_SUCCESSFUL,{});
+                  socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL,{});
               } else {
                 return;
               }
@@ -96,6 +94,20 @@ module.exports = {
           return;
         }
       });
+
+      socket.on(evts.incoming.CHARACTERLIST_REQUEST, () => {
+        if (module.exports.checkIfIdentified(socket.id)) {
+           characters.listCharacters(connectedUsers[socket.id]).then((charsObj) => {
+             if (charsObj.success) {
+               socket.emit(evts.outgoing.SEND_CHARACTERLIST, { chars: charsObj.characters });
+             } else {
+               console.log(charsObj.msg);
+             }
+           });
+         } else {
+           return;
+         }
+       });
 
       socket.on(evts.incoming.ROOMLIST_REQUEST, () => {
         socket.emit(evts.outgoing.SEND_ROOMLIST, worldContainer.getRooms());
@@ -172,7 +184,7 @@ module.exports = {
     return (connectedUsers[socketId] !== undefined);
   },
   checkIfPlayerSelected(socketId) {
-    return checkIfIdentified(socketId) && (worldContainer.getPlayers()[socketId] !== undefined);
+    return module.exports.checkIfIdentified(socketId) && (worldContainer.getPlayers()[socketId] !== undefined);
   },
   checkIfInRoom(socketId) {
     return (module.exports.checkIfPlayerSelected(socketId) && worldContainer.getPlayers()[socketId].room.length !== 0);
@@ -185,8 +197,8 @@ module.exports = {
     const payload = { rooms: serializedRooms, players: worldContainer.getPlayers() };
     ioref.to('observers').emit(evts.outgoing.OBSERVER_SEND_INFO, payload);
   },
-  removeProjectile(hash, room) {
-    ioref.to(room.name).emit(evts.outgoing.DESPAWN_PROJECTILE, { id: hash });
+  removeGameobject(hash, room) {
+    ioref.to(room.name).emit(evts.outgoing.DESPAWN_GAMEOBJECT, { id: hash });
   },
   updateNPCPosition(hash, position, room) {
     ioref.to(room.name).emit(evts.outgoing.UPDATE_NPC_POSITION, { id: hash, x: position.x, y: position.y });
@@ -201,6 +213,12 @@ module.exports = {
     const foundRoom = worldContainer.getRooms().find(x => x.name === roomname);
     foundRoom.projectiles.push(projectileObject);
     ioref.to(roomname).emit(evts.outgoing.SPAWN_PROJECTILE, { projectile: projectileObject });
+  },
+  broadcastLootBagToGame(lootbagObject, hash, room, xa, ya) {
+    const payload = { lootbag: lootbagObject, guid: hash, x: xa, y: ya };
+    console.log(payload);
+    console.log(payload.lootbag);
+    ioref.to(room.name).emit(evts.outgoing.SPAWN_LOOTBAG, payload);
   },
   removeIdentification(socketId) {
     delete connectedUsers[socketId];

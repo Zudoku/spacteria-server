@@ -18,4 +18,10 @@ module.exports = {
     }
     return `${s4() + s4()}-${s4()}-${s4()}-${s4()}-${s4()}${s4()}${s4()}`;
   },
+  getRandomIntInclusive(min, max) {
+    /* eslint no-mixed-operators: "off"*/
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  },
 };

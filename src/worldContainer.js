@@ -21,6 +21,9 @@ module.exports = {
       characterdata: playerInfo,
       x: 128,
       y: 128,
+      stats: {
+        health: 100000
+      }
     };
     players[socketID] = userInstance;
     return userInstance;

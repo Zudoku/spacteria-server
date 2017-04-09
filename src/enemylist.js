@@ -16,10 +16,20 @@ module.exports = {
     shape: new SAT.Box(new SAT.Vector(0, 0), 32, 32),
     image: '',
     type: 'wandering',
-    stats: { health: 1000, vitality: 0, strength: 10, dexterity: 10, defence: 1, speed: 50 },
+    stats: { health: 1, vitality: 0, strength: 10, dexterity: 10, defence: 1, speed: 50 },
     collideToTerrain: true,
     state: 0,
     simulations: 0,
     projectiles: [projectileList.basic_projectile(2, 1000)],
+    loot: [
+      {
+        chance: 1,
+        items: [{ id: -1, amount: 200 }]
+      },
+      {
+        chance: 1,
+        items:[{ id: 1, amount: 1 },{ id: 2, amount: 1 },{ id: 3, amount: 1 }]
+      }
+    ],
   },
 };

@@ -13,20 +13,12 @@ const pgconfig = {
 const pool = new pg.Pool(pgconfig);
 
 pool.on('error', (err, client) => {
-  console.error('idle client error', err.message, err.stack, client);
+  console.log('idle client error', err.message, err.stack, client);
 });
 
-/**
-client.query('SELECT $1::int AS number', ['1'], (err, result) => {
-  done(err);
 
-  if (err) {
-    return console.error('', err);
-  }
 
-  console.log(result.rows[0].number);
-});
-**/
+
 
 module.exports = {
   getConnection() {
