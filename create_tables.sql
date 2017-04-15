@@ -64,4 +64,4 @@ characterid INTEGER REFERENCES Gamecharacter(uniqueid),
 itemid INTEGER REFERENCES Gameitem(uniqueid),
 quantity INTEGER NOT NULL,
 slot INTEGER NOT NULL
-):
+);

@@ -30,5 +30,48 @@ module.exports = {
       });
     });
   },
+  getItemsForCharacter(uniqueid) {
+    return new Promise((resolve) => {
+      dbHandler.getConnection().then((connection) => {
+        if (connection.err) {
+          resolve({ success: false });
+        }
+        connection.client.query('SELECT * FROM gameequipment WHERE characterid = $1', [uniqueid], (err, result) => {
+          connection.done(err);
+          if (err) {
+            resolve({ success: false, msg: 'DB error' });
+          } else if(result.rows.length === 0){
+            resolve({ success: true, equipment: [] });
+          } else {
+            let equipmentPromises = [];
+            for(let j = 0; j < result.rows.length; j++){
+              const equipmentSlot = result.rows[j];
+              equipmentPromises.push(module.expors.getItem(equipmentSlot.itemid));
+            }
 
+            Promise.all(equipmentPromises).then((data) => {
+              let equipments = [];
+              for (let index = 0; index < data.length; index++) {
+                const result = data[index];
+                equipments[result.itemtypeid] = result;
+              }
+              resolve({ success: true, equipment: equipments });
+            });
+          }
+        });
+      });
+    });
+  },
+  saveItemsForCharacter(characterid, equipments) {
+
+  },
+  saveOneItemForCharacter(characterid, itemid) {
+
+  },
+  getInventoryForCharacter(uniqueid) {
+
+  },
+  setInventoryForCharacter(characterid, inventoryObj) {
+
+  },
 };

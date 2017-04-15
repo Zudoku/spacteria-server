@@ -3,6 +3,7 @@ const worldSimulator = require('./worldSimulator.js');
 const worldContainer = require('./worldContainer.js');
 const userlogin = require('./db/userlogin.js');
 const characters = require('./db/characters.js');
+const items = require('./db/items.js');
 
 let ioref;
 
@@ -60,8 +61,16 @@ module.exports = {
             if (characterinfo.success) {
               const character = characterinfo.character;
               if (module.exports.checkPlayerOwnsCharacter(socket.id, character)) {
-                worldContainer.addPlayer(socket.id, character);
-                socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL, {});
+                items.getItemsForCharacter(characterID).then((itemdata) => {
+                  if(itemdata.success){
+                    character.equipment = itemdata.equipment;
+                    worldContainer.addPlayer(socket.id, character);
+                    socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL, {});
+                  } else {
+                    console.log(itemdata);
+                    return;
+                  }
+                });
               } else {
                 return;
               }
@@ -215,8 +224,6 @@ module.exports = {
   },
   broadcastLootBagToGame(lootbagObject, hash, room) {
     const payload = { lootbag: lootbagObject, guid: hash };
-    console.log(payload);
-    console.log(payload.lootbag);
     ioref.to(room.name).emit(evts.outgoing.SPAWN_LOOTBAG, payload);
   },
   removeIdentification(socketId) {
