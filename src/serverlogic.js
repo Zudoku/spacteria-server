@@ -61,11 +61,16 @@ module.exports = {
             if (characterinfo.success) {
               const character = characterinfo.character;
               if (module.exports.checkPlayerOwnsCharacter(socket.id, character)) {
-                items.getItemsForCharacter(characterID).then((itemdata) => {
-                  if(itemdata.success){
-                    character.equipment = itemdata.equipment;
+                Promise.all([
+                  items.getItemsForCharacter(characterID),
+                  items.getInventoryForCharacter(characterID)
+                ]).then((itemdata) => {
+                  let [ equipmentData, inventoryData] = itemdata;
+                  if(equipmentData.success && inventoryData.success){
+                    character.equipment = { data : equipmentData.equipment };
+                    character.inventory = { data : inventoryData.inventory };
                     worldContainer.addPlayer(socket.id, character);
-                    socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL, {});
+                    socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL, { character : character });
                   } else {
                     console.log(itemdata);
                     return;

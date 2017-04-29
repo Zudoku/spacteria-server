@@ -46,14 +46,13 @@ module.exports = {
             let equipmentPromises = [];
             for(let j = 0; j < result.rows.length; j++){
               const equipmentSlot = result.rows[j];
-              equipmentPromises.push(module.expors.getItem(equipmentSlot.itemid));
+              equipmentPromises.push(module.exports.getItem(equipmentSlot.itemid));
             }
-
             Promise.all(equipmentPromises).then((data) => {
-              let equipments = [];
+              let equipments = {};
               for (let index = 0; index < data.length; index++) {
                 const result = data[index];
-                equipments[result.itemtypeid] = result;
+                equipments[result.item.itemtypeid] = result.item;
               }
               resolve({ success: true, equipment: equipments });
             });
@@ -69,7 +68,37 @@ module.exports = {
 
   },
   getInventoryForCharacter(uniqueid) {
+    return new Promise((resolve) => {
+      dbHandler.getConnection().then((connection) => {
+        if (connection.err) {
+          resolve({ success: false });
+        }
+        connection.client.query('SELECT * FROM gameinventory WHERE characterid = $1', [uniqueid], (err, result) => {
+          connection.done(err);
+          if (err) {
+            resolve({ success: false, msg: 'DB error' });
+          } else if(result.rows.length === 0){
+            resolve({ success: true, inventory: {} });
+          } else {
+            let inventoryPromises = [];
+            for(let j = 0; j < result.rows.length; j++){
+              const inventorySlot = result.rows[j];
+              inventoryPromises.push(module.exports.getItem(inventorySlot.itemid));
+            }
 
+            Promise.all(inventoryPromises).then((data) => {
+              let inventoryObj = {};
+              for (let index = 0; index < data.length; index++) {
+                const itemresult = data[index].item;
+                const originalRawData = result.rows.find((x) => x.itemid === itemresult.uniqueid);
+                inventoryObj[originalRawData.slot] = { data: itemresult, amount: originalRawData.quantity, uniqueid: originalRawData.itemid };
+              }
+              resolve({ success: true, inventory: inventoryObj });
+            });
+          }
+        });
+      });
+    });
   },
   setInventoryForCharacter(characterid, inventoryObj) {
 

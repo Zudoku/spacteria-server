@@ -42,6 +42,7 @@ levelreq INTEGER NOT NULL,
 tradeable BOOLEAN NOT NULL,
 rarity INTEGER NOT NULL,
 sellvalue INTEGER NOT NULL,
+imageid INTEGER NOT NULL,
 PRIMARY KEY(uniqueid)
 );
 
