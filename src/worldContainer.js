@@ -22,8 +22,8 @@ module.exports = {
       x: 128,
       y: 128,
       stats: {
-        health: 100000
-      }
+        health: 100000,
+      },
     };
     players[socketID] = userInstance;
     return userInstance;
@@ -100,6 +100,56 @@ module.exports = {
     const foundRoom = rooms.find(x => x.name === player.room);
     foundRoom.projectiles.push(projectile);
     return projectile;
+  },
+  playerLoot(player, lootbaghash, index) {
+    const world = rooms.find(x => x.name === player.world);
+    console.log(world);
+    console.log(player);
+    const lootbag = world.gameobjects.find(l => l.hash === lootbaghash);
+
+    const itemwrapper = lootbag.lootbag.items[index];
+    if (module.exports.addItemToInventory(player, itemwrapper)) {
+      lootbag.lootbag.splice(index, 1);
+
+      if (lootbag.lootbag.items.length === 0) {
+        // broadcast remove
+      }
+      // TODO: broadcast change
+    }
+  },
+  playerHasRoomInInventory(player) {
+    const invReference = player.characterdata.inventory.data;
+    for (let i = 1; i <= 20; i++) {
+      if (invReference[i] === undefined) {
+        return true;
+      }
+    }
+    return false;
+  },
+  addItemToInventory(player, itemwrapper) {
+    const invReference = player.characterdata.inventory.data;
+    // Check jos on jo olemassa
+    for (let i = 1; i <= 20; i++) {
+      if (invReference[i] !== undefined) {
+        if (invReference[i].uniqueid === itemwrapper.uniqueid) {
+          invReference[i].amount += itemwrapper.amount;
+          return true;
+          // TODO: tell database
+        }
+      }
+    }
+
+    for (let i = 1; i <= 20; i++) {
+      if (invReference[i] === undefined) {
+        invReference[i] = itemwrapper;
+        return true;
+        // TODO: tell database
+      }
+    }
+    return false;
+  },
+  removeItemFromInventory(player, slot, amount) {
+
   },
 
 };

@@ -11,6 +11,11 @@ module.exports = {
     LOAD_CHARACTER: 'loadcharacter',
     CHARACTERLIST_REQUEST: 'characterlist',
     DELETE_CHARACTER: 'deletecharacter',
+    LOOT_ITEM: 'lootgameitem',
+    EQUIP_ITEM: 'equipitem',
+    UNEQUIP_ITEM: 'unequipitem',
+    DROP_ITEM: 'dropitem',
+    MOVE_ITEM_IN_INVENTORY: 'moveitemininventory',
   },
   outgoing: {
     SEND_ROOMLIST: 'displayroomlist',
@@ -26,9 +31,8 @@ module.exports = {
     UPDATE_NPC_POSITION: 'correctnpcposition',
     LOGIN_SUCCESS: 'loginsuccess',
     LOGIN_FAIL: 'loginfail',
-    CHARACTER_LOAD_SUCCESSFUL : 'charloadsuccess',
+    CHARACTER_LOAD_SUCCESSFUL: 'charloadsuccess',
     SEND_CHARACTERLIST: 'displaycharacterlist',
-
-
+    UPDATE_CHARATER_STATUS: 'updatecharacterstatus',
   },
 };

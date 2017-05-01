@@ -14,9 +14,9 @@ module.exports = {
             resolve({ success: false, msg: 'no such itemid' });
           } else {
             const itemdata = result.rows[0];
-            connection.client.query('SELECT * FROM gameitemattribute WHERE itemid = $1', [uniqueid], (err, resultAttributes) => {
-              connection.done(err);
-              if (err) {
+            connection.client.query('SELECT * FROM gameitemattribute WHERE itemid = $1', [uniqueid], (err2, resultAttributes) => {
+              connection.done(err2);
+              if (err2) {
                 resolve({ success: false, msg: 'DB error' });
               } else {
                 itemdata.attributes = resultAttributes.rows.map((x) => {
@@ -40,16 +40,16 @@ module.exports = {
           connection.done(err);
           if (err) {
             resolve({ success: false, msg: 'DB error' });
-          } else if(result.rows.length === 0){
+          } else if (result.rows.length === 0) {
             resolve({ success: true, equipment: [] });
           } else {
-            let equipmentPromises = [];
-            for(let j = 0; j < result.rows.length; j++){
+            const equipmentPromises = [];
+            for (let j = 0; j < result.rows.length; j++) {
               const equipmentSlot = result.rows[j];
               equipmentPromises.push(module.exports.getItem(equipmentSlot.itemid));
             }
             Promise.all(equipmentPromises).then((data) => {
-              let equipments = {};
+              const equipments = {};
               for (let index = 0; index < data.length; index++) {
                 const result = data[index];
                 equipments[result.item.itemtypeid] = result.item;
@@ -77,20 +77,20 @@ module.exports = {
           connection.done(err);
           if (err) {
             resolve({ success: false, msg: 'DB error' });
-          } else if(result.rows.length === 0){
+          } else if (result.rows.length === 0) {
             resolve({ success: true, inventory: {} });
           } else {
-            let inventoryPromises = [];
-            for(let j = 0; j < result.rows.length; j++){
+            const inventoryPromises = [];
+            for (let j = 0; j < result.rows.length; j++) {
               const inventorySlot = result.rows[j];
               inventoryPromises.push(module.exports.getItem(inventorySlot.itemid));
             }
 
             Promise.all(inventoryPromises).then((data) => {
-              let inventoryObj = {};
+              const inventoryObj = {};
               for (let index = 0; index < data.length; index++) {
                 const itemresult = data[index].item;
-                const originalRawData = result.rows.find((x) => x.itemid === itemresult.uniqueid);
+                const originalRawData = result.rows.find(x => x.itemid === itemresult.uniqueid);
                 inventoryObj[originalRawData.slot] = { data: itemresult, amount: originalRawData.quantity, uniqueid: originalRawData.itemid };
               }
               resolve({ success: true, inventory: inventoryObj });

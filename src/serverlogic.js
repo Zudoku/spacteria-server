@@ -63,14 +63,14 @@ module.exports = {
               if (module.exports.checkPlayerOwnsCharacter(socket.id, character)) {
                 Promise.all([
                   items.getItemsForCharacter(characterID),
-                  items.getInventoryForCharacter(characterID)
+                  items.getInventoryForCharacter(characterID),
                 ]).then((itemdata) => {
-                  let [ equipmentData, inventoryData] = itemdata;
-                  if(equipmentData.success && inventoryData.success){
-                    character.equipment = { data : equipmentData.equipment };
-                    character.inventory = { data : inventoryData.inventory };
+                  let [equipmentData, inventoryData] = itemdata;
+                  if (equipmentData.success && inventoryData.success) {
+                    character.equipment = { data: equipmentData.equipment };
+                    character.inventory = { data: inventoryData.inventory };
                     worldContainer.addPlayer(socket.id, character);
-                    socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL, { character : character });
+                    socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL, { character });
                   } else {
                     console.log(itemdata);
                     return;
@@ -166,6 +166,15 @@ module.exports = {
           const projectile = worldContainer.playerAttack(currentPlayer, payload);
 
           module.exports.addProjectileToGame(projectile, currentPlayer.room);
+        } else {
+          return;
+        }
+      });
+
+      socket.on(evts.incoming.LOOT_ITEM, (payload) => {
+        if (module.exports.checkIfInRoom(socket.id)) {
+          const currentPlayer = worldContainer.getPlayers()[socket.id];
+          worldContainer.playerLoot(currentPlayer, payload.lootbagHash, payload.index);
         } else {
           return;
         }
