@@ -51,8 +51,8 @@ module.exports = {
             Promise.all(equipmentPromises).then((data) => {
               const equipments = {};
               for (let index = 0; index < data.length; index++) {
-                const result = data[index];
-                equipments[result.item.itemtypeid] = result.item;
+                const resultL = data[index];
+                equipments[resultL.item.itemtypeid] = resultL.item;
               }
               resolve({ success: true, equipment: equipments });
             });

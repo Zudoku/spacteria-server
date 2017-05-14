@@ -4,6 +4,7 @@ const worldContainer = require('./worldContainer.js');
 const userlogin = require('./db/userlogin.js');
 const characters = require('./db/characters.js');
 const items = require('./db/items.js');
+const SF = require('./staticFuncs.js');
 
 let ioref;
 
@@ -21,6 +22,7 @@ module.exports = {
     worldSimulator.initialize(this);
 
     // Simulate worlds
+    console.log('Starting room simulation.');
     setInterval(module.exports.callSimulation, SIMULATION_INTERVAL);
 
     io.on('connection', (socket) => {
@@ -72,7 +74,6 @@ module.exports = {
                     worldContainer.addPlayer(socket.id, character);
                     socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL, { character });
                   } else {
-                    console.log(itemdata);
                     return;
                   }
                 });
@@ -174,9 +175,63 @@ module.exports = {
       socket.on(evts.incoming.LOOT_ITEM, (payload) => {
         if (module.exports.checkIfInRoom(socket.id)) {
           const currentPlayer = worldContainer.getPlayers()[socket.id];
-          worldContainer.playerLoot(currentPlayer, payload.lootbagHash, payload.index);
+          const result = worldContainer.playerLoot(currentPlayer, payload.lootbagHash, payload.index);
+          if (result !== undefined) {
+            if (result.length > 0) {
+              module.exports.broadcastLootBagChangeToGame(result, payload.lootbagHash, currentPlayer.room);
+            } else {
+              worldContainer.removeGameobject(currentPlayer.room, payload.lootbagHash);
+              module.exports.removeGameobject(payload.lootbagHash, { name: currentPlayer.room });
+            }
+            // broadcast character status
+            // console.log(require('util').inspect(currentPlayer, { depth: null }));
+            socket.emit(evts.outgoing.UPDATE_CHARATER_STATUS, { character: currentPlayer.characterdata });
+          }
         } else {
           return;
+        }
+      });
+
+      socket.on(evts.incoming.EQUIP_ITEM, (payload) => {
+        if (module.exports.checkIfInRoom(socket.id)) {
+          const currentPlayer = worldContainer.getPlayers()[socket.id];
+          if (worldContainer.equipItem(currentPlayer, payload.index)) {
+            socket.emit(evts.outgoing.UPDATE_CHARATER_STATUS, { character: currentPlayer.characterdata });
+          }
+        }
+      });
+
+      socket.on(evts.incoming.UNEQUIP_ITEM, (payload) => {
+        if (module.exports.checkIfInRoom(socket.id)) {
+          const currentPlayer = worldContainer.getPlayers()[socket.id];
+          if (worldContainer.unEquipItem(currentPlayer, payload.slot)) {
+            socket.emit(evts.outgoing.UPDATE_CHARATER_STATUS, { character: currentPlayer.characterdata });
+          }
+        }
+      });
+
+      socket.on(evts.incoming.DROP_ITEM, (payload) => {
+        if (module.exports.checkIfInRoom(socket.id)) {
+          const currentPlayer = worldContainer.getPlayers()[socket.id];
+          const itemWrapperReference = currentPlayer.characterdata.inventory.data[payload.slot];
+          if (worldContainer.removeItemFromInventory(currentPlayer, payload.slot, Number.MAX_SAFE_INTEGER)) {
+            socket.emit(evts.outgoing.UPDATE_CHARATER_STATUS, { character: currentPlayer.characterdata });
+            // add lootbag
+            const lootBag = {
+              type: 1,
+              lootbag: {
+                quality: 1,
+                items: [itemWrapperReference],
+                x: currentPlayer.x,
+                y: currentPlayer.y,
+              },
+              x: currentPlayer.x,
+              y: currentPlayer.y,
+              hash: SF.guid(),
+            };
+            worldContainer.getRooms().find(x => x.name === currentPlayer.room).gameobjects.push(lootBag);
+            module.exports.broadcastLootBagToGame(lootBag.lootbag, lootBag.hash, { name: currentPlayer.room });
+          }
         }
       });
 
@@ -239,6 +294,11 @@ module.exports = {
   broadcastLootBagToGame(lootbagObject, hash, room) {
     const payload = { lootbag: lootbagObject, guid: hash };
     ioref.to(room.name).emit(evts.outgoing.SPAWN_LOOTBAG, payload);
+  },
+  broadcastLootBagChangeToGame(lootbagitems, hash, room) {
+    const payload = { lootbag: lootbagitems, guid: hash };
+
+    ioref.to(room).emit(evts.outgoing.UPDATE_LOOTBAG_STATUS, payload);
   },
   removeIdentification(socketId) {
     delete connectedUsers[socketId];

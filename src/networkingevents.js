@@ -34,5 +34,6 @@ module.exports = {
     CHARACTER_LOAD_SUCCESSFUL: 'charloadsuccess',
     SEND_CHARACTERLIST: 'displaycharacterlist',
     UPDATE_CHARATER_STATUS: 'updatecharacterstatus',
+    UPDATE_LOOTBAG_STATUS: 'updatelootbagstatus',
   },
 };

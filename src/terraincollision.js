@@ -14,7 +14,7 @@ module.exports = {
       }
       const blocking = [1];
       for (let x = 0; x < map.width; x++) {
-        //collisionMap[x] = new Array(map.height);
+        // collisionMap[x] = new Array(map.height);
         for (let y = 0; y < map.height; y++) {
           const blockingTile = blocking.indexOf(map.layers[0].tiles[(y * map.width) + x].id) !== -1;
           collisionMap.setWalkableAt(x, y, blockingTile);
@@ -50,16 +50,15 @@ module.exports = {
     return tilemaps[room.mapDescription.filename].isWalkableAt(x, y);
   },
   getMapClone(room) {
-
     // let returned = tilemaps[room.mapDescription.filename];
     // tilemaps[room.mapDescription.filename] = returned.clone();
     // console.log(tilemaps[room.mapDescription.filename]);
     // return returned;
-    var matrix = new Array(20);
+    const matrix = new Array(20);
     for (let x = 0; x < 20; x++) {
       matrix[x] = new Array(20);
       for (let y = 0; y < 20; y++) {
-        matrix[x][y] = (tilemaps[room.mapDescription.filename].isWalkableAt(x, y) == true) ? 1 : 0;
+        matrix[x][y] = (tilemaps[room.mapDescription.filename].isWalkableAt(x, y) === true) ? 1 : 0;
       }
     }
     return matrix;

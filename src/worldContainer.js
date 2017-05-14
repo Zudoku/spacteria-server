@@ -75,6 +75,11 @@ module.exports = {
   removePlayer(player) {
     delete players[player.id];
   },
+  removeGameobject(roomname, hash) {
+    const room = rooms.find(x => x.name === roomname);
+    const index = room.gameobjects.indexOf(room.gameobjects.find(x => x.hash === hash));
+    room.gameobjects.splice(index, 1);
+  },
   updatePlayerPosition(player, nx, ny) {
     /* eslint no-param-reassign: "off"*/
     player.x = nx;
@@ -102,20 +107,17 @@ module.exports = {
     return projectile;
   },
   playerLoot(player, lootbaghash, index) {
-    const world = rooms.find(x => x.name === player.world);
-    console.log(world);
-    console.log(player);
+    const world = rooms.find(x => x.name === player.room);
     const lootbag = world.gameobjects.find(l => l.hash === lootbaghash);
-
+    if (lootbag === undefined) {
+      return undefined;
+    }
     const itemwrapper = lootbag.lootbag.items[index];
     if (module.exports.addItemToInventory(player, itemwrapper)) {
-      lootbag.lootbag.splice(index, 1);
-
-      if (lootbag.lootbag.items.length === 0) {
-        // broadcast remove
-      }
-      // TODO: broadcast change
+      lootbag.lootbag.items.splice(index, 1);
+      return lootbag.lootbag.items;
     }
+    return undefined;
   },
   playerHasRoomInInventory(player) {
     const invReference = player.characterdata.inventory.data;
@@ -126,6 +128,7 @@ module.exports = {
     }
     return false;
   },
+  // Returns true if successful
   addItemToInventory(player, itemwrapper) {
     const invReference = player.characterdata.inventory.data;
     // Check jos on jo olemassa
@@ -149,7 +152,55 @@ module.exports = {
     return false;
   },
   removeItemFromInventory(player, slot, amount) {
+    const invReference = player.characterdata.inventory.data;
+    const itemReference = invReference[slot];
+    if (itemReference !== undefined) {
+      if (itemReference.amount > amount) {
+        itemReference.amount -= amount;
+        return true;
+      } else {
+        delete invReference[slot];
+        return true;
+      }
+    } else {
+      return false;
+    }
+  },
+  equipItem(player, invslot) {
+    const invReference = player.characterdata.inventory.data;
+    const equipmentReference = player.characterdata.equipment.data;
 
+    const equippedItemReference = invReference[invslot];
+
+    if (equippedItemReference === undefined || equippedItemReference.uniqueid == -1) {
+      return true;
+    }
+
+    if (equippedItemReference.data.itemtypeid < 0 || equippedItemReference.data.itemtypeid > 7) {
+      // special item
+      return true;
+    }
+    if (module.exports.unEquipItem(player, equippedItemReference.data.itemtypeid)) {
+      equipmentReference[equippedItemReference.data.itemtypeid] = equippedItemReference.data;
+      module.exports.removeItemFromInventory(player, invslot, 1);
+      return true;
+    } else {
+      return false;
+    }
+  },
+  unEquipItem(player, slot) {
+    const equipmentReference = player.characterdata.equipment.data;
+    const unequippedItem = equipmentReference[slot];
+    if (unequippedItem === undefined) {
+      return true;
+    }
+    const unequippedItemWrapper = { amount: 1, uniqueid: unequippedItem.uniqueid, data: unequippedItem };
+    if (module.exports.addItemToInventory(player, unequippedItemWrapper)) {
+      delete equipmentReference[slot];
+      return true;
+    } else {
+      return false;
+    }
   },
 
 };
