@@ -42,4 +42,14 @@ module.exports = {
     }
     return result;
   },
+  d1arraytod2(d1array, width, height) {
+    const result = [width];
+    for (let x = 0; x < width; x++) {
+      result[x] = [height]
+      for (let y = 0; y < height; y++) {
+        result[x][y] = d1array[x * width + y];
+      }
+    }
+    return result;
+  },
 };

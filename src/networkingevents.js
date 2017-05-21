@@ -16,6 +16,8 @@ module.exports = {
     UNEQUIP_ITEM: 'unequipitem',
     DROP_ITEM: 'dropitem',
     MOVE_ITEM_IN_INVENTORY: 'moveitemininventory',
+    MAP_LOADED: 'maploaded',
+    ENTER_PORTAL: 'enterportal',
   },
   outgoing: {
     SEND_ROOMLIST: 'displayroomlist',
@@ -35,5 +37,6 @@ module.exports = {
     SEND_CHARACTERLIST: 'displaycharacterlist',
     UPDATE_CHARATER_STATUS: 'updatecharacterstatus',
     UPDATE_LOOTBAG_STATUS: 'updatelootbagstatus',
+    LOAD_NEW_MAP: 'loadnewmap',
   },
 };

@@ -38,6 +38,7 @@ module.exports = {
         filename: 'temp.tmx',
         startX: 128,
         startY: 128,
+        mapID: 1,
       },
       gameobjects: [], // Static objects that can't be
       enemies: [], // Enemies that can be harmed

@@ -23,7 +23,7 @@ INSERT INTO gameitem
 ('Test item 3', 'no desc', 3,TRUE,1,FALSE, 1, 100, 3);
 
 INSERT INTO gameitemattribute
-(itemid attributeid, attributevalue) VALUES
+(itemid, attributeid, attributevalue) VALUES
 (1, 1, 1);
 
 INSERT INTO gameequipment

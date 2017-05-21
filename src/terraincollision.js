@@ -2,17 +2,20 @@ const tmxparser = require('tmx-parser');
 const PF = require('pathfinding');
 
 const tilemaps = {};
+const tilemapTypes = {};
 
 module.exports = {
-  initializeMap(filename) {
+  initializeMap(filename, cb) {
     tmxparser.parseFile(`maps/${filename}`, (err, map) => {
       const collisionMap = new PF.Grid(map.width, map.height);
       if (err) {
         console.log(err);
         console.log('error');
-        return false;
+        cb(false);
       }
       const blocking = [1];
+      console.log('initializing collision for map: ' + filename);
+      tilemapTypes[filename] = { type: map.layers[0].name, width: map.width, height: map.height };
       for (let x = 0; x < map.width; x++) {
         // collisionMap[x] = new Array(map.height);
         for (let y = 0; y < map.height; y++) {
@@ -22,7 +25,7 @@ module.exports = {
         }
       }
 
-      return true;
+      cb(true);
     });
   },
   collidesToTerrain(shape, room) {
@@ -63,4 +66,7 @@ module.exports = {
     }
     return matrix;
   },
+  getTypes(tilemapname) {
+    return tilemapTypes[tilemapname];
+  }
 };

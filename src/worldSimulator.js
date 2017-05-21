@@ -6,6 +6,8 @@ const enemySimulator = require('./enemySimulator.js');
 const terrainCollision = require('./terraincollision.js');
 const SF = require('./staticFuncs.js');
 const itemHandler = require('./db/items.js');
+const gameobjects = require('./gameobjects.js');
+const mapDescription = require('./gamemapDescriptions.js')
 
 let serverlogic;
 const DELTA = 1000 / 60;
@@ -30,16 +32,18 @@ var room = {
 
 module.exports = {
   init(filename, room) {
-    const result = terrainCollision.initializeMap(filename);
-    if (result) {
-      console.log('works');
-    }
-    // INIT MONSTERS
-    const dummy = enemies.getMonster('dummy_small', room.difficulty, 3 * 126, 124);
-    const smallGuy = enemies.getMonster('small_guy', room.difficulty, 126, 3 * 124);
-    room.enemies.push(dummy);
-    room.enemies.push(smallGuy);
-    serverlogic.updateroomdescription(room);
+    const resultA = terrainCollision.initializeMap(filename, function(result) {
+      if (result === true) {
+        console.log('Tilemap successfully read for map: ' + filename);
+      } else {
+        console.log('wtf..?');
+      }
+      mapDescription.initializeMap(room, terrainCollision.getTypes(filename).type, terrainCollision);
+      serverlogic.updateroomdescription(room);
+    });
+
+
+
   },
   initialize(serlogic) {
     serverlogic = serlogic;

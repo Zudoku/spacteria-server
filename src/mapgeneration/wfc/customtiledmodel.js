@@ -126,10 +126,10 @@ const CustomTiledModel = function CustomTiledModel(data, subsetName, width, heig
 
     if (unique) {
       for (t = 0; t < cardinality; t++) {
-        this.tiles.push({ name: currentTile.name, index: i });
+        this.tiles.push({ name: currentTile.name, index: currentTile.id });
       }
     } else {
-      this.tiles.push({ name: currentTile.name, index: i });
+      this.tiles.push({ name: currentTile.name, index: currentTile.id });
 
       for (t = 1; t < cardinality; t++) {
         this.tiles.push(rotate(this.tiles[this.T + t - 1]));
