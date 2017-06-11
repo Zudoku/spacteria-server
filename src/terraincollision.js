@@ -6,7 +6,7 @@ const tilemapTypes = {};
 
 module.exports = {
   initializeMap(filename, cb) {
-    tmxparser.parseFile(`maps/${filename}`, (err, map) => {
+    tmxparser.parseFile(`maps/${filename}.tmx`, (err, map) => {
       const collisionMap = new PF.Grid(map.width, map.height);
       if (err) {
         console.log(err);

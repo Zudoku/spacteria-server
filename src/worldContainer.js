@@ -1,4 +1,5 @@
 const SAT = require('sat');
+const maputil = require('./mapgeneration/maputil.js');
 
 let currentRoomID = 1;
 const players = {};
@@ -35,10 +36,9 @@ module.exports = {
       players: [],
       difficulty: 1,
       mapDescription: {
-        filename: 'temp.tmx',
+        filename: 'temp',
         startX: 128,
         startY: 128,
-        mapID: 1,
       },
       gameobjects: [], // Static objects that can't be
       enemies: [], // Enemies that can be harmed

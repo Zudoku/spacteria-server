@@ -5,6 +5,8 @@ const userlogin = require('./db/userlogin.js');
 const characters = require('./db/characters.js');
 const items = require('./db/items.js');
 const SF = require('./staticFuncs.js');
+const maputil = require('./mapgeneration/maputil.js');
+const gamemapDescriptions = require('./gamemapDescriptions.js');
 
 let ioref;
 
@@ -99,7 +101,7 @@ module.exports = {
             if (err) {
               // console.log(err);
             }
-            worldSimulator.init(generatedRoom.mapDescription.filename, generatedRoom);
+            worldSimulator.init(generatedRoom.mapDescription.filename, generatedRoom, true, false);
             // console.log(generatedRoom.enemies);
             socket.emit(evts.outgoing.JOIN_ROOM, generatedRoom);
             module.exports.updateObservers();
@@ -232,6 +234,41 @@ module.exports = {
             worldContainer.getRooms().find(x => x.name === currentPlayer.room).gameobjects.push(lootBag);
             module.exports.broadcastLootBagToGame(lootBag.lootbag, lootBag.hash, { name: currentPlayer.room });
           }
+        }
+      });
+
+      socket.on(evts.incoming.ENTER_PORTAL, (payload) => {
+        if (module.exports.checkIfInRoom(socket.id)) {
+          const currentPlayer = worldContainer.getPlayers()[socket.id];
+          const currentRoom = worldContainer.getRooms().find(x => x.name === currentPlayer.room);
+          const nextMapDescription = gamemapDescriptions.getDescs()["" + payload.to];
+          // console.log(payload.to);
+          // console.log(nextMapDescription);
+          // console.log(gamemapDescriptions.getDescs());
+          const nextMap = maputil.getTilemap(nextMapDescription.tiledata, nextMapDescription.width, nextMapDescription.height);
+          const mapname = SF.guid();
+          maputil.saveTilemap(nextMap, mapname, nextMapDescription.width, nextMapDescription.height, payload.to, function(){
+            worldSimulator.init(mapname, currentRoom, true, true);
+            const payloadEvent = {
+              mapdata: maputil.getPreparedTileData(nextMap, nextMapDescription.width, nextMapDescription.height),
+              name: mapname,
+              type: payload.to,
+              width: nextMapDescription.width,
+              height: nextMapDescription.height,
+            };
+            ioref.to(currentRoom.name).emit(evts.outgoing.LOAD_NEW_MAP, payloadEvent);
+            console.log('switching map to ' + currentRoom.name);
+          });
+
+        }
+      });
+
+      socket.on(evts.incoming.MAP_LOADED, (payload) => {
+        if (module.exports.checkIfInRoom(socket.id)) {
+          const currentPlayer = worldContainer.getPlayers()[socket.id];
+          const currentRoom = worldContainer.getRooms().find(x => x.name === currentPlayer.room);
+          console.log('Map loaded for ' + socket.id);
+          socket.emit(evts.outgoing.REFRESH_ROOM_DESCRIPTION, { desc: currentRoom, forceUpdate: true });
         }
       });
 

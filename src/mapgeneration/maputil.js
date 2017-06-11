@@ -3,7 +3,7 @@ const packer = require('./packer.js');
 const fs = require('fs');
 const castle = require('./data/castle.js');
 
-const modelIterationLimit = 500;
+const modelIterationLimit = 50000;
 
 module.exports = {
   getTilemap(data, width, height) {
@@ -22,9 +22,15 @@ module.exports = {
       //const uncompressed = packer.uncompressDecodeMapData(compressed);
     } else {
       console.log('failed to create map');
+      return undefined;
     }
   },
-  saveTilemap(tiledata, name, width, height) {
+  saveTilemap(tiledata, name, width, height, id, cb) {
+    if(tiledata === undefined) {
+      console.log('Not trying to save map...');
+      return;
+    }
+
     let stream = fs.createWriteStream("maps/" + name + ".tmx");
     let preparedtiledata = packer.compressEncodeMapData(packer.d2arraytod1(tiledata), width, height);
     console.log(preparedtiledata);
@@ -36,15 +42,19 @@ module.exports = {
       stream.write(" <tileset firstgid=\"1\" name=\"BasicTileset\" tilewidth=\"64\" tileheight=\"64\">\n");
       stream.write("  <image source=\"tilemap.png\" trans=\"ff00ff\" width=\"1280\" height=\"2560\"/>\n");
       stream.write(" </tileset>\n");
-      stream.write(" <layer name=\"Tile Layer 1\" width=\"" + width + "\" height=\"" + height + "\">\n");
+      stream.write(" <layer name=\"" + id + "\" width=\"" + width + "\" height=\"" + height + "\">\n");
       stream.write("  <data encoding=\"base64\" compression=\"zlib\">\n");
       stream.write("   " + preparedtiledata + "\n");
       stream.write("  </data>\n");
       stream.write(" </layer>\n");
       stream.write("</map>\n");
       stream.end();
+      cb();
     });
-  }
+  },
+  getPreparedTileData(tiledata, width, height) {
+    return packer.compressEncodeMapData(packer.d2arraytod1(tiledata), width, height);
+  },
 };
 
 //let castleMap = module.exports.getTilemap(castle, 20, 20);

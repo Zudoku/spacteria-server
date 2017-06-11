@@ -31,15 +31,18 @@ var room = {
 */
 
 module.exports = {
-  init(filename, room) {
+  init(filename, room, broadcast, reset) {
     const resultA = terrainCollision.initializeMap(filename, function(result) {
       if (result === true) {
         console.log('Tilemap successfully read for map: ' + filename);
       } else {
         console.log('wtf..?');
       }
-      mapDescription.initializeMap(room, terrainCollision.getTypes(filename).type, terrainCollision);
-      serverlogic.updateroomdescription(room);
+      room.mapDescription.filename = filename;
+      mapDescription.initializeMap(room, terrainCollision.getTypes(filename).type, terrainCollision, reset);
+      if(broadcast) {
+        serverlogic.updateroomdescription(room);
+      }
     });
 
 
