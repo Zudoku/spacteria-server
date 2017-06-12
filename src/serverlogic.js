@@ -241,13 +241,13 @@ module.exports = {
         if (module.exports.checkIfInRoom(socket.id)) {
           const currentPlayer = worldContainer.getPlayers()[socket.id];
           const currentRoom = worldContainer.getRooms().find(x => x.name === currentPlayer.room);
-          const nextMapDescription = gamemapDescriptions.getDescs()["" + payload.to];
+          const nextMapDescription = gamemapDescriptions.getDescs()[`${payload.to}`];
           // console.log(payload.to);
           // console.log(nextMapDescription);
           // console.log(gamemapDescriptions.getDescs());
-          const nextMap = maputil.getTilemap(nextMapDescription.tiledata, nextMapDescription.width, nextMapDescription.height);
+          const nextMap = maputil.getTilemap(nextMapDescription.generationData);
           const mapname = SF.guid();
-          maputil.saveTilemap(nextMap, mapname, nextMapDescription.width, nextMapDescription.height, payload.to, function(){
+          maputil.saveTilemap(nextMap, mapname, nextMapDescription.width, nextMapDescription.height, payload.to, () => {
             worldSimulator.init(mapname, currentRoom, true, true);
             const payloadEvent = {
               mapdata: maputil.getPreparedTileData(nextMap, nextMapDescription.width, nextMapDescription.height),
@@ -257,9 +257,8 @@ module.exports = {
               height: nextMapDescription.height,
             };
             ioref.to(currentRoom.name).emit(evts.outgoing.LOAD_NEW_MAP, payloadEvent);
-            console.log('switching map to ' + currentRoom.name);
+            console.log(`switching map to ${currentRoom.name}`);
           });
-
         }
       });
 
@@ -267,7 +266,7 @@ module.exports = {
         if (module.exports.checkIfInRoom(socket.id)) {
           const currentPlayer = worldContainer.getPlayers()[socket.id];
           const currentRoom = worldContainer.getRooms().find(x => x.name === currentPlayer.room);
-          console.log('Map loaded for ' + socket.id);
+          console.log(`Map loaded for ${socket.id}`);
           socket.emit(evts.outgoing.REFRESH_ROOM_DESCRIPTION, { desc: currentRoom, forceUpdate: true });
         }
       });

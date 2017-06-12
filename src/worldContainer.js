@@ -37,8 +37,8 @@ module.exports = {
       difficulty: 1,
       mapDescription: {
         filename: 'temp',
-        startX: 128,
-        startY: 128,
+        startX: 5 * 64,
+        startY: 5 * 64,
       },
       gameobjects: [], // Static objects that can't be
       enemies: [], // Enemies that can be harmed

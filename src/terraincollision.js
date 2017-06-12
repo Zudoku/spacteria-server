@@ -14,11 +14,12 @@ module.exports = {
         cb(false);
       }
       const blocking = [1];
-      console.log('initializing collision for map: ' + filename);
+      console.log(`initializing collision for map: ${filename}`);
       tilemapTypes[filename] = { type: map.layers[0].name, width: map.width, height: map.height };
       for (let x = 0; x < map.width; x++) {
         // collisionMap[x] = new Array(map.height);
         for (let y = 0; y < map.height; y++) {
+          console.log(`${map.layers[0].tiles[(y * map.width) + x]} ${x}   ${y}`);
           const blockingTile = blocking.indexOf(map.layers[0].tiles[(y * map.width) + x].id) !== -1;
           collisionMap.setWalkableAt(x, y, blockingTile);
           tilemaps[filename] = collisionMap;
@@ -68,5 +69,5 @@ module.exports = {
   },
   getTypes(tilemapname) {
     return tilemapTypes[tilemapname];
-  }
+  },
 };
