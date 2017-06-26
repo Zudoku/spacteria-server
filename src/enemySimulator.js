@@ -72,6 +72,11 @@ module.exports = {
         const arrayPosYT = Math.floor(enemy.target.shape.pos.y / 64);
         const finder = new PF.AStarFinder();
         const grid = new PF.Grid(terrainCollision.getMapClone(room));
+
+        if(!grid.isInside(arrayPosXE, arrayPosYE) || !grid.isInside(arrayPosXT, arrayPosYT)) {
+          return;
+        }
+
         const path = finder.findPath(arrayPosXE, arrayPosYE, arrayPosXT, arrayPosYT, grid);
 
         // console.log(path);

@@ -242,6 +242,12 @@ module.exports = {
           const currentPlayer = worldContainer.getPlayers()[socket.id];
           const currentRoom = worldContainer.getRooms().find(x => x.name === currentPlayer.room);
           const nextMapDescription = gamemapDescriptions.getDescs()[`${payload.to}`];
+          if(payload.to === 1) {
+            worldSimulator.init('temp', currentRoom, true, true);
+            const currentRoomActual = worldContainer.getRooms().find(x => x.name === currentPlayer.room);
+            socket.emit(evts.outgoing.REFRESH_ROOM_DESCRIPTION, { desc: currentRoomActual, forceUpdate: true });
+            return;
+          }
           // console.log(payload.to);
           // console.log(nextMapDescription);
           // console.log(gamemapDescriptions.getDescs());

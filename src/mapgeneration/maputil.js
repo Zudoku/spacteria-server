@@ -18,8 +18,7 @@ module.exports = {
 
     const stream = fs.createWriteStream(`maps/${name}.tmx`);
     const preparedtiledata = packer.compressEncodeMapData(packer.d2arraytod1(tiledata), width, height);
-    console.log(preparedtiledata);
-    console.log(packer.d1arraytod2(packer.uncompressDecodeMapData(preparedtiledata), width, height));
+    /// console.log(packer.d1arraytod2(packer.uncompressDecodeMapData(preparedtiledata), width, height));
 
     stream.once('open', (fd) => {
       stream.write('<?xml version="1.0" encoding="UTF-8"?>\n');
@@ -34,6 +33,7 @@ module.exports = {
       stream.write(' </layer>\n');
       stream.write('</map>\n');
       stream.end();
+      console.log('map ' + name + ' written.');
       cb();
     });
   },

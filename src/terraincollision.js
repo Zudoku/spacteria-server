@@ -2,7 +2,7 @@ const tmxparser = require('tmx-parser');
 const PF = require('pathfinding');
 
 const tilemaps = {};
-const tilemapTypes = {};
+const tilemapTypes = { 'temp' : { type:'1', width: 20, height: 20} };
 
 module.exports = {
   initializeMap(filename, cb) {
@@ -19,7 +19,7 @@ module.exports = {
       for (let x = 0; x < map.width; x++) {
         // collisionMap[x] = new Array(map.height);
         for (let y = 0; y < map.height; y++) {
-          console.log(`${map.layers[0].tiles[(y * map.width) + x]} ${x}   ${y}`);
+
           const blockingTile = blocking.indexOf(map.layers[0].tiles[(y * map.width) + x].id) !== -1;
           collisionMap.setWalkableAt(x, y, blockingTile);
           tilemaps[filename] = collisionMap;
@@ -58,10 +58,12 @@ module.exports = {
     // tilemaps[room.mapDescription.filename] = returned.clone();
     // console.log(tilemaps[room.mapDescription.filename]);
     // return returned;
-    const matrix = new Array(20);
-    for (let x = 0; x < 20; x++) {
-      matrix[x] = new Array(20);
-      for (let y = 0; y < 20; y++) {
+
+    const mapProperties = tilemapTypes[room.mapDescription.filename];
+    const matrix = new Array(mapProperties.width);
+    for (let x = 0; x < mapProperties.width; x++) {
+      matrix[x] = new Array(mapProperties.height);
+      for (let y = 0; y < mapProperties.height; y++) {
         matrix[x][y] = (tilemaps[room.mapDescription.filename].isWalkableAt(x, y) === true) ? 1 : 0;
       }
     }
