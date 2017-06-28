@@ -4,7 +4,6 @@ const terrainCollision = require('./terraincollision.js');
 const SF = require('./staticFuncs.js');
 
 
-
 const NO_TARGET_FOUND = 0;
 const TARGET_FOUND = 1;
 
@@ -71,9 +70,18 @@ module.exports = {
         const arrayPosXT = Math.floor(enemy.target.shape.pos.x / 64);
         const arrayPosYT = Math.floor(enemy.target.shape.pos.y / 64);
         const finder = new PF.AStarFinder();
-        const grid = new PF.Grid(terrainCollision.getMapClone(room));
+        const grid = terrainCollision.getMapCloneForPF(room);
 
-        if(!grid.isInside(arrayPosXE, arrayPosYE) || !grid.isInside(arrayPosXT, arrayPosYT)) {
+        for (let y = 0; y < grid.height; y++) {
+          let row = '';
+          for (let x = 0; x < grid.width; x++) {
+            row += (` ${grid.isWalkableAt(x, y) ? 0 : 1}`);
+          }
+          console.log(row);
+        }
+
+        if (!grid.isInside(arrayPosXE, arrayPosYE) || !grid.isInside(arrayPosXT, arrayPosYT)) {
+          console.log('target outside map...');
           return;
         }
 
@@ -92,6 +100,7 @@ module.exports = {
           }
         }
         if (path === undefined || path.length === 0) {
+          console.log(`cant find path for ${arrayPosXE},${arrayPosYE} and ${arrayPosXT},${arrayPosYT}`);
           enemy.moveTarget = undefined;
         }
 

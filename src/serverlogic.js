@@ -38,6 +38,7 @@ module.exports = {
           }
           userlogin.login(identifyInfo.username, identifyInfo.password).then((result) => {
             if (result.success) {
+              console.log(`${socket.id} joined the server`);
               connectedUsers[socket.id] = result.uniqueid;
               socket.emit(evts.outgoing.LOGIN_SUCCESS, {});
             } else {
@@ -50,6 +51,7 @@ module.exports = {
           module.exports.updateObservers(); **/
         }
         if (identifyInfo.type === 'browser') {
+          console.log(`${socket.id} joined the server`);
           const serializedRooms = worldContainer.getRooms();
           const payload = { connections: connectedUsers, rooms: serializedRooms, characters: worldContainer.getPlayers() };
           socket.emit(evts.outgoing.OBSERVER_SEND_INFO, payload);
@@ -69,7 +71,7 @@ module.exports = {
                   items.getItemsForCharacter(characterID),
                   items.getInventoryForCharacter(characterID),
                 ]).then((itemdata) => {
-                  let [equipmentData, inventoryData] = itemdata;
+                  const [equipmentData, inventoryData] = itemdata;
                   if (equipmentData.success && inventoryData.success) {
                     character.equipment = { data: equipmentData.equipment };
                     character.inventory = { data: inventoryData.inventory };
@@ -242,10 +244,10 @@ module.exports = {
           const currentPlayer = worldContainer.getPlayers()[socket.id];
           const currentRoom = worldContainer.getRooms().find(x => x.name === currentPlayer.room);
           const nextMapDescription = gamemapDescriptions.getDescs()[`${payload.to}`];
-          if(payload.to === 1) {
+          if (payload.to === 1) {
             worldSimulator.init('temp', currentRoom, true, true);
-            const currentRoomActual = worldContainer.getRooms().find(x => x.name === currentPlayer.room);
-            socket.emit(evts.outgoing.REFRESH_ROOM_DESCRIPTION, { desc: currentRoomActual, forceUpdate: true });
+            // const currentRoomActual = worldContainer.getRooms().find(x => x.name === currentPlayer.room);
+            // ioref.to(currentRoom.name).emit(evts.outgoing.REFRESH_ROOM_DESCRIPTION, { desc: currentRoomActual, forceUpdate: true });
             return;
           }
           // console.log(payload.to);
@@ -253,10 +255,10 @@ module.exports = {
           // console.log(gamemapDescriptions.getDescs());
           const nextMap = maputil.getTilemap(nextMapDescription.generationData);
           const mapname = SF.guid();
-          maputil.saveTilemap(nextMap, mapname, nextMapDescription.width, nextMapDescription.height, payload.to, () => {
-            worldSimulator.init(mapname, currentRoom, true, true);
+          maputil.saveTilemap(nextMap.map, mapname, nextMapDescription.width, nextMapDescription.height, payload.to, () => {
+            worldSimulator.init(mapname, currentRoom, true, true, nextMap.rooms);
             const payloadEvent = {
-              mapdata: maputil.getPreparedTileData(nextMap, nextMapDescription.width, nextMapDescription.height),
+              mapdata: maputil.getPreparedTileData(nextMap.map, nextMapDescription.width, nextMapDescription.height),
               name: mapname,
               type: payload.to,
               width: nextMapDescription.width,
@@ -272,13 +274,14 @@ module.exports = {
         if (module.exports.checkIfInRoom(socket.id)) {
           const currentPlayer = worldContainer.getPlayers()[socket.id];
           const currentRoom = worldContainer.getRooms().find(x => x.name === currentPlayer.room);
-          console.log(`Map loaded for ${socket.id}`);
+          console.log(`Map loaded for ${socket.id} ${currentRoom.enemies.length}`);
           socket.emit(evts.outgoing.REFRESH_ROOM_DESCRIPTION, { desc: currentRoom, forceUpdate: true });
         }
       });
 
       socket.on('disconnect', () => {
         const disconnectedId = socket.id;
+        console.log(`${socket.id} left the server`);
         const disconnectedPlayer = worldContainer.getPlayers()[disconnectedId];
         if (module.exports.checkIfIdentified(disconnectedId)) {
           if (module.exports.checkIfPlayerSelected(disconnectedId)) {

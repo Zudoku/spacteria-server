@@ -2,7 +2,8 @@ const tmxparser = require('tmx-parser');
 const PF = require('pathfinding');
 
 const tilemaps = {};
-const tilemapTypes = { 'temp' : { type:'1', width: 20, height: 20} };
+const tilemapTypes = { temp: { type: '1', width: 20, height: 20 } };
+const blocking = [0, 1];
 
 module.exports = {
   initializeMap(filename, cb) {
@@ -13,13 +14,12 @@ module.exports = {
         console.log('error');
         cb(false);
       }
-      const blocking = [1];
+
       console.log(`initializing collision for map: ${filename}`);
       tilemapTypes[filename] = { type: map.layers[0].name, width: map.width, height: map.height };
       for (let x = 0; x < map.width; x++) {
         // collisionMap[x] = new Array(map.height);
         for (let y = 0; y < map.height; y++) {
-
           const blockingTile = blocking.indexOf(map.layers[0].tiles[(y * map.width) + x].id) !== -1;
           collisionMap.setWalkableAt(x, y, blockingTile);
           tilemaps[filename] = collisionMap;
@@ -53,21 +53,16 @@ module.exports = {
     }
     return tilemaps[room.mapDescription.filename].isWalkableAt(x, y);
   },
-  getMapClone(room) {
-    // let returned = tilemaps[room.mapDescription.filename];
-    // tilemaps[room.mapDescription.filename] = returned.clone();
-    // console.log(tilemaps[room.mapDescription.filename]);
-    // return returned;
+  getMapCloneForPF(room) {
+    const result = tilemaps[room.mapDescription.filename].clone();
 
-    const mapProperties = tilemapTypes[room.mapDescription.filename];
-    const matrix = new Array(mapProperties.width);
-    for (let x = 0; x < mapProperties.width; x++) {
-      matrix[x] = new Array(mapProperties.height);
-      for (let y = 0; y < mapProperties.height; y++) {
-        matrix[x][y] = (tilemaps[room.mapDescription.filename].isWalkableAt(x, y) === true) ? 1 : 0;
+    for (let y = 0; y < result.height; y++) {
+      for (let x = 0; x < result.width; x++) {
+        result.setWalkableAt(!tilemaps[room.mapDescription.filename].clone().isWalkableAt(x, y));
       }
     }
-    return matrix;
+
+    return result;
   },
   getTypes(tilemapname) {
     return tilemapTypes[tilemapname];

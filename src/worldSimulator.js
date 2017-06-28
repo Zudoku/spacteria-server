@@ -7,7 +7,7 @@ const terrainCollision = require('./terraincollision.js');
 const SF = require('./staticFuncs.js');
 const itemHandler = require('./db/items.js');
 const gameobjects = require('./gameobjects.js');
-const mapDescription = require('./gamemapDescriptions.js')
+const mapDescription = require('./gamemapDescriptions.js');
 
 let serverlogic;
 const DELTA = 1000 / 60;
@@ -31,22 +31,21 @@ var room = {
 */
 
 module.exports = {
-  init(filename, room, broadcast, reset) {
-    const resultA = terrainCollision.initializeMap(filename, function(result) {
+  init(filename, room, broadcast, reset, maprooms) {
+    const resultA = terrainCollision.initializeMap(filename, (result) => {
       if (result === true) {
-        console.log('Tilemap successfully read for map: ' + filename);
+        console.log(`Tilemap successfully read for map: ${filename}`);
       } else {
         console.log('wtf..?');
       }
       room.mapDescription.filename = filename;
-      mapDescription.initializeMap(room, terrainCollision.getTypes(filename).type, terrainCollision, reset);
-      if(broadcast) {
-        serverlogic.updateroomdescription(room);
+      if (mapDescription.initializeMap(room, terrainCollision.getTypes(filename).type, terrainCollision, reset, maprooms)) {
+        if (broadcast) {
+          console.log('broadcasting map change');
+          serverlogic.updateroomdescription(room);
+        }
       }
     });
-
-
-
   },
   initialize(serlogic) {
     serverlogic = serlogic;
@@ -274,9 +273,7 @@ module.exports = {
     }
 
     // Promises
-    Promise.all(lootPromises.map((u) => {
-      return u.promise;
-    })).then((data) => {
+    Promise.all(lootPromises.map(u => u.promise)).then((data) => {
       for (let index = 0; index < data.length; index++) {
         const result = data[index];
         if (!result.success) {
