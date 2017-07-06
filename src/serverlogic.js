@@ -75,8 +75,8 @@ module.exports = {
                   if (equipmentData.success && inventoryData.success) {
                     character.equipment = { data: equipmentData.equipment };
                     character.inventory = { data: inventoryData.inventory };
-                    worldContainer.addPlayer(socket.id, character);
-                    socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL, { character });
+                    const playerRef = worldContainer.addPlayer(socket.id, character);
+                    socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL, { character, stats: playerRef.stats });
                   } else {
                     return;
                   }
@@ -347,6 +347,13 @@ module.exports = {
   },
   removeIdentification(socketId) {
     delete connectedUsers[socketId];
+  },
+  refreshStatsForPlayer(player){
+    player.stats = worldContainer.calculateStatsForCharacter(player.characterdata);
+  },
+  sendUpdateCharacterStatus(socketId) {
+    const currentPlayer = worldContainer.getPlayers()[socketId];
+    ioref.to(socketId).emit(evts.outgoing.UPDATE_CHARATER_STATUS, { character: currentPlayer.characterdata, stats: currentPlayer.stats });
   },
 
 };

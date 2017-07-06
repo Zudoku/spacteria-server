@@ -1,8 +1,8 @@
 const PF = require('pathfinding');
 const SF = require('./../staticFuncs.js');
 
-const FIND_PATH_MAX_TRIES = 400;
-const PLACE_ROOM_MAX_TRIES = 50;
+const FIND_PATH_MAX_TRIES = 20;
+const PLACE_ROOM_MAX_TRIES = 10;
 const terrainCollision = require('./../terraincollision.js');
 /*
  minroomheight
@@ -72,7 +72,6 @@ module.exports = {
     module.exports.applyRoom(d, startZoneHeight, startZoneWidth, startZoneX, startZoneY, mapData, constructableMask, roomWalls);
   },
   applyRoom(d, zw, zh, zx, zy, mapData, constructableMask, roomWalls, path) {
-    console.log(`. ${zw} ${zh} ${zx} ${zy} `);
 
     // Empty walls
     roomWalls.north = [];
@@ -130,7 +129,7 @@ module.exports = {
       for (let x = 0; x < zw; x++) {
         if (!constructableMask.isInside(zx + x, zy + y) || !constructableMask.isWalkableAt(zx + x, zy + y)) {
           result = false;
-          console.log(`room collision at: ${zx + x} , ${zy + y}`);
+          // console.log(`room collision at: ${zx + x} , ${zy + y}`);
           break;
         } else {
           // Get new constructablemask copied with new room already put in it,
@@ -142,7 +141,7 @@ module.exports = {
 
     if (result) {
       // Try to connect room to previous
-      console.log('room fits.');
+      // console.log('room fits.');
       // Get new room walls
       const newRoomWalls = {
         north: [],
@@ -196,15 +195,21 @@ module.exports = {
         continue;
       }
       const pfGrid = constructableMaskCopy.clone();
-      const path = finder.findPath(startPos.x, startPos.y, endPos.x, endPos.y, pfGrid);
+      try {
+        const path = finder.findPath(startPos.x, startPos.y, endPos.x, endPos.y, pfGrid);
 
-      if (path.length === 0) {
+        if (path.length === 0) {
+          continue;
+        } else {
+          resultObject.path = PF.Util.expandPath(path);
+          //  console.log(`path found between ${startPos.x},${startPos.y} and ${endPos.x},${endPos.y}`);
+          return true;
+        }
+      } catch (ex) {
+        console.log('fail at pathfiding..');
         continue;
-      } else {
-        resultObject.path = PF.Util.expandPath(path);
-        console.log(`path found between ${startPos.x},${startPos.y} and ${endPos.x},${endPos.y}`);
-        return true;
       }
+
     }
     return false;
   },

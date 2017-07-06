@@ -12,23 +12,12 @@ const mapDescription = require('./gamemapDescriptions.js');
 let serverlogic;
 const DELTA = 1000 / 60;
 
-/*
-
-var room = {
-  name : "room" + currentRoomID,
-  players : [],
-  difficulty : 1,
-  mapDescription : {
-    filename : "temp.tmx",
-    startX : 128,
-    startY : 128
-  },
-  gameobjects : [], //Static objects that can't be
-  enemies : [  ], //Enemies that can be harmed
-  projectiles : [] //Projectiles
-};
-
-*/
+const levelCaps = [
+  800, 2600, 4100, 7200, 10000,
+  14800, 20400, 29000, 43000, 67600,
+  90800, 145600, 210800, 306100, 454000,
+  515000, 575800, 644400, 770000, 1200000
+];
 
 module.exports = {
   init(filename, room, broadcast, reset, maprooms) {
@@ -219,6 +208,7 @@ module.exports = {
       }
     } else if (type === 'player') {
       target.stats.health -= damage;
+      serverlogic.sendUpdateCharacterStatus(target.id);
     }
   },
   objectCollidedWithTerrain(target, room, type) {
@@ -245,9 +235,24 @@ module.exports = {
       // Roll the loot
       module.exports.spawnLoot(target.loot, room, target.x, target.y);
       // Give EXP
-      // TODO:
+      module.exports.giveExp(target, room);
+
     } else {
       // WTF?
+    }
+  },
+  giveExp(deadTarget, room) {
+
+    for(let i = 0; i < room.players.length; i++) {
+      const player = room.players[i];
+      player.characterdata.experience += deadTarget.exp;
+      const levelCap = levelCaps[player.characterdata.level - 1];
+      if(player.characterdata.experience >= levelCap){
+        player.characterdata.experience -= levelCap;
+        player.characterdata.level++;
+        serverlogic.refreshStatsForPlayer(player);
+      }
+      serverlogic.sendUpdateCharacterStatus(player.id);
     }
   },
   spawnLoot(lootTable, room, x, y) {

@@ -72,14 +72,6 @@ module.exports = {
         const finder = new PF.AStarFinder();
         const grid = terrainCollision.getMapCloneForPF(room);
 
-        for (let y = 0; y < grid.height; y++) {
-          let row = '';
-          for (let x = 0; x < grid.width; x++) {
-            row += (` ${grid.isWalkableAt(x, y) ? 0 : 1}`);
-          }
-          console.log(row);
-        }
-
         if (!grid.isInside(arrayPosXE, arrayPosYE) || !grid.isInside(arrayPosXT, arrayPosYT)) {
           console.log('target outside map...');
           return;
@@ -93,6 +85,7 @@ module.exports = {
           enemy.moveTarget = { x: (path[0][0] * 64) + 32, y: (path[0][1] * 64) + 32 };
         }
         if (path.length > 1) {
+
           if (arrayPosXE === path[0][0] && arrayPosYE === path[0][1]) {
             enemy.moveTarget = { x: (path[1][0] * 64) + 32, y: (path[1][1] * 64) + 32 };
           } else {

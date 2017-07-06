@@ -22,9 +22,7 @@ module.exports = {
       characterdata: playerInfo,
       x: 128,
       y: 128,
-      stats: {
-        health: 100000,
-      },
+      stats: module.exports.calculateStatsForCharacter(playerInfo),
     };
     players[socketID] = userInstance;
     return userInstance;
@@ -202,6 +200,48 @@ module.exports = {
     } else {
       return false;
     }
+  },
+  calculateStatsForCharacter(playerData, currentHealth){
+    const baseStats = [
+      {
+        health : 5,
+        dexterity: 2,
+        strength: 12,
+        vitality: 5,
+        defence: 5,
+        speed: 1,
+      },
+      {
+        health : 3,
+        dexterity: 4,
+        strength: 7,
+        vitality: 5,
+        defence: 2,
+        speed: 1,
+      },
+      {
+        health : 6,
+        dexterity: 1,
+        strength: 10,
+        vitality: 5,
+        defence: 7,
+        speed: 1,
+      },
+    ];
+    const result = {
+      health : (100  + (playerData.level * baseStats[playerData.cclass].health)),
+      dexterity : (100  + (playerData.level * baseStats[playerData.cclass].dexterity)),
+      strength : (100  + (playerData.level * baseStats[playerData.cclass].strength)),
+      vitality : (100  + (playerData.level * baseStats[playerData.cclass].vitality)),
+      defence : (100  + (playerData.level * baseStats[playerData.cclass].defence)),
+      speed : (100  + (playerData.level * baseStats[playerData.cclass].speed)),
+      maxhealth : (100  + (playerData.level * baseStats[playerData.cclass].health)),
+    };
+
+    if(currentHealth !== undefined) {
+      result.health = currentHealth;
+    }
+    return result;
   },
 
 };

@@ -1,10 +1,6 @@
-const CustomTiledModel = require('./wfc/customtiledmodel.js');
 const packer = require('./packer.js');
 const fs = require('fs');
-const castle = require('./data/castle.js');
 const mapalgo = require('./mapalgo.js');
-
-const modelIterationLimit = 50000;
 
 module.exports = {
   getTilemap(data) {

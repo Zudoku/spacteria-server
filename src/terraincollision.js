@@ -8,12 +8,14 @@ const blocking = [0, 1];
 module.exports = {
   initializeMap(filename, cb) {
     tmxparser.parseFile(`maps/${filename}.tmx`, (err, map) => {
-      const collisionMap = new PF.Grid(map.width, map.height);
       if (err) {
         console.log(err);
-        console.log('error');
+        console.log('error ar reading file');
         cb(false);
+        return false;
       }
+      const collisionMap = new PF.Grid(map.width, map.height);
+
 
       console.log(`initializing collision for map: ${filename}`);
       tilemapTypes[filename] = { type: map.layers[0].name, width: map.width, height: map.height };
@@ -58,7 +60,8 @@ module.exports = {
 
     for (let y = 0; y < result.height; y++) {
       for (let x = 0; x < result.width; x++) {
-        result.setWalkableAt(!tilemaps[room.mapDescription.filename].clone().isWalkableAt(x, y));
+        const blocking = result.isWalkableAt(x, y);
+        result.setWalkableAt(x, y, !blocking);
       }
     }
 

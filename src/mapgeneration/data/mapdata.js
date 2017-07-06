@@ -1,0 +1,36 @@
+module.exports = {
+  1: {
+    portals: [{ id: 2, prob: 1.0, x: 2 * 64, y: 18 * 64 }],
+    npcs: [],
+    enemies: [],
+    lootbags: [],
+    tiledata: undefined,
+    width: 20,
+    height: 20,
+  },
+  2: {
+    portals: [{ id: 1, prob: 1.0, x: 3 * 64, y: 3 * 64 }, { id: 2, prob: 1.0 }],
+    npcs: [],
+    enemies: [{ id: 'small_guy', amount: 2, prob: 1.0 }, { id: 'small_guy', amount: 4, prob: 0.4 }],
+    lootbags: [],
+    generationData: {
+      minroomheight: 2,
+      maxroomheight: 6,
+      minroomwidth: 2,
+      maxroomwidth: 6,
+      minroomamount: 10,
+      maxroomamount: 20,
+      minroomdistance: 3,
+      maxroomdistance: 20,
+      width: 60,
+      height: 60,
+      tiles: {
+        floor: 21,
+        wall: 2,
+        path: 21,
+      },
+    },
+    width: 60,
+    height: 60,
+  },
+};
