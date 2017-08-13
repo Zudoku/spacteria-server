@@ -87,7 +87,7 @@ module.exports = {
       player.y), 32, 32);
   },
   playerAttack(player, payload) {
-    const projectile = { x: player.x, y: player.y, deltaX: 0, deltaY: 0 };
+    const projectile = { x: player.x + 16, y: player.y + 16, deltaX: 0, deltaY: 0 };
 
     projectile.image = payload.projectile.image;
     projectile.team = 1;
@@ -157,13 +157,11 @@ module.exports = {
       if (itemReference.amount > amount) {
         itemReference.amount -= amount;
         return true;
-      } else {
-        delete invReference[slot];
-        return true;
       }
-    } else {
-      return false;
+      delete invReference[slot];
+      return true;
     }
+    return false;
   },
   equipItem(player, invslot) {
     const invReference = player.characterdata.inventory.data;
@@ -183,9 +181,8 @@ module.exports = {
       equipmentReference[equippedItemReference.data.itemtypeid] = equippedItemReference.data;
       module.exports.removeItemFromInventory(player, invslot, 1);
       return true;
-    } else {
-      return false;
     }
+    return false;
   },
   unEquipItem(player, slot) {
     const equipmentReference = player.characterdata.equipment.data;
@@ -197,14 +194,13 @@ module.exports = {
     if (module.exports.addItemToInventory(player, unequippedItemWrapper)) {
       delete equipmentReference[slot];
       return true;
-    } else {
-      return false;
     }
+    return false;
   },
-  calculateStatsForCharacter(playerData, currentHealth){
+  calculateStatsForCharacter(playerData, currentHealth) {
     const baseStats = [
       {
-        health : 5,
+        health: 5,
         dexterity: 2,
         strength: 12,
         vitality: 5,
@@ -212,7 +208,7 @@ module.exports = {
         speed: 1,
       },
       {
-        health : 3,
+        health: 3,
         dexterity: 4,
         strength: 7,
         vitality: 5,
@@ -220,7 +216,7 @@ module.exports = {
         speed: 1,
       },
       {
-        health : 6,
+        health: 6,
         dexterity: 1,
         strength: 10,
         vitality: 5,
@@ -229,16 +225,16 @@ module.exports = {
       },
     ];
     const result = {
-      health : (100  + (playerData.level * baseStats[playerData.cclass].health)),
-      dexterity : (100  + (playerData.level * baseStats[playerData.cclass].dexterity)),
-      strength : (100  + (playerData.level * baseStats[playerData.cclass].strength)),
-      vitality : (100  + (playerData.level * baseStats[playerData.cclass].vitality)),
-      defence : (100  + (playerData.level * baseStats[playerData.cclass].defence)),
-      speed : (100  + (playerData.level * baseStats[playerData.cclass].speed)),
-      maxhealth : (100  + (playerData.level * baseStats[playerData.cclass].health)),
+      health: (100 + (playerData.level * baseStats[playerData.cclass].health)),
+      dexterity: (100 + (playerData.level * baseStats[playerData.cclass].dexterity)),
+      strength: (100 + (playerData.level * baseStats[playerData.cclass].strength)),
+      vitality: (100 + (playerData.level * baseStats[playerData.cclass].vitality)),
+      defence: (100 + (playerData.level * baseStats[playerData.cclass].defence)),
+      speed: (100 + (playerData.level * baseStats[playerData.cclass].speed)),
+      maxhealth: (100 + (playerData.level * baseStats[playerData.cclass].health)),
     };
 
-    if(currentHealth !== undefined) {
+    if (currentHealth !== undefined) {
       result.health = currentHealth;
     }
     return result;

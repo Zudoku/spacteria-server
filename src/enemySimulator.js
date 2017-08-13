@@ -7,12 +7,11 @@ const SF = require('./staticFuncs.js');
 const NO_TARGET_FOUND = 0;
 const TARGET_FOUND = 1;
 
-function getRandomIntInclusive(min, max) {
-  /* eslint no-mixed-operators: "off"*/
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+const AI_TILE_CORNER_BUFFER = 16;
+const AI_MOVETARGET_BUFFER = 6;
+
+const AI_TARGET_SEARCH_FREQ = 20;
+const AI_MOVE_RANDOMLY_FREQ = 4;
 
 module.exports = {
   simulate(enemy, room, serverlogic) {
@@ -33,31 +32,40 @@ module.exports = {
     }
   },
   wandering(enemy, room, serverlogic) {
-    // console.log(enemy.state);
+    const simulationIndex = enemy.simulations + parseInt(enemy.hash.substring(0, 3), 10);
     switch (enemy.state) {
       case NO_TARGET_FOUND: {
         /* eslint no-mixed-operators: "off"*/
-        if (enemy.simulations % 10 === 0) {
+        if (simulationIndex % AI_TARGET_SEARCH_FREQ === 0) {
           if (module.exports.enemylookForTarget(enemy, room)) {
-            enemy.state = 1;
+            enemy.state = TARGET_FOUND;
 
             return;
           }
         }
         if (enemy.moveTarget === undefined) {
+          if (simulationIndex % AI_MOVE_RANDOMLY_FREQ !== 0) {
+            return;
+          }
           // Move somewhere
-          const arrayPosX = Math.floor(((enemy.shape.pos.x - (enemy.shape.w / 2)) / 64) + getRandomIntInclusive(0, 2) - 1);
-          const arrayPosY = Math.floor(((enemy.shape.pos.y - (enemy.shape.h / 2)) / 64) + getRandomIntInclusive(0, 2) - 1);
+          let arrayPosX = Math.floor(((enemy.shape.pos.x) / 64));
+          let arrayPosY = Math.floor(((enemy.shape.pos.y) / 64));
 
-          if (!terrainCollision.isBlocked(arrayPosX, arrayPosY, room)) {
-            enemy.moveTarget = { x: (arrayPosX * 64) + 32, y: (arrayPosY * 64) + 32 };
+          if (SF.getRandomIntInclusive(0, 1) === 0) {
+            arrayPosX += (SF.getRandomIntInclusive(0, 2) - 1);
+          } else {
+            arrayPosY += (SF.getRandomIntInclusive(0, 2) - 1);
+          }
+
+          if (!terrainCollision.isBlocked(arrayPosX, arrayPosY, room) && terrainCollision.isInsideRoom(arrayPosX, arrayPosY, room)) {
+            enemy.moveTarget = { x: (arrayPosX * 64) + 16, y: (arrayPosY * 64) + 16 };
             // console.log(`movetarget found: ${enemy.moveTarget.x},${enemy.moveTarget.y}`);
           }
         } else {
           // if we are close, set moveTarget to undefined
           const deltaX = Math.abs(Math.abs(enemy.moveTarget.x) - Math.abs(enemy.shape.pos.x));
           const deltaY = Math.abs(Math.abs(enemy.moveTarget.y) - Math.abs(enemy.shape.pos.y));
-          if (deltaX + deltaY < 6) {
+          if (deltaX + deltaY < AI_MOVETARGET_BUFFER) {
             enemy.moveTarget = undefined;
           }
         }
@@ -72,6 +80,16 @@ module.exports = {
         const finder = new PF.AStarFinder();
         const grid = terrainCollision.getMapCloneForPF(room);
 
+        // Shoot at target
+
+        if (enemy.target !== undefined) {
+          module.exports.tryToShootProjectiles(enemy, room, serverlogic);
+        }
+
+        if (simulationIndex % 10 !== 0) {
+          return;
+        }
+
         if (!grid.isInside(arrayPosXE, arrayPosYE) || !grid.isInside(arrayPosXT, arrayPosYT)) {
           console.log('target outside map...');
           return;
@@ -82,26 +100,18 @@ module.exports = {
         // console.log(path);
 
         if (path.length === 1) {
-          enemy.moveTarget = { x: (path[0][0] * 64) + 32, y: (path[0][1] * 64) + 32 };
+          enemy.moveTarget = { x: (path[0][0] * 64) + AI_TILE_CORNER_BUFFER, y: (path[0][1] * 64) + AI_TILE_CORNER_BUFFER };
         }
         if (path.length > 1) {
-
           if (arrayPosXE === path[0][0] && arrayPosYE === path[0][1]) {
-            enemy.moveTarget = { x: (path[1][0] * 64) + 32, y: (path[1][1] * 64) + 32 };
+            enemy.moveTarget = { x: (path[1][0] * 64) + AI_TILE_CORNER_BUFFER, y: (path[1][1] * 64) + AI_TILE_CORNER_BUFFER };
           } else {
-            enemy.moveTarget = { x: (path[0][0] * 64) + 32, y: (path[0][1] * 64) + 32 };
+            enemy.moveTarget = { x: (path[0][0] * 64) + AI_TILE_CORNER_BUFFER, y: (path[0][1] * 64) + AI_TILE_CORNER_BUFFER };
           }
         }
         if (path === undefined || path.length === 0) {
           console.log(`cant find path for ${arrayPosXE},${arrayPosYE} and ${arrayPosXT},${arrayPosYT}`);
           enemy.moveTarget = undefined;
-        }
-
-        // module.exports.enemylookForTarget(enemy, room);
-        // Shoot at target
-
-        if (enemy.target !== undefined) {
-          module.exports.tryToShootProjectiles(enemy, room, serverlogic);
         }
 
         break;
@@ -143,7 +153,7 @@ module.exports = {
     // TODO: add the option to shoot multiple projectiles with one shot, like a shotgun
     const angle = SF.angleBetweenTwoPoints(enemy.shape.pos, enemy.target.shape.pos);
 
-    const projectile = { x: enemy.x, y: enemy.y, deltaX: 0, deltaY: 0 };
+    const projectile = { x: enemy.x + (enemy.shape.w / 2), y: enemy.y + (enemy.shape.h), deltaX: 0, deltaY: 0 };
     projectile.image = enemy.projectiles[index].image;
     projectile.team = 2;
     projectile.path = enemy.projectiles[index].path;

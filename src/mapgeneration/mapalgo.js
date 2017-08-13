@@ -21,6 +21,7 @@ const terrainCollision = require('./../terraincollision.js');
   floor
   wall
   path
+  empty
 */
 
 module.exports = {
@@ -38,7 +39,7 @@ module.exports = {
     for (let x = 0; x < data.width; x++) {
       mapData[x] = [data.heigth];
       for (let y = 0; y < data.height; y++) {
-        mapData[x][y] = 1;
+        mapData[x][y] = data.tiles.empty[SF.getRandomIntInclusive(0, data.tiles.empty.length - 1)];
       }
     }
     module.exports.addStartZone(data, mapData, constructableMask, roomWalls);
@@ -72,7 +73,6 @@ module.exports = {
     module.exports.applyRoom(d, startZoneHeight, startZoneWidth, startZoneX, startZoneY, mapData, constructableMask, roomWalls);
   },
   applyRoom(d, zw, zh, zx, zy, mapData, constructableMask, roomWalls, path) {
-
     // Empty walls
     roomWalls.north = [];
     roomWalls.south = [];
@@ -85,6 +85,7 @@ module.exports = {
         constructableMask.setWalkableAt(zx + x, zy + y, false);
       }
     }
+    const wallTile = d.tiles.wall[SF.getRandomIntInclusive(0, d.tiles.wall.length - 1)];
 
     // Set walls
     for (let y = 0; y < zh + 2; y++) {
@@ -92,7 +93,7 @@ module.exports = {
         const ix = x - 1;
         const iy = y - 1;
         if (constructableMask.isInside(zx + ix, zy + iy) && constructableMask.isWalkableAt(zx + ix, zy + iy)) {
-          mapData[zx + ix][zy + iy] = d.tiles.wall;
+          mapData[zx + ix][zy + iy] = wallTile;
           const wallObj = { x: (zx + ix), y: (zy + iy) };
           if (x === 0 && y > 0 && y < zh + 1) {
             roomWalls.west.push(wallObj);
@@ -110,10 +111,12 @@ module.exports = {
       }
     }
 
+    const floorTile = d.tiles.floor[SF.getRandomIntInclusive(0, d.tiles.floor.length - 1)];
+
     // set floor tiles
     for (let y = 0; y < zh; y++) {
       for (let x = 0; x < zw; x++) {
-        mapData[zx + x][zy + y] = d.tiles.floor;
+        mapData[zx + x][zy + y] = floorTile;
       }
     }
     if (path !== undefined) {
@@ -175,9 +178,11 @@ module.exports = {
     return result;
   },
   applyPath(d, path, constructableMask, mapData) {
+    const pathTile = d.tiles.path[SF.getRandomIntInclusive(0, d.tiles.path.length - 1)];
+
     for (let p = 0; p < path.length; p++) {
       const tileArr = path[p];
-      mapData[tileArr[0]][tileArr[1]] = d.tiles.path;
+      mapData[tileArr[0]][tileArr[1]] = pathTile;
       constructableMask.setWalkableAt(tileArr[0], tileArr[1], false);
     }
     console.log('path applied');
@@ -209,7 +214,6 @@ module.exports = {
         console.log('fail at pathfiding..');
         continue;
       }
-
     }
     return false;
   },

@@ -3,7 +3,7 @@ const PF = require('pathfinding');
 
 const tilemaps = {};
 const tilemapTypes = { temp: { type: '1', width: 20, height: 20 } };
-const blocking = [0, 1];
+const blocking = [0, 1, 3, 7, 9];
 
 module.exports = {
   initializeMap(filename, cb) {
@@ -53,7 +53,13 @@ module.exports = {
     if (tilemaps[room.mapDescription.filename] === undefined) {
       return true;
     }
-    return tilemaps[room.mapDescription.filename].isWalkableAt(x, y);
+    return (tilemaps[room.mapDescription.filename].isWalkableAt(x, y));
+  },
+  isInsideRoom(x, y, room) {
+    if (tilemaps[room.mapDescription.filename] === undefined) {
+      return false;
+    }
+    return (tilemaps[room.mapDescription.filename].isInside(x, y));
   },
   getMapCloneForPF(room) {
     const result = tilemaps[room.mapDescription.filename].clone();
