@@ -19,9 +19,7 @@ module.exports = {
               if (err2) {
                 resolve({ success: false, msg: 'DB error' });
               } else {
-                itemdata.attributes = resultAttributes.rows.map((x) => {
-                  return { attributeid: x.attributeid, attributevalue: x.attributevalue };
-                });
+                itemdata.attributes = resultAttributes.rows.map(x => ({ attributeid: x.attributeid, attributevalue: x.attributevalue }));
                 resolve({ success: true, item: itemdata });
               }
             });

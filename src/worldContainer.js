@@ -169,7 +169,7 @@ module.exports = {
 
     const equippedItemReference = invReference[invslot];
 
-    if (equippedItemReference === undefined || equippedItemReference.uniqueid == -1) {
+    if (equippedItemReference === undefined || equippedItemReference.uniqueid === -1) {
       return true;
     }
 
@@ -198,6 +198,14 @@ module.exports = {
     return false;
   },
   calculateStatsForCharacter(playerData, currentHealth) {
+    const statMapping = {
+      1: 'maxhealth',
+      2: 'vitality',
+      3: 'strength',
+      4: 'dexterity',
+      5: 'defence',
+      6: 'speed',
+    };
     const baseStats = [
       {
         health: 5,
@@ -233,9 +241,24 @@ module.exports = {
       speed: (100 + (playerData.level * baseStats[playerData.cclass].speed)),
       maxhealth: (100 + (playerData.level * baseStats[playerData.cclass].health)),
     };
+    // Go through items and add all stats
+    for (let i = 1; i <= 8; i++) {
+      const equippeditem = playerData.equipment.data[i];
+      if (equippeditem !== undefined) {
+        for (let e = 0; e < equippeditem.attributes.length; e++) {
+          const attribute = equippeditem.attributes[e];
+          const attributetypeDecoded = statMapping[attribute.attributeid];
+          if (attributetypeDecoded !== undefined) {
+            result[attributetypeDecoded] += attribute.attributevalue;
+          }
+        }
+      }
+    }
 
     if (currentHealth !== undefined) {
       result.health = currentHealth;
+    } else {
+      result.health = result.maxhealth;
     }
     return result;
   },
