@@ -128,7 +128,7 @@ module.exports = {
       });
 
       socket.on(evts.incoming.ROOMLIST_REQUEST, () => {
-        socket.emit(evts.outgoing.SEND_ROOMLIST, worldContainer.getRooms());
+        socket.emit(evts.outgoing.SEND_ROOMLIST, { roomlist: worldContainer.getRooms() });
       });
       socket.on(evts.incoming.ASK_TO_JOIN_GAME, (args) => {
         if (module.exports.checkIfPlayerSelected(socket.id)
