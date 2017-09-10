@@ -8,6 +8,8 @@ const SF = require('./staticFuncs.js');
 const maputil = require('./mapgeneration/maputil.js');
 const gamemapDescriptions = require('./gamemapDescriptions.js');
 
+const gameplayconfig = require('./../config/gameplayconfig.js');
+
 let ioref;
 
 const SIMULATION_INTERVAL = 1000 / 60;
@@ -38,9 +40,21 @@ module.exports = {
           }
           userlogin.login(identifyInfo.username, identifyInfo.password).then((result) => {
             if (result.success) {
-              console.log(`${socket.id} joined the server`);
-              connectedUsers[socket.id] = result.uniqueid;
-              socket.emit(evts.outgoing.LOGIN_SUCCESS, {});
+              let allowLogin = true;
+              if (!gameplayconfig.allow_multiple_logins_on_account) {
+                Object.entries(connectedUsers).forEach(([key, value]) => {
+                  if (value === result.uniqueid) {
+                    socket.emit(evts.outgoing.LOGIN_FAIL, { reason: 'User already logged in!' });
+                    console.log(`User ${identifyInfo.username} already logged on, failing login.`);
+                    allowLogin = false;
+                  }
+                });
+              }
+              if (allowLogin) {
+                console.log(`${socket.id} joined the server`);
+                connectedUsers[socket.id] = result.uniqueid;
+                socket.emit(evts.outgoing.LOGIN_SUCCESS, {});
+              }
             } else {
               socket.emit(evts.outgoing.LOGIN_FAIL, { reason: result.msg });
             }
@@ -68,7 +82,7 @@ module.exports = {
               const character = characterinfo.character;
               if (module.exports.checkPlayerOwnsCharacter(socket.id, character)) {
                 Promise.all([
-                  items.getItemsForCharacter(characterID),
+                  items.getEquipmentForCharacter(characterID),
                   items.getInventoryForCharacter(characterID),
                 ]).then((itemdata) => {
                   const [equipmentData, inventoryData] = itemdata;
