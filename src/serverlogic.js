@@ -128,7 +128,7 @@ module.exports = {
       });
 
       socket.on(evts.incoming.ROOMLIST_REQUEST, () => {
-        socket.emit(evts.outgoing.SEND_ROOMLIST, worldContainer.getRooms());
+        socket.emit(evts.outgoing.SEND_ROOMLIST, { roomlist: worldContainer.getRooms() });
       });
       socket.on(evts.incoming.ASK_TO_JOIN_GAME, (args) => {
         if (module.exports.checkIfPlayerSelected(socket.id)
@@ -200,7 +200,8 @@ module.exports = {
         if (module.exports.checkIfInRoom(socket.id)) {
           const currentPlayer = worldContainer.getPlayers()[socket.id];
           if (worldContainer.equipItem(currentPlayer, payload.index)) {
-            socket.emit(evts.outgoing.UPDATE_CHARATER_STATUS, { character: currentPlayer.characterdata });
+            module.exports.refreshStatsForPlayer(currentPlayer);
+            module.exports.sendUpdateCharacterStatus(socket.id);
           }
         }
       });
@@ -209,7 +210,8 @@ module.exports = {
         if (module.exports.checkIfInRoom(socket.id)) {
           const currentPlayer = worldContainer.getPlayers()[socket.id];
           if (worldContainer.unEquipItem(currentPlayer, payload.slot)) {
-            socket.emit(evts.outgoing.UPDATE_CHARATER_STATUS, { character: currentPlayer.characterdata });
+            module.exports.refreshStatsForPlayer(currentPlayer);
+            module.exports.sendUpdateCharacterStatus(socket.id);
           }
         }
       });
@@ -348,8 +350,8 @@ module.exports = {
   removeIdentification(socketId) {
     delete connectedUsers[socketId];
   },
-  refreshStatsForPlayer(player){
-    player.stats = worldContainer.calculateStatsForCharacter(player.characterdata);
+  refreshStatsForPlayer(player) {
+    player.stats = worldContainer.calculateStatsForCharacter(player.characterdata, player.stats.health);
   },
   sendUpdateCharacterStatus(socketId) {
     const currentPlayer = worldContainer.getPlayers()[socketId];

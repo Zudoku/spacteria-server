@@ -28,9 +28,10 @@ const mapDescs = {
       width: 60,
       height: 60,
       tiles: {
-        floor: 21,
-        wall: 2,
-        path: 21,
+        floor: [6, 7],
+        wall: [8],
+        path: [3],
+        empty: [4, 10],
       },
     },
     width: 60,
