@@ -43,6 +43,7 @@ tradeable BOOLEAN NOT NULL,
 rarity INTEGER NOT NULL,
 sellvalue INTEGER NOT NULL,
 imageid INTEGER NOT NULL,
+cclassreq INTEGER NOT NULL,
 PRIMARY KEY(uniqueid)
 );
 

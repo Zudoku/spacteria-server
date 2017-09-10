@@ -11,16 +11,16 @@ INSERT INTO gamecharacter
 (1,'bar',2,1,0,CURRENT_TIMESTAMP);
 
 INSERT INTO gameitem
-(displayname, description, itemtypeid, stackable, levelreq, tradeable, rarity, sellvalue, imageid) VALUES
-('Test item 1', 'no desc', 1,TRUE,1,FALSE, 1, 100, 1);
+(displayname, description, itemtypeid, stackable, levelreq, tradeable, rarity, sellvalue, imageid, cclassreq) VALUES
+('Test item 1', 'no desc', 1,TRUE,1,FALSE, 1, 100, 1, 0);
 
 INSERT INTO gameitem
-(displayname, description, itemtypeid, stackable, levelreq, tradeable, rarity, sellvalue, imageid) VALUES
-('Test item 2', 'no desc', 2,TRUE,1,FALSE, 1, 100, 2);
+(displayname, description, itemtypeid, stackable, levelreq, tradeable, rarity, sellvalue, imageid, cclassreq) VALUES
+('Test item 2 w', 'no desc', 3,TRUE,1,FALSE, 1, 100, 2, 1);
 
 INSERT INTO gameitem
-(displayname, description, itemtypeid, stackable, levelreq, tradeable, rarity, sellvalue, imageid) VALUES
-('Test item 3', 'no desc', 3,TRUE,1,FALSE, 1, 100, 3);
+(displayname, description, itemtypeid, stackable, levelreq, tradeable, rarity, sellvalue, imageid, cclassreq) VALUES
+('Test item 3', 'no desc', 3,TRUE,1,FALSE, 1, 100, 3, 0);
 
 INSERT INTO gameitemattribute
 (itemid, attributeid, attributevalue) VALUES
