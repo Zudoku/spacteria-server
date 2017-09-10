@@ -100,7 +100,74 @@ module.exports = {
       });
     });
   },
-  setInventoryForCharacter(characterid, inventoryObj) {
+  saveInventoryForCharacter(characterid, inventoryObj) {
+    // Commit based implementation maybe needed here ? depending if this causes problems...
+    return new Promise((resolve) => {
+      dbHandler.getConnection().then((connection) => {
+        if (connection.err) {
+          resolve({ success: false });
+        }
+        connection.client.query('DELETE FROM gameinventory WHERE characterid = $1', [characterid], (err, result) => {
+          connection.done(err);
+          if (err) {
+            resolve({ success: false, msg: 'DB error' });
+          } else {
+            const inventoryPromises = [];
+            for (let j = 0; j < result.rows.length; j++) {
+              const inventorySlot = result.rows[j];
+              inventoryPromises.push(module.exports.saveItemForCharacter(inventorySlot.itemid));
+            }
+
+            Promise.all(inventoryPromises).then((data) => {
+              const inventoryObj = {};
+              for (let index = 0; index < data.length; index++) {
+                const itemresult = data[index].item;
+                const originalRawData = result.rows.find(x => x.itemid === itemresult.uniqueid);
+                inventoryObj[originalRawData.slot] = { data: itemresult, amount: originalRawData.quantity, uniqueid: originalRawData.itemid };
+              }
+              resolve({ success: true, inventory: inventoryObj });
+            });
+          }
+        });
+      });
+    });
+  },
+  saveItemForCharacter(characterid, itemid, index, destination, quantity) {
+    //Destinations : 1 -> inventory, 2 -> equipment
+    return new Promise((resolve, reject) => {
+      dbHandler.getConnection().then((connection) => {
+        if (connection.err) {
+          reject({ success: false });
+        } else {
+          if(destination === 1){
+            connection.client.query(
+              'INSERT INTO gameinventory (characterid, itemid, quantity, slot) VALUES ($1, $2, $3 $4) ',
+               [characterid, itemid, quantity, index], (err, result) => {
+              if (err) {
+                reject({ success: false, msg: 'DB error' });
+              } else {
+                resolve({ success: true });
+              }
+            });
+          } else if(destination === 2){
+            connection.client.query(
+              'INSERT INTO gameequipment (characterid, itemid) VALUES ($1, $2) ',
+              [characterid, itemidx], (err, result) => {
+              connection.done(err);
+              if (err) {
+                reject({ success: false, msg: 'DB error' });
+              } else {
+                resolve({ success: true });
+              }
+            });
+          }
+        }
+      });
+    });
+
+
+  },
+  saveItemToDB(itemObj) {
 
   },
 };
