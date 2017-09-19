@@ -30,6 +30,7 @@ module.exports = {
     setInterval(module.exports.callSimulation, SIMULATION_INTERVAL);
 
     io.on('connection', (socket) => {
+      console.log('Connection!');
       socket.on(evts.incoming.IDENTIFY, (identifyInfo) => {
         if (identifyInfo.type === undefined) {
           return;
@@ -87,8 +88,8 @@ module.exports = {
                 ]).then((itemdata) => {
                   const [equipmentData, inventoryData] = itemdata;
                   if (equipmentData.success && inventoryData.success) {
-                    character.equipment = { data: equipmentData.equipment };
-                    character.inventory = { data: inventoryData.inventory };
+                    character.equipment = { data: equipmentData.equipment || { } };
+                    character.inventory = { data: inventoryData.inventory || { } };
                     const playerRef = worldContainer.addPlayer(socket.id, character);
                     socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL, { character, stats: playerRef.stats });
                   } else {
@@ -212,20 +213,28 @@ module.exports = {
 
       socket.on(evts.incoming.EQUIP_ITEM, (payload) => {
         if (module.exports.checkIfInRoom(socket.id)) {
-          const currentPlayer = worldContainer.getPlayers()[socket.id];
+          let currentPlayer = worldContainer.getPlayers()[socket.id];
           if (worldContainer.equipItem(currentPlayer, payload.index)) {
-            module.exports.refreshStatsForPlayer(currentPlayer);
-            module.exports.sendUpdateCharacterStatus(socket.id);
+            currentPlayer = worldContainer.getPlayers()[socket.id];
+            worldContainer.tryToSaveItemData(currentPlayer, true, true);
+            setTimeout(() => {
+              module.exports.refreshStatsForPlayer(currentPlayer);
+              module.exports.sendUpdateCharacterStatus(socket.id);
+            }, 250);
           }
         }
       });
 
       socket.on(evts.incoming.UNEQUIP_ITEM, (payload) => {
         if (module.exports.checkIfInRoom(socket.id)) {
-          const currentPlayer = worldContainer.getPlayers()[socket.id];
+          let currentPlayer = worldContainer.getPlayers()[socket.id];
           if (worldContainer.unEquipItem(currentPlayer, payload.slot)) {
-            module.exports.refreshStatsForPlayer(currentPlayer);
-            module.exports.sendUpdateCharacterStatus(socket.id);
+            currentPlayer = worldContainer.getPlayers()[socket.id];
+            worldContainer.tryToSaveItemData(currentPlayer, true, true);
+            setTimeout(() => {
+              module.exports.refreshStatsForPlayer(currentPlayer);
+              module.exports.sendUpdateCharacterStatus(socket.id);
+            }, 250);
           }
         }
       });
@@ -234,7 +243,7 @@ module.exports = {
         if (module.exports.checkIfInRoom(socket.id)) {
           const currentPlayer = worldContainer.getPlayers()[socket.id];
           const itemWrapperReference = currentPlayer.characterdata.inventory.data[payload.slot];
-          if (worldContainer.removeItemFromInventory(currentPlayer, payload.slot, Number.MAX_SAFE_INTEGER)) {
+          if (worldContainer.playerDropItem(currentPlayer, payload.slot, Number.MAX_SAFE_INTEGER)) {
             socket.emit(evts.outgoing.UPDATE_CHARATER_STATUS, { character: currentPlayer.characterdata });
             // add lootbag
             const lootBag = {

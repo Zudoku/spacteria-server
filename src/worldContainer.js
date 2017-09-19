@@ -1,5 +1,7 @@
 const SAT = require('sat');
 const maputil = require('./mapgeneration/maputil.js');
+const itemDB = require('./db/items.js');
+const gameplayconfig = require('./../config/gameplayconfig.js');
 
 let currentRoomID = 1;
 const players = {};
@@ -114,9 +116,15 @@ module.exports = {
     const itemwrapper = lootbag.lootbag.items[index];
     if (module.exports.addItemToInventory(player, itemwrapper)) {
       lootbag.lootbag.items.splice(index, 1);
+      module.exports.tryToSaveItemData(player, false, true);
       return lootbag.lootbag.items;
     }
     return undefined;
+  },
+  playerDropItem(player, slot, amount) {
+    const result = module.exports.removeItemFromInventory(player, slot, amount);
+    module.exports.tryToSaveItemData(player, false, true);
+    return result;
   },
   playerHasRoomInInventory(player) {
     const invReference = player.characterdata.inventory.data;
@@ -136,7 +144,6 @@ module.exports = {
         if (invReference[i].uniqueid === itemwrapper.uniqueid) {
           invReference[i].amount += itemwrapper.amount;
           return true;
-          // TODO: tell database
         }
       }
     }
@@ -145,7 +152,6 @@ module.exports = {
       if (invReference[i] === undefined) {
         invReference[i] = itemwrapper;
         return true;
-        // TODO: tell database
       }
     }
     return false;
@@ -261,6 +267,29 @@ module.exports = {
       result.health = result.maxhealth;
     }
     return result;
+  },
+  tryToSaveItemData(player, saveEquipment, saveInventory) {
+    if (gameplayconfig.data_percistence) {
+      if (saveEquipment) {
+        itemDB.saveEquipmentForCharacter(player.characterdata.uniqueid, player.characterdata.equipment.data).then(
+          (result) => {
+            if (!result.success) {
+              console.log(`Error while saving equipment: ${result.msg}`);
+            }
+          }
+        );
+      }
+
+      if (saveInventory) {
+        itemDB.saveInventoryForCharacter(player.characterdata.uniqueid, player.characterdata.inventory.data).then(
+          (result) => {
+            if (!result.success) {
+              console.log(`Error while saving inventory: ${result.msg}`);
+            }
+          }
+        );
+      }
+    }
   },
 
 };

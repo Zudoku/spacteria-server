@@ -39,7 +39,7 @@ module.exports = {
           if (err) {
             resolve({ success: false, msg: 'DB error' });
           } else if (result.rows.length === 0) {
-            resolve({ success: true, equipment: [] });
+            resolve({ success: true, equipment: {} });
           } else {
             const equipmentPromises = [];
             for (let j = 0; j < result.rows.length; j++) {
@@ -141,7 +141,7 @@ module.exports = {
               }
             }
 
-            Promise.all(inventoryPromises).then((data) => {
+            Promise.all(inventoryPromises).then((data, reject) => {
               resolve({ success: true, inventory: inventoryObj });
             });
           }
@@ -157,7 +157,7 @@ module.exports = {
           reject({ success: false });
         } else if (destination === 1) {
           connection.client.query(
-              'INSERT INTO gameinventory (characterid, itemid, quantity, slot) VALUES ($1, $2, $3 $4) ',
+              'INSERT INTO gameinventory(characterid, itemid, quantity, slot) VALUES($1, $2, $3, $4)',
                [characterid, itemid, quantity, index], (err, result) => {
                  if (err) {
                    reject({ success: false, msg: 'DB error' });
@@ -167,8 +167,8 @@ module.exports = {
                });
         } else if (destination === 2) {
           connection.client.query(
-              'INSERT INTO gameequipment (characterid, itemid) VALUES ($1, $2) ',
-              [characterid, itemidx], (err, result) => {
+              'INSERT INTO gameequipment(characterid, itemid) VALUES($1, $2)',
+              [characterid, itemid], (err, result) => {
                 connection.done(err);
                 if (err) {
                   reject({ success: false, msg: 'DB error' });

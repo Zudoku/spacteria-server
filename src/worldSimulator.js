@@ -8,6 +8,8 @@ const SF = require('./staticFuncs.js');
 const itemHandler = require('./db/items.js');
 const gameobjects = require('./gameobjects.js');
 const mapDescription = require('./gamemapDescriptions.js');
+const charDB = require('./db/characters.js');
+const gameplayconfig = require('./../config/gameplayconfig.js');
 
 let serverlogic;
 const DELTA = 1000 / 60;
@@ -16,7 +18,7 @@ const levelCaps = [
   800, 2600, 4100, 7200, 10000,
   14800, 20400, 29000, 43000, 67600,
   90800, 145600, 210800, 306100, 454000,
-  515000, 575800, 644400, 770000, 1200000
+  515000, 575800, 644400, 770000, 1200000,
 ];
 
 module.exports = {
@@ -236,21 +238,22 @@ module.exports = {
       module.exports.spawnLoot(target.loot, room, target.x, target.y);
       // Give EXP
       module.exports.giveExp(target, room);
-
     } else {
       // WTF?
     }
   },
   giveExp(deadTarget, room) {
-
-    for(let i = 0; i < room.players.length; i++) {
+    for (let i = 0; i < room.players.length; i++) {
       const player = room.players[i];
       player.characterdata.experience += deadTarget.exp;
       const levelCap = levelCaps[player.characterdata.level - 1];
-      if(player.characterdata.experience >= levelCap){
+      if (player.characterdata.experience >= levelCap) {
         player.characterdata.experience -= levelCap;
         player.characterdata.level++;
         serverlogic.refreshStatsForPlayer(player);
+      }
+      if (gameplayconfig.data_percistence) {
+        charDB.updateCharacter(player.characterdata);
       }
       serverlogic.sendUpdateCharacterStatus(player.id);
     }

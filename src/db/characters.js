@@ -81,7 +81,7 @@ module.exports = {
         if (connection.err) {
           resolve({ success: false });
         }
-        connection.client.query('UPDATE gamecharacter SET level = $1, SET experience = $2', [characterObj.level, characterObj.experience], (err, result) => {
+        connection.client.query('UPDATE gamecharacter SET level = $1, experience = $2 WHERE uniqueid = $3', [characterObj.level, characterObj.experience, characterObj.uniqueid], (err, result) => {
           connection.done(err);
           if (err) {
             resolve({ success: false, msg: 'DB error' });
