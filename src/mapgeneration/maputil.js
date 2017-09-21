@@ -1,6 +1,7 @@
 const packer = require('./packer.js');
 const fs = require('fs');
 const mapalgo = require('./mapalgo.js');
+const mapDescs = require('./data/mapdata.js');
 
 module.exports = {
   getTilemap(data) {
@@ -14,7 +15,7 @@ module.exports = {
 
     const stream = fs.createWriteStream(`maps/${name}.tmx`);
     const preparedtiledata = packer.compressEncodeMapData(packer.d2arraytod1(tiledata), width, height);
-    /// console.log(packer.d1arraytod2(packer.uncompressDecodeMapData(preparedtiledata), width, height));
+    // / console.log(packer.d1arraytod2(packer.uncompressDecodeMapData(preparedtiledata), width, height));
 
     stream.once('open', (fd) => {
       stream.write('<?xml version="1.0" encoding="UTF-8"?>\n');
@@ -29,12 +30,15 @@ module.exports = {
       stream.write(' </layer>\n');
       stream.write('</map>\n');
       stream.end();
-      console.log('map ' + name + ' written.');
+      console.log(`map ${name} written.`);
       cb();
     });
   },
   getPreparedTileData(tiledata, width, height) {
     return packer.compressEncodeMapData(packer.d2arraytod1(tiledata), width, height);
+  },
+  isDynamicMap(id) {
+    return mapDescs[id].generationData !== undefined;
   },
 };
 

@@ -1,15 +1,16 @@
 module.exports = {
-  1: {
+  1: { // Spawn area
     portals: [{ id: 2, prob: 1.0, x: 2 * 64, y: 18 * 64 }],
     npcs: [],
     enemies: [],
     lootbags: [],
-    tiledata: undefined,
+    generationData: undefined,
+    filename: 'temp',
     width: 20,
     height: 20,
   },
-  2: {
-    portals: [{ id: 1, prob: 1.0, x: 3 * 64, y: 3 * 64 }, { id: 2, prob: 1.0 }],
+  2: { // first street
+    portals: [{ id: 1, prob: 1.0, x: 3 * 64, y: 3 * 64 }, { id: 2, prob: 1.0 }, { id: 3, prob: 0.5 }],
     npcs: [],
     enemies: [{ id: 'small_guy', amount: 2, prob: 1.0 }, { id: 'small_guy', amount: 4, prob: 0.4 }],
     lootbags: [],
@@ -25,12 +26,39 @@ module.exports = {
       width: 60,
       height: 60,
       tiles: {
-        floor: 21,
-        wall: 2,
-        path: 21,
+        floor: [6, 7],
+        wall: [8],
+        path: [3],
+        empty: [4, 10],
       },
     },
     width: 60,
     height: 60,
+  },
+  3: { // 1DL1
+    portals: [{ id: 2, prob: 1.0, x: 3 * 64, y: 3 * 64 }],
+    npcs: [],
+    enemies: [{ id: 'small_guy', amount: 8, prob: 1.0 }],
+    lootbags: [],
+    generationData: {
+      minroomheight: 3,
+      maxroomheight: 4,
+      minroomwidth: 3,
+      maxroomwidth: 4,
+      minroomamount: 10,
+      maxroomamount: 20,
+      minroomdistance: 6,
+      maxroomdistance: 10,
+      width: 40,
+      height: 40,
+      tiles: {
+        floor: [6, 7],
+        wall: [8],
+        path: [3],
+        empty: [4, 10],
+      },
+    },
+    width: 40,
+    height: 40,
   },
 };

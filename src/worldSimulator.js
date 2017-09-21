@@ -51,14 +51,10 @@ module.exports = {
   },
   simulateRoom(room, ioref) {
     // Give projectiles momentum
+    // And move them
     for (let i = 0; i < room.projectiles.length; i++) {
       const projectile = room.projectiles[i];
       module.exports.giveMomentum(projectile, projectile.angle, projectile.speed);
-    }
-
-    // Move projectiles
-    for (let i = 0; i < room.projectiles.length; i++) {
-      const projectile = room.projectiles[i];
       module.exports.defaultMove(projectile, room, 'projectile', ioref);
     }
     // Simulate enemies

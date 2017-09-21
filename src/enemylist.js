@@ -5,7 +5,7 @@ module.exports = {
   dummy_small() {
     return {
       shape: new SAT.Box(new SAT.Vector(0, 0), 64, 64),
-      image: '',
+      image: 0,
       type: 'dummy',
       stats: { health: 10000000, vitality: 0, strength: 0, dexterity: 0, defence: 10000, speed: 0 },
       collideToTerrain: false,
@@ -17,7 +17,7 @@ module.exports = {
   small_guy() {
     return {
       shape: new SAT.Box(new SAT.Vector(0, 0), 32, 32),
-      image: '',
+      image: 1,
       type: 'wandering',
       stats: { health: 30, vitality: 0, strength: 10, dexterity: 10, defence: 1, speed: 50 },
       collideToTerrain: true,

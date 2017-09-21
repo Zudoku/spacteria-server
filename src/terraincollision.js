@@ -14,6 +14,7 @@ module.exports = {
         cb(false);
         return false;
       }
+      console.log(require('util').inspect(map, { depth: null }));
       const collisionMap = new PF.Grid(map.width, map.height);
 
 
