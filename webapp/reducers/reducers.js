@@ -1,11 +1,19 @@
 import { combineReducers } from 'redux'
 
 const initialState = {
-  connections : [ { ip: '1.1.1.1', name: 'asd', type:'browser', info:'test'} ]
+  connections : []
 };
 
 function connList(state = initialState, action) {
-  return state;
+  switch (action.type) {
+    case 'SET_CONNS':
+        return Object.assign({}, state, {
+          connections: action.payload
+        });
+      break;
+    default:
+      return state
+  }
 }
 
 const appi = combineReducers({

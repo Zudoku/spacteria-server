@@ -14,6 +14,8 @@ let ioref;
 
 const SIMULATION_INTERVAL = 1000 / 60;
 
+const connections = {};
+// DEPRECATED vvvv
 const connectedUsers = {};
 
 function isString(oobj) {
@@ -54,6 +56,12 @@ module.exports = {
               if (allowLogin) {
                 console.log(`${socket.id} joined the server`);
                 connectedUsers[socket.id] = result.uniqueid;
+                connections[socket.id] = {
+                  id: result.uniqueid,
+                  username: identifyInfo.username,
+                  ip: socket.request.connection.remoteAddress,
+                  type: identifyInfo.type,
+                };
                 socket.emit(evts.outgoing.LOGIN_SUCCESS, {});
               }
             } else {
@@ -68,9 +76,15 @@ module.exports = {
         if (identifyInfo.type === 'browser') {
           console.log(`${socket.id} joined the server`);
           const serializedRooms = worldContainer.getRooms();
-          const payload = { connections: connectedUsers, rooms: serializedRooms, characters: worldContainer.getPlayers() };
-          socket.emit(evts.outgoing.OBSERVER_SEND_INFO, payload);
           socket.join('observers');
+          connections[socket.id] = {
+            id: '-',
+            username: '-',
+            charactername: '-',
+            ip: socket.request.connection.remoteAddress,
+            type: identifyInfo.type,
+          };
+          module.exports.updateObservers();
         }
       });
 
@@ -91,6 +105,7 @@ module.exports = {
                     character.equipment = { data: equipmentData.equipment || { } };
                     character.inventory = { data: inventoryData.inventory || { } };
                     const playerRef = worldContainer.addPlayer(socket.id, character);
+                    connections[socket.id].charactername = character.name;
                     socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL, { character, stats: playerRef.stats });
                   } else {
                     return;
@@ -319,8 +334,8 @@ module.exports = {
             worldContainer.removePlayer(disconnectedPlayer);
           }
           module.exports.removeIdentification(disconnectedId);
+          module.exports.updateObservers();
         }
-        module.exports.updateObservers();
       });
     });
   },
@@ -338,7 +353,7 @@ module.exports = {
   },
   updateObservers() {
     const serializedRooms = worldContainer.getRooms();
-    const payload = { rooms: serializedRooms, players: worldContainer.getPlayers() };
+    const payload = { connections, rooms: serializedRooms, players: worldContainer.getPlayers() };
     ioref.to('observers').emit(evts.outgoing.OBSERVER_SEND_INFO, payload);
   },
   removeGameobject(hash, room) {
@@ -369,6 +384,7 @@ module.exports = {
   },
   removeIdentification(socketId) {
     delete connectedUsers[socketId];
+    delete connections[socketId];
   },
   refreshStatsForPlayer(player) {
     player.stats = worldContainer.calculateStatsForCharacter(player.characterdata, player.stats.health);
