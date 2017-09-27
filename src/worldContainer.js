@@ -1,7 +1,6 @@
 const SAT = require('sat');
 const maputil = require('./mapgeneration/maputil.js');
-const itemDB = require('./db/items.js');
-const gameplayconfig = require('./../config/gameplayconfig.js');
+const worldUtil = require('./worldUtil.js');
 
 let currentRoomID = 1;
 const players = {};
@@ -24,7 +23,7 @@ module.exports = {
       characterdata: playerInfo,
       x: 128,
       y: 128,
-      stats: module.exports.calculateStatsForCharacter(playerInfo),
+      stats: worldUtil.calculateStatsForCharacter(playerInfo),
     };
     players[socketID] = userInstance;
     return userInstance;
@@ -43,6 +42,7 @@ module.exports = {
       gameobjects: [], // Static objects that can't be
       enemies: [], // Enemies that can be harmed
       projectiles: [], // Projectiles
+      zones: worldUtil.getZones(20, 20),
     };
     currentRoomID += 1;
 
@@ -103,7 +103,9 @@ module.exports = {
     projectile.damage = 50;
     projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y), 2, 2);
 
+
     const foundRoom = rooms.find(x => x.name === player.room);
+    projectile.zone = worldUtil.getZoneForCoord(foundRoom.zones, projectile.x, projectile.y);
     foundRoom.projectiles.push(projectile);
     return projectile;
   },
@@ -116,14 +118,14 @@ module.exports = {
     const itemwrapper = lootbag.lootbag.items[index];
     if (module.exports.addItemToInventory(player, itemwrapper)) {
       lootbag.lootbag.items.splice(index, 1);
-      module.exports.tryToSaveItemData(player, false, true);
+      worldUtil.tryToSaveItemData(player, false, true);
       return lootbag.lootbag.items;
     }
     return undefined;
   },
   playerDropItem(player, slot, amount) {
     const result = module.exports.removeItemFromInventory(player, slot, amount);
-    module.exports.tryToSaveItemData(player, false, true);
+    worldUtil.tryToSaveItemData(player, false, true);
     return result;
   },
   playerHasRoomInInventory(player) {
@@ -203,93 +205,4 @@ module.exports = {
     }
     return false;
   },
-  calculateStatsForCharacter(playerData, currentHealth) {
-    const statMapping = {
-      1: 'maxhealth',
-      2: 'vitality',
-      3: 'strength',
-      4: 'dexterity',
-      5: 'defence',
-      6: 'speed',
-    };
-    const baseStats = [
-      {
-        health: 5,
-        dexterity: 2,
-        strength: 12,
-        vitality: 5,
-        defence: 5,
-        speed: 1,
-      },
-      {
-        health: 3,
-        dexterity: 4,
-        strength: 7,
-        vitality: 5,
-        defence: 2,
-        speed: 1,
-      },
-      {
-        health: 6,
-        dexterity: 1,
-        strength: 10,
-        vitality: 5,
-        defence: 7,
-        speed: 1,
-      },
-    ];
-    const result = {
-      health: (100 + (playerData.level * baseStats[playerData.cclass].health)),
-      dexterity: (100 + (playerData.level * baseStats[playerData.cclass].dexterity)),
-      strength: (100 + (playerData.level * baseStats[playerData.cclass].strength)),
-      vitality: (100 + (playerData.level * baseStats[playerData.cclass].vitality)),
-      defence: (100 + (playerData.level * baseStats[playerData.cclass].defence)),
-      speed: (100 + (playerData.level * baseStats[playerData.cclass].speed)),
-      maxhealth: (100 + (playerData.level * baseStats[playerData.cclass].health)),
-    };
-    // Go through items and add all stats
-    for (let i = 1; i <= 8; i++) {
-      const equippeditem = playerData.equipment.data[i];
-      if (equippeditem !== undefined) {
-        for (let e = 0; e < equippeditem.attributes.length; e++) {
-          const attribute = equippeditem.attributes[e];
-          const attributetypeDecoded = statMapping[attribute.attributeid];
-          if (attributetypeDecoded !== undefined) {
-            result[attributetypeDecoded] += attribute.attributevalue;
-          }
-        }
-      }
-    }
-
-    if (currentHealth !== undefined) {
-      result.health = currentHealth;
-    } else {
-      result.health = result.maxhealth;
-    }
-    return result;
-  },
-  tryToSaveItemData(player, saveEquipment, saveInventory) {
-    if (gameplayconfig.data_percistence) {
-      if (saveEquipment) {
-        itemDB.saveEquipmentForCharacter(player.characterdata.uniqueid, player.characterdata.equipment.data).then(
-          (result) => {
-            if (!result.success) {
-              console.log(`Error while saving equipment: ${result.msg}`);
-            }
-          }
-        );
-      }
-
-      if (saveInventory) {
-        itemDB.saveInventoryForCharacter(player.characterdata.uniqueid, player.characterdata.inventory.data).then(
-          (result) => {
-            if (!result.success) {
-              console.log(`Error while saving inventory: ${result.msg}`);
-            }
-          }
-        );
-      }
-    }
-  },
-
 };

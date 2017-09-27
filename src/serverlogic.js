@@ -7,6 +7,7 @@ const items = require('./db/items.js');
 const SF = require('./staticFuncs.js');
 const maputil = require('./mapgeneration/maputil.js');
 const gamemapDescriptions = require('./gamemapDescriptions.js');
+const worldUtil = require('./worldUtil.js');
 
 const gameplayconfig = require('./../config/gameplayconfig.js');
 
@@ -231,7 +232,7 @@ module.exports = {
           let currentPlayer = worldContainer.getPlayers()[socket.id];
           if (worldContainer.equipItem(currentPlayer, payload.index)) {
             currentPlayer = worldContainer.getPlayers()[socket.id];
-            worldContainer.tryToSaveItemData(currentPlayer, true, true);
+            worldUtil.tryToSaveItemData(currentPlayer, true, true);
             setTimeout(() => {
               module.exports.refreshStatsForPlayer(currentPlayer);
               module.exports.sendUpdateCharacterStatus(socket.id);
@@ -245,7 +246,7 @@ module.exports = {
           let currentPlayer = worldContainer.getPlayers()[socket.id];
           if (worldContainer.unEquipItem(currentPlayer, payload.slot)) {
             currentPlayer = worldContainer.getPlayers()[socket.id];
-            worldContainer.tryToSaveItemData(currentPlayer, true, true);
+            worldUtil.tryToSaveItemData(currentPlayer, true, true);
             setTimeout(() => {
               module.exports.refreshStatsForPlayer(currentPlayer);
               module.exports.sendUpdateCharacterStatus(socket.id);
@@ -387,7 +388,7 @@ module.exports = {
     delete connections[socketId];
   },
   refreshStatsForPlayer(player) {
-    player.stats = worldContainer.calculateStatsForCharacter(player.characterdata, player.stats.health);
+    player.stats = worldUtil.calculateStatsForCharacter(player.characterdata, player.stats.health);
   },
   sendUpdateCharacterStatus(socketId) {
     const currentPlayer = worldContainer.getPlayers()[socketId];

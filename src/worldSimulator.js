@@ -10,6 +10,7 @@ const gameobjects = require('./gameobjects.js');
 const mapDescription = require('./gamemapDescriptions.js');
 const charDB = require('./db/characters.js');
 const gameplayconfig = require('./../config/gameplayconfig.js');
+const worldUtil = require('./worldUtil.js');
 
 let serverlogic;
 const DELTA = 1000 / 60;
@@ -23,20 +24,22 @@ const levelCaps = [
 
 module.exports = {
   init(filename, room, broadcast, reset, maprooms) {
-    const resultA = terrainCollision.initializeMap(filename, (result) => {
-      if (result === true) {
-        console.log(`Tilemap successfully read for map: ${filename}`);
-      } else {
-        console.log('wtf..?');
-      }
-      room.mapDescription.filename = filename;
-      if (mapDescription.initializeMap(room, terrainCollision.getTypes(filename).type, terrainCollision, reset, maprooms)) {
-        if (broadcast) {
-          console.log('broadcasting map change');
-          serverlogic.updateroomdescription(room);
+    setTimeout(() => {
+      terrainCollision.initializeMap(filename, (result) => {
+        if (result === true) {
+          console.log(`Tilemap successfully read for map: ${filename}`);
+        } else {
+          console.log('wtf..?');
         }
-      }
-    });
+        room.mapDescription.filename = filename;
+        if (mapDescription.initializeMap(room, terrainCollision.getTypes(filename).type, terrainCollision, reset, maprooms)) {
+          if (broadcast) {
+            console.log('broadcasting map change');
+            serverlogic.updateroomdescription(room);
+          }
+        }
+      });
+    }, 100);
   },
   initialize(serlogic) {
     serverlogic = serlogic;
@@ -175,9 +178,31 @@ module.exports = {
 
     target.deltaX = 0;
     target.deltaY = 0;
+    if (type === 'projectile') {
+      const newZone = worldUtil.getZoneForCoord(room.zones, target.x, target.y);
+      if (target.zone === undefined || newZone.x !== target.zone.x || newZone.y !== target.zone.y) {
+        target.zone = newZone;
+      }
+    }
   },
   projectileCollidesToObjects(target, room) {
     if (target.team === 1) {
+      // Get targets zone
+      const zoneToCheck = room.zones[target.zone.x][target.zone.y];
+      let collided = false;
+      Object.entries(zoneToCheck.enemies).forEach(([key, value]) => {
+        const foundShape = value.shape;
+        if (SAT.testPolygonPolygon(target.shape.toPolygon(), foundShape.toPolygon())) {
+          const foundEnemy = room.enemies.find(x => (x.hash === `${key}`));
+          if (foundEnemy !== undefined) {
+            module.exports.takeDamage(foundEnemy, 'enemy', target.damage, room);
+            collided = true;
+          }
+        }
+      });
+      return collided;
+      // Get all enemies in the zone
+      /*
       for (let i = 0; i < room.enemies.length; i++) {
         const foundEnemy = room.enemies[i];
         if (SAT.testPolygonPolygon(target.shape.toPolygon(), foundEnemy.shape.toPolygon())) {
@@ -186,6 +211,7 @@ module.exports = {
         }
       }
       return false;
+       */
     } else if (target.team === 2) {
       for (let i = 0; i < room.players.length; i++) {
         const foundPlayer = room.players[i];
@@ -313,9 +339,19 @@ module.exports = {
     const deltaX = Math.abs(enemy.shape.pos.x - enemy.lastBroadCastedPosition.x);
     const deltaY = Math.abs(enemy.shape.pos.y - enemy.lastBroadCastedPosition.y);
 
-    if (deltaX + deltaY >= 2) {
+    if (deltaX + deltaY >= gameplayconfig.NPC_POSITION_BROADCAST_BUFFER) {
       enemy.lastBroadCastedPosition = { x: enemy.shape.pos.x, y: enemy.shape.pos.y };
       serverlogic.updateNPCPosition(enemy.hash, enemy.lastBroadCastedPosition, room);
+      // Recalculate zone
+      const newZone = worldUtil.getZoneForCoord(room.zones, enemy.x, enemy.y);
+      if (enemy.zone === undefined || newZone.x !== enemy.zone.x || newZone.y !== enemy.zone.y) {
+        // Remove the old zone,
+        const oldZone = room.zones[enemy.zone.x][enemy.zone.y];
+        delete oldZone[enemy.hash];
+        // Add to new zone
+        worldUtil.getZoneForCoord(room.zones, enemy.x, enemy.y).enemies[enemy.hash] = { shape: enemy.shape };
+        enemy.zone = worldUtil.getZoneForCoord(room.zones, enemy.x, enemy.y);
+      }
     }
   },
 

@@ -1,10 +1,12 @@
 const enemies = require('./enemies.js');
 const gameobjects = require('./gameobjects.js');
+const SF = require('./staticFuncs.js');
+const worldUtil = require('./worldUtil.js');
 
 const mapDescs = require('./mapgeneration/data/mapdata.js');
 
 module.exports = {
-  initializeMap(room, id, terrainCollision, reset, maprooms, cb) {
+  initializeMap(room, id, terrainCollision, reset, maprooms) {
     // get map diameters
     const width = terrainCollision.getTypes(room.mapDescription.filename).width;
     const height = terrainCollision.getTypes(room.mapDescription.filename).height;
@@ -14,10 +16,12 @@ module.exports = {
       return true;
     }
     if (reset) {
+      /* eslint no-param-reassign: "off"*/
       room.gameobjects = [];
       room.enemies = [];
       room.projectiles = [];
     }
+    room.zones = worldUtil.getZones(width, height);
     // Set players to right place
     for (let i = 0; i < room.players.length; i++) {
       const player = room.players[i];
@@ -69,6 +73,9 @@ module.exports = {
       spawnY = parseInt(spawnY, 10);
       for (let o = 0; o < enemyObj.amount; o++) {
         const enemy = enemies.getMonster(enemyObj.id, room.difficulty, spawnX, spawnY);
+        enemy.simulations = SF.getRandomIntInclusive(0, 1000);
+        worldUtil.getZoneForCoord(room.zones, spawnX, spawnY).enemies[enemy.hash] = { shape: enemy.shape };
+        enemy.zone = worldUtil.getZoneForCoord(room.zones, spawnX, spawnY);
         room.enemies.push(enemy);
       }
     }

@@ -10,8 +10,8 @@ const TARGET_FOUND = 1;
 const AI_TILE_CORNER_BUFFER = 16;
 const AI_MOVETARGET_BUFFER = 6;
 
-const AI_TARGET_SEARCH_FREQ = 20;
-const AI_MOVE_RANDOMLY_FREQ = 4;
+const AI_TARGET_SEARCH_FREQ = 18;
+const AI_MOVE_RANDOMLY_FREQ = 22;
 
 module.exports = {
   simulate(enemy, room, serverlogic) {

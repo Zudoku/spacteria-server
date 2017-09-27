@@ -12,6 +12,7 @@ module.exports = {
       state: 0,
       simulations: 0,
       projectiles: [],
+      zone: undefined,
     };
   },
   small_guy() {
@@ -24,6 +25,7 @@ module.exports = {
       state: 0,
       simulations: 0,
       projectiles: [projectileList.basic_projectile(2, 1000)],
+      zone: undefined,
       loot: [
         {
           chance: 1,

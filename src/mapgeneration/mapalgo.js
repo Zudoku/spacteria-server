@@ -55,7 +55,7 @@ module.exports = {
       for (let x = 0; x < data.width; x++) {
         row += (` ${mapData[x][y]}`);
       }
-      console.log(row);
+      // console.log(row);
     }
 
     const resultObj = {
@@ -122,7 +122,7 @@ module.exports = {
     if (path !== undefined) {
       module.exports.applyPath(d, path, constructableMask, mapData);
     }
-    console.log('Room applied');
+    // console.log('Room applied');
   },
   doesRoomFit(d, zw, zh, zx, zy, constructableMask, roomWalls, resultObject) {
     let result = true;
@@ -185,7 +185,7 @@ module.exports = {
       mapData[tileArr[0]][tileArr[1]] = pathTile;
       constructableMask.setWalkableAt(tileArr[0], tileArr[1], false);
     }
-    console.log('path applied');
+    // console.log('path applied');
   },
   findPathIfPossible(oldWalls, newWalls, constructableMaskCopy, resultObject) {
     const finder = new PF.AStarFinder();
@@ -211,7 +211,7 @@ module.exports = {
           return true;
         }
       } catch (ex) {
-        console.log('fail at pathfiding..');
+        // console.log('fail at pathfiding..');
         continue;
       }
     }
@@ -259,7 +259,7 @@ module.exports = {
       // Tried to debug it but accepting defeat for now and just switching the positions of the arguments in function call
       // TODO fix this bs
       if (module.exports.doesRoomFit(data, roomH, roomW, roomStartY, roomStartX, constructableMask, walls, resultObject)) {
-        console.log(`Room fits: ${roomStartX} , ${roomStartY} - ${direction}`);
+        // console.log(`Room fits: ${roomStartX} , ${roomStartY} - ${direction}`);
         module.exports.applyRoom(data, roomH, roomW, roomStartY, roomStartX, mapData, constructableMask, walls, resultObject.path);
         const roomObj = {
           x: roomStartX,
