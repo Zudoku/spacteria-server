@@ -12,6 +12,10 @@ let store = createStore(appi);
 let socket = io();
 socket.on('info', function(payload){
 
+  
+  document.getElementById("content").innerHTML = JSON.stringify(payload, null,4);
+
+
   const mutatedConnections = Object.entries(payload.connections).map(([key, value]) => {
     console.log(value);
     return { ip: value.ip, type: value.type, name: value.username,

@@ -18641,6 +18641,8 @@ var store = (0, _redux.createStore)(_reducers2.default);
 var socket = (0, _socket2.default)();
 socket.on('info', function (payload) {
 
+  document.getElementById("content").innerHTML = JSON.stringify(payload, null, 4);
+
   var mutatedConnections = Object.entries(payload.connections).map(function (_ref) {
     var _ref2 = _slicedToArray(_ref, 2),
         key = _ref2[0],
