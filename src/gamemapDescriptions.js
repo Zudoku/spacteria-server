@@ -1,4 +1,4 @@
-const enemies = require('./enemies.js');
+const enemies = require('./enemies/enemies.js');
 const gameobjects = require('./gameobjects.js');
 const SF = require('./staticFuncs.js');
 const worldUtil = require('./worldUtil.js');

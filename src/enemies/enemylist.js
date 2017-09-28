@@ -1,5 +1,6 @@
 const SAT = require('sat');
-const projectileList = require('./projectilelist.js');
+const projectileList = require('./../projectilelist.js');
+const SF = require('./../staticFuncs.js');
 
 module.exports = {
   dummy_small() {

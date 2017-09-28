@@ -9,5 +9,6 @@ config.publish_gameplay_config = false;// TODO
 
 
 config.NPC_POSITION_BROADCAST_BUFFER = 2;
+config.SIMULATION_INTERVAL = 1000 / 60;
 
 module.exports = config;

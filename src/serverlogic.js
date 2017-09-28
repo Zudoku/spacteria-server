@@ -13,11 +13,8 @@ const gameplayconfig = require('./../config/gameplayconfig.js');
 
 let ioref;
 
-const SIMULATION_INTERVAL = 1000 / 60;
 
 const connections = {};
-// DEPRECATED vvvv
-const connectedUsers = {};
 
 function isString(oobj) {
   return (oobj !== undefined && typeof oobj === 'string');
@@ -30,7 +27,7 @@ module.exports = {
 
     // Simulate worlds
     console.log('Starting room simulation.');
-    setInterval(module.exports.callSimulation, SIMULATION_INTERVAL);
+    setInterval(module.exports.callSimulation, gameplayconfig.SIMULATION_INTERVAL);
 
     io.on('connection', (socket) => {
       console.log('Connection!');
@@ -46,8 +43,8 @@ module.exports = {
             if (result.success) {
               let allowLogin = true;
               if (!gameplayconfig.allow_multiple_logins_on_account) {
-                Object.entries(connectedUsers).forEach(([key, value]) => {
-                  if (value === result.uniqueid) {
+                Object.entries(connections).forEach(([key, value]) => {
+                  if (value.type !== 'browser' && value.id === result.uniqueid) {
                     socket.emit(evts.outgoing.LOGIN_FAIL, { reason: 'User already logged in!' });
                     console.log(`User ${identifyInfo.username} already logged on, failing login.`);
                     allowLogin = false;
@@ -56,7 +53,6 @@ module.exports = {
               }
               if (allowLogin) {
                 console.log(`${socket.id} joined the server`);
-                connectedUsers[socket.id] = result.uniqueid;
                 connections[socket.id] = {
                   id: result.uniqueid,
                   username: identifyInfo.username,
@@ -146,7 +142,7 @@ module.exports = {
 
       socket.on(evts.incoming.CHARACTERLIST_REQUEST, () => {
         if (module.exports.checkIfIdentified(socket.id)) {
-          characters.listCharacters(connectedUsers[socket.id]).then((charsObj) => {
+          characters.listCharacters(connections[socket.id].id).then((charsObj) => {
             if (charsObj.success) {
               socket.emit(evts.outgoing.SEND_CHARACTERLIST, { chars: charsObj.characters });
             } else {
@@ -341,7 +337,7 @@ module.exports = {
     });
   },
   checkIfIdentified(socketId) {
-    return (connectedUsers[socketId] !== undefined);
+    return (connections[socketId] !== undefined);
   },
   checkIfPlayerSelected(socketId) {
     return module.exports.checkIfIdentified(socketId) && (worldContainer.getPlayers()[socketId] !== undefined);
@@ -350,7 +346,7 @@ module.exports = {
     return (module.exports.checkIfPlayerSelected(socketId) && worldContainer.getPlayers()[socketId].room.length !== 0);
   },
   checkPlayerOwnsCharacter(socketId, character) {
-    return (connectedUsers[socketId] === character.userid);
+    return (connections[socketId].id === character.userid);
   },
   updateObservers() {
     const serializedRooms = worldContainer.getRooms();
@@ -384,7 +380,6 @@ module.exports = {
     ioref.to(room).emit(evts.outgoing.UPDATE_LOOTBAG_STATUS, payload);
   },
   removeIdentification(socketId) {
-    delete connectedUsers[socketId];
     delete connections[socketId];
   },
   refreshStatsForPlayer(player) {

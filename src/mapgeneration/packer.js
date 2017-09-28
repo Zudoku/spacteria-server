@@ -17,9 +17,7 @@ module.exports = {
     return finalProduct;
   },
   uncompressDecodeMapData(rawMapdata) {
-    const charData = atob(rawMapdata).split('').map((x) => {
-      return x.charCodeAt(0);
-    });
+    const charData = atob(rawMapdata).split('').map(x => x.charCodeAt(0));
 
     const binData = new Uint32Array(charData);
 
@@ -45,9 +43,9 @@ module.exports = {
   d1arraytod2(d1array, width, height) {
     const result = [width];
     for (let x = 0; x < width; x++) {
-      result[x] = [height]
+      result[x] = [height];
       for (let y = 0; y < height; y++) {
-        result[x][y] = d1array[x * width + y];
+        result[x][y] = d1array[(x * width) + y];
       }
     }
     return result;

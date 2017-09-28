@@ -49,14 +49,15 @@ module.exports = {
     for (let t = 0; t < roomAmount; t++) {
       module.exports.tryToaddRoom(data, mapData, constructableMask, roomWalls, roomData);
     }
-
+    /*
     for (let y = 0; y < data.height; y++) {
       let row = '';
       for (let x = 0; x < data.width; x++) {
         row += (` ${mapData[x][y]}`);
       }
-      // console.log(row);
+      console.log(row);
     }
+    */
 
     const resultObj = {
       map: mapData,
@@ -73,6 +74,7 @@ module.exports = {
     module.exports.applyRoom(d, startZoneHeight, startZoneWidth, startZoneX, startZoneY, mapData, constructableMask, roomWalls);
   },
   applyRoom(d, zw, zh, zx, zy, mapData, constructableMask, roomWalls, path) {
+    /* eslint no-param-reassign: "off"*/
     // Empty walls
     roomWalls.north = [];
     roomWalls.south = [];

@@ -1,6 +1,6 @@
 
 const enemyList = require('./enemylist.js');
-const SF = require('./staticFuncs.js');
+const SF = require('./../staticFuncs.js');
 
 
 module.exports = {

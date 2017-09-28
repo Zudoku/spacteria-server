@@ -1,8 +1,8 @@
 let roomsRef;
 
 const SAT = require('sat');
-const enemies = require('./enemies.js');
-const enemySimulator = require('./enemySimulator.js');
+const enemies = require('./enemies/enemies.js');
+const enemySimulator = require('./enemies/enemySimulator.js');
 const terrainCollision = require('./terraincollision.js');
 const SF = require('./staticFuncs.js');
 const itemHandler = require('./db/items.js');

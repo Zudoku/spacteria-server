@@ -5,7 +5,7 @@ module.exports = {
     const guid = SF.guid();
     const portal = {
       type: 2,
-      portal : {
+      portal: {
         to: toID,
         x,
         y,
