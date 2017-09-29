@@ -6,7 +6,7 @@ const wanderingSimulator = require('./enemySimulatorWandering.js');
 
 
 module.exports = {
-  simulate(enemy, room, serverlogic) {
+  simulate(enemy, room, gameserver) {
     /* eslint no-param-reassign: "off"*/
     switch (enemy.type) {
       case 'dummy': {
@@ -15,7 +15,7 @@ module.exports = {
       }
       case 'wandering': {
         enemy.simulations++;
-        wanderingSimulator.simulate(enemy, room, serverlogic, this, terrainCollision);
+        wanderingSimulator.simulate(enemy, room, gameserver, this, terrainCollision);
         break;
       }
       default: {
@@ -23,13 +23,13 @@ module.exports = {
       }
     }
   },
-  tryToShootProjectiles(enemy, room, serverlogic) {
+  tryToShootProjectiles(enemy, room, gameserver) {
     for (let i = 0; i < enemy.projectiles.length; i++) {
       const currentProjectile = enemy.projectiles[i];
       const thisTime = new Date().getTime();
       const projectileTime = currentProjectile.lastShotTime + currentProjectile.cooldown;
       if (projectileTime < thisTime) {
-        module.exports.shootProjectile(enemy, i, room, serverlogic);
+        module.exports.shootProjectile(enemy, i, room, gameserver);
         currentProjectile.lastShotTime = thisTime;
       }
     }
@@ -48,7 +48,7 @@ module.exports = {
     return false;
   },
 
-  shootProjectile(enemy, index, room, serverlogic) {
+  shootProjectile(enemy, index, room, gameserver) {
     // Calculate the angle between the two
     // TODO: add the option to shoot multiple projectiles with one shot, like a shotgun
     const angle = SF.angleBetweenTwoPoints(enemy.shape.pos, enemy.target.shape.pos);
@@ -66,6 +66,6 @@ module.exports = {
     projectile.damage = enemy.projectiles[index].damage;
     projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y), 2, 2);
 
-    serverlogic.addProjectileToGame(projectile, room.name);
+    gameserver.addProjectileToGame(projectile, room.name);
   },
 };

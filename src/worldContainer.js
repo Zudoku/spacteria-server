@@ -1,5 +1,4 @@
 const SAT = require('sat');
-const maputil = require('./mapgeneration/maputil.js');
 const worldUtil = require('./worldUtil.js');
 
 let currentRoomID = 1;

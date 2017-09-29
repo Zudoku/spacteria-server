@@ -8,13 +8,13 @@ const path = require('path');
 
 const serverconfig = require('./config/serverconfig.js');
 
-const serverlogic = require('./src/serverlogic');
+const gameserver = require('./src/gameserver');
 
 app.use(express.static(path.join(__dirname, 'webapp')));
-serverlogic.init(io);
+gameserver.init(io);
 
 app.get('/*', (req, res) => {
-  res.sendfile(path.join(__dirname, 'webapp', 'index.html'));
+  res.sendFile(path.join(__dirname, 'webapp', 'index.html'));
 });
 
 http.listen(serverconfig.webserver_port, serverconfig.webserver_bind, () => {

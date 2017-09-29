@@ -20,8 +20,11 @@ module.exports = {
   },
   getRandomIntInclusive(min, max) {
     /* eslint no-mixed-operators: "off"*/
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+    const minC = Math.ceil(min);
+    const maxF = Math.floor(max);
+    return Math.floor(Math.random() * (maxF - minC + 1)) + minC;
+  },
+  isString(oobj) {
+    return (oobj !== undefined && typeof oobj === 'string');
   },
 };

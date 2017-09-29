@@ -11,7 +11,7 @@ const AI_TARGET_SEARCH_FREQ = 18;
 const AI_MOVE_RANDOMLY_FREQ = 22;
 
 module.exports = {
-  simulate(enemy, room, serverlogic, enemySimulator, terrainCollision) {
+  simulate(enemy, room, gameserver, enemySimulator, terrainCollision) {
     /* eslint no-param-reassign: "off"*/
     const simulationIndex = enemy.simulations;
     switch (enemy.state) {
@@ -64,7 +64,7 @@ module.exports = {
         // Shoot at target
 
         if (enemy.target !== undefined) {
-          module.exports.tryToShootProjectiles(enemy, room, serverlogic);
+          module.exports.tryToShootProjectiles(enemy, room, gameserver);
         }
 
         if (simulationIndex % 10 !== 0) {

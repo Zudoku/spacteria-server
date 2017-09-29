@@ -1,26 +1,16 @@
 let roomsRef;
 
 const SAT = require('sat');
-const enemies = require('./enemies/enemies.js');
 const enemySimulator = require('./enemies/enemySimulator.js');
 const terrainCollision = require('./terraincollision.js');
 const SF = require('./staticFuncs.js');
 const itemHandler = require('./db/items.js');
-const gameobjects = require('./gameobjects.js');
 const mapDescription = require('./gamemapDescriptions.js');
 const charDB = require('./db/characters.js');
 const gameplayconfig = require('./../config/gameplayconfig.js');
 const worldUtil = require('./worldUtil.js');
 
-let serverlogic;
-const DELTA = 1000 / 60;
-
-const levelCaps = [
-  800, 2600, 4100, 7200, 10000,
-  14800, 20400, 29000, 43000, 67600,
-  90800, 145600, 210800, 306100, 454000,
-  515000, 575800, 644400, 770000, 1200000,
-];
+let gameserver;
 
 module.exports = {
   init(filename, room, broadcast, reset, maprooms) {
@@ -35,14 +25,14 @@ module.exports = {
         if (mapDescription.initializeMap(room, terrainCollision.getTypes(filename).type, terrainCollision, reset, maprooms)) {
           if (broadcast) {
             console.log('broadcasting map change');
-            serverlogic.updateroomdescription(room);
+            gameserver.broadcastUpdateRoomDescription(room);
           }
         }
       });
     }, 100);
   },
   initialize(serlogic) {
-    serverlogic = serlogic;
+    gameserver = serlogic;
   },
   simulate(rooms, ioref) {
     roomsRef = rooms;
@@ -64,15 +54,13 @@ module.exports = {
     for (let i = 0; i < room.enemies.length; i++) {
       const enemy = room.enemies[i];
       // Set move target, shoot at players, look for target here
-      enemySimulator.simulate(enemy, room, serverlogic);
+      enemySimulator.simulate(enemy, room, gameserver);
       // If we need to move, move
       if (enemy.moveTarget !== undefined) {
         // Give momentum
         let angle = SF.angleBetweenTwoPoints(enemy.shape.pos, enemy.moveTarget);
         angle %= 360;
-        // console.log(`${enemy.moveTarget.x},${enemy.moveTarget.y}-${enemy.shape.pos.x},${enemy.shape.pos.y}-${angle}`);
         module.exports.giveMomentum(enemy, angle, enemy.stats.speed);
-        // console.log(`${enemy.deltaX},${enemy.deltaY}`);
         // Move enemies
         module.exports.defaultMove(enemy, room, 'enemy');
         // Test if we should broadcast new position
@@ -82,7 +70,7 @@ module.exports = {
   },
   giveMomentum(target, angle, speed) {
     const angleInRadians = (angle / 360) * (2 * Math.PI);
-    const scaler = ((speed * DELTA) / 200);
+    const scaler = ((speed * gameplayconfig.SIMULATION_INTERVAL) / 200);
 
     let deltaX = -Math.sin(angleInRadians);
     let deltaY = -Math.cos(angleInRadians);
@@ -232,7 +220,7 @@ module.exports = {
       }
     } else if (type === 'player') {
       target.stats.health -= damage;
-      serverlogic.sendUpdateCharacterStatus(target.id);
+      gameserver.broadcastCharacterStatus(target.id);
     }
   },
   objectCollidedWithTerrain(target, room, type) {
@@ -248,14 +236,14 @@ module.exports = {
       room.projectiles.splice(index, 1);
     }
     // Send remove event
-    serverlogic.removeGameobject(target.guid, room);
+    gameserver.broadcastRemoveGameobject(target.guid, room);
   },
   npcDie(target, room) {
     // Kill it from the server
     const index = room.enemies.indexOf(target);
     if (index !== -1) {
       room.enemies.splice(index, 1);
-      serverlogic.removeGameobject(target.hash, room);
+      gameserver.broadcastRemoveGameobject(target.hash, room);
       // Roll the loot
       module.exports.spawnLoot(target.loot, room, target.x, target.y);
       // Give EXP
@@ -268,16 +256,16 @@ module.exports = {
     for (let i = 0; i < room.players.length; i++) {
       const player = room.players[i];
       player.characterdata.experience += deadTarget.exp;
-      const levelCap = levelCaps[player.characterdata.level - 1];
+      const levelCap = gameplayconfig.LEVELCAPS[player.characterdata.level - 1];
       if (player.characterdata.experience >= levelCap) {
         player.characterdata.experience -= levelCap;
         player.characterdata.level++;
-        serverlogic.refreshStatsForPlayer(player);
+        gameserver.refreshStatsForPlayer(player);
       }
       if (gameplayconfig.data_percistence) {
         charDB.updateCharacter(player.characterdata);
       }
-      serverlogic.sendUpdateCharacterStatus(player.id);
+      gameserver.broadcastCharacterStatus(player.id);
     }
   },
   spawnLoot(lootTable, room, x, y) {
@@ -332,7 +320,7 @@ module.exports = {
         hash: SF.guid(),
       };
       room.gameobjects.push(lootBag);
-      serverlogic.broadcastLootBagToGame(lootBag.lootbag, lootBag.hash, room);
+      gameserver.broadcastLootBagToGame(lootBag.lootbag, lootBag.hash, room);
     });
   },
   checkIfBroadcastNPC(enemy, room) {
@@ -341,7 +329,7 @@ module.exports = {
 
     if (deltaX + deltaY >= gameplayconfig.NPC_POSITION_BROADCAST_BUFFER) {
       enemy.lastBroadCastedPosition = { x: enemy.shape.pos.x, y: enemy.shape.pos.y };
-      serverlogic.updateNPCPosition(enemy.hash, enemy.lastBroadCastedPosition, room);
+      gameserver.broadcastUpdateNPCPosition(enemy.hash, enemy.lastBroadCastedPosition, room);
       // Recalculate zone
       const newZone = worldUtil.getZoneForCoord(room.zones, enemy.x, enemy.y);
       if (enemy.zone === undefined || newZone.x !== enemy.zone.x || newZone.y !== enemy.zone.y) {
