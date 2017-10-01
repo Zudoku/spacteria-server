@@ -51,9 +51,18 @@ module.exports = {
   shootProjectile(enemy, index, room, gameserver) {
     // Calculate the angle between the two
     // TODO: add the option to shoot multiple projectiles with one shot, like a shotgun
-    const angle = SF.angleBetweenTwoPoints(enemy.shape.pos, enemy.target.shape.pos);
+    const realEnemyPos = {
+      x: enemy.shape.pos.x + (enemy.shape.w / 2),
+      y: enemy.shape.pos.y + (enemy.shape.h / 2),
+    };
+    const realTargetPos = {
+      x: enemy.target.shape.pos.x + (enemy.target.shape.w / 2),
+      y: enemy.target.shape.pos.y + (enemy.target.shape.h / 2),
+    };
 
-    const projectile = { x: enemy.x + (enemy.shape.w / 2), y: enemy.y + (enemy.shape.h), deltaX: 0, deltaY: 0 };
+    const angle = SF.angleBetweenTwoPoints(realEnemyPos, realTargetPos);
+
+    const projectile = { x: enemy.x + (enemy.shape.w / 2), y: enemy.y + (enemy.shape.h / 2), deltaX: 0, deltaY: 0 };
     projectile.image = enemy.projectiles[index].image;
     projectile.team = 2;
     projectile.path = enemy.projectiles[index].path;
@@ -65,7 +74,8 @@ module.exports = {
     projectile.travelDistance = 0;
     projectile.damage = enemy.projectiles[index].damage;
     projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y), 2, 2);
+    room.projectiles.push(projectile);
 
-    gameserver.addProjectileToGame(projectile, room.name);
+    gameserver.broadcastProjectileSpawn(projectile, room);
   },
 };

@@ -14,6 +14,17 @@ module.exports = {
   simulate(enemy, room, gameserver, enemySimulator, terrainCollision) {
     /* eslint no-param-reassign: "off"*/
     const simulationIndex = enemy.simulations;
+
+    if (simulationIndex % 60 === 0) {
+      if (enemy.stats.health !== enemy.stats.maxhhealth) {
+        enemy.stats.health += enemy.stats.vitality;
+        // Cant generate over maxhealth
+        if (enemy.stats.health > enemy.stats.maxhhealth) {
+          enemy.stats.health = enemy.stats.maxhealth;
+        }
+      }
+    }
+
     switch (enemy.state) {
       case NO_TARGET_FOUND: {
         /* eslint no-mixed-operators: "off"*/
@@ -64,7 +75,7 @@ module.exports = {
         // Shoot at target
 
         if (enemy.target !== undefined) {
-          module.exports.tryToShootProjectiles(enemy, room, gameserver);
+          enemySimulator.tryToShootProjectiles(enemy, room, gameserver);
         }
 
         if (simulationIndex % 10 !== 0) {

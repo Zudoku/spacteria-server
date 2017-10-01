@@ -12,7 +12,7 @@ module.exports = {
   2: { // first street
     portals: [{ id: 1, prob: 1.0, x: 3 * 64, y: 3 * 64 }, { id: 2, prob: 1.0 }, { id: 3, prob: 0.5 }],
     npcs: [],
-    enemies: [{ id: 'small_guy', amount: 2, prob: 1.0 }, { id: 'small_guy', amount: 4, prob: 0.4 }],
+    enemies: [{ id: 'gelatinous_blob', amount: 2, prob: 1.0 }, { id: 'mini_gelatinous_blob', amount: 8, prob: 0.4 }],
     lootbags: [],
     generationData: {
       minroomheight: 2,
@@ -38,7 +38,7 @@ module.exports = {
   3: { // 1DL1
     portals: [{ id: 2, prob: 1.0, x: 3 * 64, y: 3 * 64 }],
     npcs: [],
-    enemies: [{ id: 'small_guy', amount: 8, prob: 1.0 }],
+    enemies: [{ id: 'gelatinous_blob', amount: 8, prob: 1.0 }],
     lootbags: [],
     generationData: {
       minroomheight: 3,

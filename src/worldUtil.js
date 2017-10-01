@@ -65,10 +65,10 @@ module.exports = {
     ];
     const result = {
       health: (100 + (playerData.level * baseStats[playerData.cclass].health)),
-      dexterity: (100 + (playerData.level * baseStats[playerData.cclass].dexterity)),
-      strength: (100 + (playerData.level * baseStats[playerData.cclass].strength)),
-      vitality: (100 + (playerData.level * baseStats[playerData.cclass].vitality)),
-      defence: (100 + (playerData.level * baseStats[playerData.cclass].defence)),
+      dexterity: (1 + (playerData.level * baseStats[playerData.cclass].dexterity)),
+      strength: (1 + (playerData.level * baseStats[playerData.cclass].strength)),
+      vitality: (1 + (playerData.level * baseStats[playerData.cclass].vitality)),
+      defence: (1 + (playerData.level * baseStats[playerData.cclass].defence)),
       speed: (100 + (playerData.level * baseStats[playerData.cclass].speed)),
       maxhealth: (100 + (playerData.level * baseStats[playerData.cclass].health)),
     };

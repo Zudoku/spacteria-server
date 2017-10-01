@@ -189,17 +189,6 @@ module.exports = {
         }
       });
       return collided;
-      // Get all enemies in the zone
-      /*
-      for (let i = 0; i < room.enemies.length; i++) {
-        const foundEnemy = room.enemies[i];
-        if (SAT.testPolygonPolygon(target.shape.toPolygon(), foundEnemy.shape.toPolygon())) {
-          module.exports.takeDamage(foundEnemy, 'enemy', target.damage, room);
-          return true;
-        }
-      }
-      return false;
-       */
     } else if (target.team === 2) {
       for (let i = 0; i < room.players.length; i++) {
         const foundPlayer = room.players[i];
@@ -213,13 +202,17 @@ module.exports = {
     return false;
   },
   takeDamage(target, type, damage, room) {
+    let takenDamage = damage - target.stats.defence;
+    if (takenDamage <= 0) {
+      takenDamage = 1;
+    }
     if (type === 'enemy') {
-      target.stats.health -= damage;
+      target.stats.health -= takenDamage;
       if (target.stats.health <= 0) {
         module.exports.npcDie(target, room);
       }
     } else if (type === 'player') {
-      target.stats.health -= damage;
+      target.stats.health -= takenDamage;
       gameserver.broadcastCharacterStatus(target.id);
     }
   },
@@ -236,7 +229,7 @@ module.exports = {
       room.projectiles.splice(index, 1);
     }
     // Send remove event
-    gameserver.broadcastRemoveGameobject(target.guid, room);
+    // gameserver.broadcastRemoveGameobject(target.guid, room);
   },
   npcDie(target, room) {
     // Kill it from the server
