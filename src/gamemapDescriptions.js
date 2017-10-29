@@ -23,6 +23,11 @@ module.exports = {
     }
     room.zones = worldUtil.getZones(width, height);
     // Set players to right place
+    if (description.spawn !== undefined) {
+      room.mapDescription.startX = description.spawn.x;
+      room.mapDescription.startY = description.spawn.y;
+    }
+    // room.mapDescription.filename = id;
     for (let i = 0; i < room.players.length; i++) {
       const player = room.players[i];
       player.x = room.mapDescription.startX;
@@ -31,21 +36,22 @@ module.exports = {
       player.shape.y = room.mapDescription.startY;
     }
 
+    // add position defined enemies
+    for (let i = 0; i < description.enemies.length; i++) {
+      if (description.enemies[i].x !== undefined && description.enemies[i].y !== undefined) {
+        module.exports.tryToAddEnemy(room, description.enemies[i], 0, 0);
+      }
+    }
+
     // add enemies if there are rooms defined
     if (maprooms !== undefined) {
-      // add position defined enemies
-      for (let i = 0; i < description.enemies.length; i++) {
-        if (description.enemies[i].x !== undefined && description.enemies[i].y !== undefined) {
-          module.exports.tryToAddEnemy(room, description.enemies[i], 0, 0);
-        }
-      }
       // Add room defined enemies
       for (let i = 0; i < maprooms.length; i++) {
         const mapRoom = maprooms[i];
         for (let k = 0; k < description.enemies.length; k++) {
           const handledEnemy = description.enemies[k];
           if (handledEnemy.x === undefined || handledEnemy.y === undefined) {
-            module.exports.tryToAddEnemy(room, handledEnemy, mapRoom.x * 64 + 96, mapRoom.y * 64 + 96);
+            module.exports.tryToAddEnemy(room, handledEnemy, (mapRoom.x * 64) + 96, (mapRoom.y * 64) + 96);
           }
         }
       }

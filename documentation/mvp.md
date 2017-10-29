@@ -8,7 +8,7 @@
  - Player can join
  - Player can leave
  - Player can die
- - Only one zone can be active at one time
+ - Only one zone can be active at one time in the room
 
 ### Player move syncronization to every player
 
@@ -46,6 +46,9 @@
  - Player can pick up an item from ground
  - Are dropped by NPCs
 
-### Random Map generation
- - Made using https://github.com/mxgmn/WaveFunctionCollapse
+### Pseudo-Random Map generation
  - Can generate enterances to other zones and proper enemies
+
+### Base
+ - Vendor that you can sell items for coins and buy health potions
+ - Some other NPC's that talk and give tips

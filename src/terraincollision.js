@@ -3,7 +3,9 @@ const PF = require('pathfinding');
 
 const tilemaps = {};
 const tilemapTypes = { temp: { type: '1', width: 20, height: 20 } };
-const blocking = [0, 1, 3, 7, 9];
+const blocking = [1, 2, 4, 6, 7, 8, 10, 11, 15, 16, 18];
+
+const TMXPARSER_OFFSET = 1;
 
 module.exports = {
   initializeMap(filename, cb) {
@@ -28,7 +30,7 @@ module.exports = {
       for (let x = 0; x < map.width; x++) {
         // collisionMap[x] = new Array(map.height);
         for (let y = 0; y < map.height; y++) {
-          const blockingTile = blocking.indexOf(map.layers[0].tiles[(y * map.width) + x].id) !== -1;
+          const blockingTile = blocking.indexOf(map.layers[0].tiles[(y * map.width) + x].id + TMXPARSER_OFFSET) !== -1;
           collisionMap.setWalkableAt(x, y, blockingTile);
           tilemaps[filename] = collisionMap;
         }

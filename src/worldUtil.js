@@ -37,40 +37,22 @@ module.exports = {
       5: 'defence',
       6: 'speed',
     };
-    const baseStats = [
-      {
-        health: 5,
-        dexterity: 2,
-        strength: 12,
-        vitality: 5,
-        defence: 5,
-        speed: 1,
-      },
-      {
-        health: 3,
-        dexterity: 4,
-        strength: 7,
-        vitality: 5,
-        defence: 2,
-        speed: 1,
-      },
-      {
-        health: 6,
-        dexterity: 1,
-        strength: 10,
-        vitality: 5,
-        defence: 7,
-        speed: 1,
-      },
-    ];
+    const baseStats = {
+      health: 5,
+      dexterity: 2,
+      strength: 2,
+      vitality: 1,
+      defence: 1,
+      speed: 1,
+    };
     const result = {
-      health: (100 + (playerData.level * baseStats[playerData.cclass].health)),
-      dexterity: (1 + (playerData.level * baseStats[playerData.cclass].dexterity)),
-      strength: (1 + (playerData.level * baseStats[playerData.cclass].strength)),
-      vitality: (1 + (playerData.level * baseStats[playerData.cclass].vitality)),
-      defence: (1 + (playerData.level * baseStats[playerData.cclass].defence)),
-      speed: (100 + (playerData.level * baseStats[playerData.cclass].speed)),
-      maxhealth: (100 + (playerData.level * baseStats[playerData.cclass].health)),
+      health: (100 + (playerData.level * baseStats.health)),
+      dexterity: (1 + (playerData.level * baseStats.dexterity)),
+      strength: (1 + (playerData.level * baseStats.strength)),
+      vitality: (1 + (playerData.level * baseStats.vitality)),
+      defence: (1 + (playerData.level * baseStats.defence)),
+      speed: (100 + (playerData.level * baseStats.speed)),
+      maxhealth: (100 + (playerData.level * baseStats.health)),
     };
     // Go through items and add all stats
     for (let i = 1; i <= 8; i++) {

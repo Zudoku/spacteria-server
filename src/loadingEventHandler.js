@@ -2,6 +2,7 @@ const SF = require('./staticFuncs.js');
 
 const characters = require('./db/characters.js');
 const items = require('./db/items.js');
+const currencies = require('./db/currencies.js');
 
 const maputil = require('./mapgeneration/maputil.js');
 const gamemapDescriptions = require('./gamemapDescriptions.js');
@@ -19,11 +20,13 @@ module.exports = {
           Promise.all([
             items.getEquipmentForCharacter(characterID),
             items.getInventoryForCharacter(characterID),
+            currencies.getCurrencies(characterID),
           ]).then((itemdata) => {
-            const [equipmentData, inventoryData] = itemdata;
+            const [equipmentData, inventoryData, currencyData] = itemdata;
             if (equipmentData.success && inventoryData.success) {
               character.equipment = { data: equipmentData.equipment || { } };
               character.inventory = { data: inventoryData.inventory || { } };
+              character.currencies = currencyData.currencies || { };
               const playerRef = worldContainer.addPlayer(socket.id, character);
               connections[socket.id].charactername = character.name;
               socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL, { character, stats: playerRef.stats });

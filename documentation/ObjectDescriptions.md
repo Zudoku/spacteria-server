@@ -2,18 +2,26 @@
 
 ## Enemy
  - shape: SAT.Box
- - image: STRING
+ - image: INTEGER
  - stats: { health, vitality, strength, dexterity, defence, speed }
  - collideToTerrain: BOOLEAN
+ - name: STRING
  - type: 'dummy' | 'wandering' | 'caster' | 'static'
+ - hitsound: STRING
+ - deathsound: STRING
  - state: INTEGER
+ - extra: {}
  - simulations: INTEGER
  - moveTarget: {x, y}
  - target: player / gameobjects
  - lastBroadCastedPosition: {x, y}
  - hash: STRING
- - projectileType: STRING
  - projectiles: [Projectile objects]
+ - zone: Zone
+ - loot: [Object]
+ - exp: INTEGER
+ - x: INTEGER,
+ - y: INTEGER,
 
 
 ## Player
@@ -33,8 +41,32 @@
  - currentTravelDistance: DOUBLE
  - maxTravelDistance: DOUBLE
  - path: STRING
+ - cooldown: INTEGER
  - damage: INTEGER
+ - lastShotTime: INTEGER
  - guid: STRING
  - team: INTEGER
  - collideToTerrain: BOOLEAN
  - shape: SAT.Box
+ - width: INTEGER
+ - height: INTEGER
+ - onTerrainCollision: function
+
+## Item slots
+ - 0 = Helmet
+ - 1 = Pants
+ - 2 = Shoulders
+ - 3 = Weapon
+ - 4 = Chest
+ - 5 = Boots
+ - 6 = Ring
+ - 7 = Relic
+
+## Item attribute mapping
+ - 1 = maxhealth
+ - 2 = vitality
+ - 3 = strength
+ - 4 = dexterity
+ - 5 = defence
+ - 6 = speed
+ - 10 = weapon projectile

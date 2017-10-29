@@ -9,27 +9,22 @@ const AI_MOVETARGET_BUFFER = 6;
 
 const AI_TARGET_SEARCH_FREQ = 18;
 const AI_MOVE_RANDOMLY_FREQ = 22;
+const AI_MOVE_LIMITER_FREQ = 8;
+
+const AI_UPDATE_PATH_FREQ = 2;
 
 module.exports = {
   simulate(enemy, room, gameserver, enemySimulator, terrainCollision) {
     /* eslint no-param-reassign: "off"*/
     const simulationIndex = enemy.simulations;
 
-    if (simulationIndex % 60 === 0) {
-      if (enemy.stats.health !== enemy.stats.maxhhealth) {
-        enemy.stats.health += enemy.stats.vitality;
-        // Cant generate over maxhealth
-        if (enemy.stats.health > enemy.stats.maxhhealth) {
-          enemy.stats.health = enemy.stats.maxhealth;
-        }
-      }
-    }
+    enemySimulator.regenLife(enemy);
 
     switch (enemy.state) {
       case NO_TARGET_FOUND: {
         /* eslint no-mixed-operators: "off"*/
         if (simulationIndex % AI_TARGET_SEARCH_FREQ === 0) {
-          if (enemySimulator.enemylookForTarget(enemy, room)) {
+          if (enemySimulator.enemylookForTarget(enemy, room, 150)) {
             enemy.state = TARGET_FOUND;
 
             return;
@@ -64,32 +59,36 @@ module.exports = {
         break;
       }
       case TARGET_FOUND: {
-        // Move towards target
         const arrayPosXE = Math.floor(enemy.shape.pos.x / 64);
         const arrayPosYE = Math.floor(enemy.shape.pos.y / 64);
         const arrayPosXT = Math.floor(enemy.target.shape.pos.x / 64);
         const arrayPosYT = Math.floor(enemy.target.shape.pos.y / 64);
-        const finder = new PF.AStarFinder();
-        const grid = terrainCollision.getMapCloneForPF(room);
+
 
         // Shoot at target
 
         if (enemy.target !== undefined) {
           enemySimulator.tryToShootProjectiles(enemy, room, gameserver);
         }
-
-        if (simulationIndex % 10 !== 0) {
+        // Move towards target, if needed
+        if (simulationIndex % AI_MOVE_LIMITER_FREQ !== 0) {
           return;
         }
+
+        const finder = new PF.AStarFinder();
+        const grid = terrainCollision.getMapCloneForPF(room);
 
         if (!grid.isInside(arrayPosXE, arrayPosYE) || !grid.isInside(arrayPosXT, arrayPosYT)) {
           console.log('target outside map...');
           return;
         }
 
-        const path = finder.findPath(arrayPosXE, arrayPosYE, arrayPosXT, arrayPosYT, grid);
+        let path = enemy.path;
 
-        // console.log(path);
+        if (path === undefined || simulationIndex % AI_UPDATE_PATH_FREQ === 0) {
+          path = finder.findPath(arrayPosXE, arrayPosYE, arrayPosXT, arrayPosYT, grid);
+          enemy.path = path;
+        }
 
         if (path.length === 1) {
           enemy.moveTarget = { x: (path[0][0] * 64) + AI_TILE_CORNER_BUFFER, y: (path[0][1] * 64) + AI_TILE_CORNER_BUFFER };

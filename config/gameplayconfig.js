@@ -2,13 +2,14 @@ const config = {};
 
 config.allow_multiple_logins_on_account = false;
 config.data_percistence = true;
-config.zone_amount = 20;
+config.zone_amount = 40;
 config.publish_gameplay_config = false;// TODO
 
 
 
 
-config.NPC_POSITION_BROADCAST_BUFFER = 2;
+config.NPC_POSITION_BROADCAST_BUFFER = 4;
+config.NPC_MOVE_CYCLE_AMOUNT = 0.25;
 config.SIMULATION_INTERVAL = 1000 / 60;
 config.LEVELCAPS = [
   800, 2600, 4100, 7200, 10000,

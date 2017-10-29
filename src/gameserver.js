@@ -21,13 +21,7 @@ module.exports = {
     ioref = io;
     worldSimulator.initialize(this);
     // Simulate worlds
-    setInterval(() => {
-      tickAmount++;
-      module.exports.callSimulation();
-      if (tickAmount % 300 === 0) {
-        module.exports.updateObservers();
-      }
-    }, gameplayconfig.SIMULATION_INTERVAL);
+    module.exports.doTimer();
 
     io.on('connection', (socket) => {
       socket.on(evts.incoming.IDENTIFY, (identifyInfo) => {
@@ -207,6 +201,22 @@ module.exports = {
   },
   removeIdentification(socketId) {
     delete connections[socketId];
+  },
+  doTimer() {
+    const speed = gameplayconfig.SIMULATION_INTERVAL;
+    let count = 1;
+    const start = new Date().getTime();
+
+    function instance() {
+      count++;
+      tickAmount++;
+      worldSimulator.simulate(worldContainer.getRooms(), ioref);
+
+      const diff = (new Date().getTime() - start) - (count * speed);
+      setTimeout(instance, (speed - diff));
+    }
+
+    setTimeout(instance, speed);
   },
   callSimulation() {
     worldSimulator.simulate(worldContainer.getRooms(), ioref);

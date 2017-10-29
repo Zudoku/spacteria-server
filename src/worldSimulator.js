@@ -60,7 +60,7 @@ module.exports = {
         // Give momentum
         let angle = SF.angleBetweenTwoPoints(enemy.shape.pos, enemy.moveTarget);
         angle %= 360;
-        module.exports.giveMomentum(enemy, angle, enemy.stats.speed);
+        module.exports.giveMomentum(enemy, angle, enemy.stats.speed, enemy.moveTarget);
         // Move enemies
         module.exports.defaultMove(enemy, room, 'enemy');
         // Test if we should broadcast new position
@@ -68,7 +68,7 @@ module.exports = {
       }
     }
   },
-  giveMomentum(target, angle, speed) {
+  giveMomentum(target, angle, speed, moveTarget) {
     const angleInRadians = (angle / 360) * (2 * Math.PI);
     const scaler = ((speed * gameplayconfig.SIMULATION_INTERVAL) / 200);
 
@@ -80,6 +80,15 @@ module.exports = {
 
     target.deltaX = deltaX;
     target.deltaY = deltaY;
+
+    if (moveTarget !== undefined) {
+      const xdiff = Math.abs(target.x - moveTarget.x);
+      const ydiff = Math.abs(target.y - moveTarget.y);
+      if ((xdiff + ydiff) < 10) {
+        target.deltaX /= 10;
+        target.deltaY /= 10;
+      }
+    }
   },
   defaultMove(target, room, type) {
     /* eslint no-param-reassign: "off"*/
@@ -88,77 +97,56 @@ module.exports = {
     }
 
     const maxDelta = Math.max(Math.abs(target.deltaX), Math.abs(target.deltaY));
+
     let collidedX = false;
     let collidedY = false;
 
-    for (let currentDelta = 0.0; currentDelta < maxDelta; currentDelta += 0.1) {
+    const NMCA = gameplayconfig.NPC_MOVE_CYCLE_AMOUNT;
+
+    for (let currentDelta = 0.0; currentDelta < maxDelta; currentDelta += NMCA) {
       // Move in X
       if (currentDelta < Math.abs(target.deltaX) && !collidedX) {
         const copiedShape = new SAT.Box(new SAT.Vector(target.shape.pos.x, target.shape.pos.y), target.shape.w, target.shape.h);
-        copiedShape.pos.x += (target.deltaX > 0) ? 0.1 : -0.1;
+        copiedShape.pos.x += (target.deltaX > 0) ? NMCA : -NMCA;
         if (target.collideToTerrain) {
           if (!terrainCollision.collidesToTerrain(copiedShape.toPolygon(), room)) {
-            target.x += ((target.deltaX > 0) ? 0.1 : -0.1);
+            target.x += ((target.deltaX > 0) ? NMCA : -NMCA);
             target.shape.pos = new SAT.Vector(target.x, target.y);
-            if (type === 'projectile') {
-              target.travelDistance += 0.1;
-              if (target.travelDistance > target.maxTravelDistance) {
-                module.exports.removeBulletFromGame(target, room);
-                return;
-              }
-              if (module.exports.projectileCollidesToObjects(target, room)) {
-                module.exports.removeBulletFromGame(target, room);
-                return;
-              }
+            if (module.exports.projectileMovingForward(target, room, type)) {
+              return;
             }
           } else {
             module.exports.objectCollidedWithTerrain(target, room, type);
             collidedX = true;
           }
         } else {
-          target.x += ((target.deltaX > 0) ? 0.1 : -0.1);
+          target.x += ((target.deltaX > 0) ? NMCA : -NMCA);
           target.shape.pos = new SAT.Vector(target.x, target.y);
-          if (type === 'projectile') {
-            target.travelDistance += 0.1;
-            if (target.travelDistance > target.maxTravelDistance) {
-              module.exports.removeBulletFromGame(target, room);
-              return;
-            }
-            if (module.exports.projectileCollidesToObjects(target, room)) {
-              module.exports.removeBulletFromGame(target, room);
-              return;
-            }
+          if (module.exports.projectileMovingForward(target, room, type)) {
+            return;
           }
         }
       }
       // Move in Y
       if (currentDelta < Math.abs(target.deltaY) && !collidedY) {
         const copiedShape = new SAT.Box(new SAT.Vector(target.shape.pos.x, target.shape.pos.y), target.shape.w, target.shape.h);
-        copiedShape.pos.y += (target.deltaY > 0) ? 0.1 : -0.1;
+        copiedShape.pos.y += (target.deltaY > 0) ? NMCA : -NMCA;
         if (target.collideToTerrain) {
           if (!terrainCollision.collidesToTerrain(copiedShape.toPolygon(), room)) {
-            target.y += ((target.deltaY > 0) ? 0.1 : -0.1);
+            target.y += ((target.deltaY > 0) ? NMCA : -NMCA);
             target.shape.pos = new SAT.Vector(target.x, target.y);
-            if (type === 'projectile') {
-              target.travelDistance += 0.1;
-              if (target.travelDistance > target.maxTravelDistance) {
-                module.exports.removeBulletFromGame(target, room);
-                return;
-              }
+            if (module.exports.projectileMovingForward(target, room, type)) {
+              return;
             }
           } else {
             module.exports.objectCollidedWithTerrain(target, room, type);
             collidedY = true;
           }
         } else {
-          target.y += ((target.deltaY > 0) ? 0.1 : -0.1);
+          target.y += ((target.deltaY > 0) ? NMCA : -NMCA);
           target.shape.pos = new SAT.Vector(target.x, target.y);
-          if (type === 'projectile') {
-            target.travelDistance += 0.1;
-            if (target.travelDistance > target.maxTravelDistance) {
-              module.exports.objectCollidedWithTerrain(target, room, type);
-              return;
-            }
+          if (module.exports.projectileMovingForward(target, room, type)) {
+            return;
           }
         }
       }
@@ -167,11 +155,26 @@ module.exports = {
     target.deltaX = 0;
     target.deltaY = 0;
     if (type === 'projectile') {
+      debugger;
       const newZone = worldUtil.getZoneForCoord(room.zones, target.x, target.y);
       if (target.zone === undefined || newZone.x !== target.zone.x || newZone.y !== target.zone.y) {
         target.zone = newZone;
       }
     }
+  },
+  projectileMovingForward(target, room, type) {
+    if (type === 'projectile') {
+      target.travelDistance += gameplayconfig.NPC_MOVE_CYCLE_AMOUNT;
+      if (target.travelDistance > target.maxTravelDistance) {
+        module.exports.removeBulletFromGame(target, room);
+        return true;
+      }
+      if (module.exports.projectileCollidesToObjects(target, room)) {
+        module.exports.removeBulletFromGame(target, room);
+        return true;
+      }
+    }
+    return false;
   },
   projectileCollidesToObjects(target, room) {
     if (target.team === 1) {

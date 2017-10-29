@@ -23,12 +23,19 @@ CREATE TABLE gamecharacter
 uniqueid SERIAL,
 userid INTEGER REFERENCES Gameuser(uniqueid),
 name varchar(60),
-cclass INTEGER NOT NULL,
 level INTEGER NOT NULL,
 experience INTEGER NOT NULL,
 created TIMESTAMP NOT NULL,
 PRIMARY KEY(uniqueid),
 UNIQUE(name)
+);
+
+CREATE TABLE gamecharactercurrency
+(
+characterid INTEGER REFERENCES gamecharacter(uniqueid),
+coin INTEGER NOT NULL,
+bugbounty INTEGER NOT NULL,
+rollticket INTEGER NOT NULL
 );
 
 CREATE TABLE gameitem
@@ -43,7 +50,6 @@ tradeable BOOLEAN NOT NULL,
 rarity INTEGER NOT NULL,
 sellvalue INTEGER NOT NULL,
 imageid INTEGER NOT NULL,
-cclassreq INTEGER NOT NULL,
 PRIMARY KEY(uniqueid)
 );
 

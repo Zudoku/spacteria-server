@@ -49,7 +49,7 @@ module.exports = {
     player.x = room.mapDescription.startX;
     player.y = room.mapDescription.startY;
     player.shape = new SAT.Box(new SAT.Vector(player.x,
-      player.y), 32, 32);
+      player.y - 32), 32, 32);
     room.players.push(player);
 
     rooms.push(room);
@@ -65,7 +65,7 @@ module.exports = {
     player.x = room.mapDescription.startX;
     player.y = room.mapDescription.startY;
     player.shape = new SAT.Box(new SAT.Vector(player.x,
-      player.y), 32, 32);
+      player.y - 32), 32, 32);
     room.players.push(player);
   },
   removePlayerFromRoom(player, room) {
@@ -85,22 +85,32 @@ module.exports = {
     player.x = nx;
     player.y = ny;
     player.shape = new SAT.Box(new SAT.Vector(player.x,
-      player.y), 32, 32);
+      player.y - 32), 32, 32);
   },
   playerAttack(player, payload) {
-    const projectile = { x: player.x + 16, y: player.y + 16, deltaX: 0, deltaY: 0 };
+    // TODO: make projectile serverside, dont trust user input
 
-    projectile.image = payload.projectile.image;
-    projectile.team = 1;
-    projectile.path = 'STRAIGHT';
-    projectile.speed = payload.projectile.speed;
-    projectile.guid = payload.projectile.guid;
-    projectile.collideToTerrain = true;
+    const projectile = {
+      deltaX: 0,
+      deltaY: 0,
+      image: payload.projectile.image,
+      team: 1,
+      path: 'STRAIGHT',
+      speed: payload.projectile.speed,
+      guid: payload.projectile.guid,
+      collideToTerrain: true,
+      maxTravelDistance: payload.projectile.maxTravelDistance,
+      travelDistance: 0,
+      damage: player.stats.strength,
+      onTerrainCollision: undefined,
+      width: 2,
+      height: 2,
+    };
+
+    projectile.x = player.x + (16);
+    projectile.y = player.y + (16);
     projectile.angle = payload.projectile.angle % 360;
-    projectile.maxTravelDistance = payload.projectile.maxTravelDistance;
-    projectile.travelDistance = 0;
-    projectile.damage = player.stats.strength;
-    projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y), 2, 2);
+    projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y - projectile.height), projectile.width, projectile.height);
 
 
     const foundRoom = rooms.find(x => x.name === player.room);
