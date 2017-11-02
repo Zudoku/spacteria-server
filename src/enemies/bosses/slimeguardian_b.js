@@ -68,7 +68,7 @@ module.exports = {
       const projectileToSpawn = enemySimulator.getProjectile(enemy, 0);
       projectileToSpawn.x = projectileX;
       projectileToSpawn.y = projectileY;
-      projectileToSpawn.shape = new SAT.Box(new SAT.Vector(projectileX, projectileY - projectileToSpawn.height), projectileToSpawn.width, projectileToSpawn.height);
+      projectileToSpawn.shape = new SAT.Box(new SAT.Vector(projectileX, projectileY), projectileToSpawn.width, projectileToSpawn.height);
       projectileToSpawn.angle = projectileDirection;
 
       room.projectiles.push(projectileToSpawn);

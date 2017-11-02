@@ -5,12 +5,14 @@ const wanderingSimulator = require('./enemySimulatorWandering.js');
 const staticSimulator = require('./enemySimulatorStatic.js');
 const slimeguardiana = require('./bosses/slimeguardian_a.js');
 const slimeguardianb = require('./bosses/slimeguardian_b.js');
+const testS = require('./bosses/testingutil.js');
 
 const simulatorMap = {
   wandering: wanderingSimulator,
   static: staticSimulator,
   slimeguardian_a: slimeguardiana,
   slimeguardian_b: slimeguardianb,
+  testingutil: testS,
 };
 
 
@@ -65,7 +67,7 @@ module.exports = {
     projectile.x = enemy.x + (enemy.shape.w / 2);
     projectile.y = enemy.y + (enemy.shape.h / 2);
     projectile.angle = angle;
-    projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y - projectile.height), projectile.width, projectile.height);
+    projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y), projectile.width, projectile.height);
     room.projectiles.push(projectile);
 
     gameserver.broadcastProjectileSpawn(projectile, room);
@@ -93,7 +95,7 @@ module.exports = {
     const simulationIndex = enemy.simulations;
 
     if (simulationIndex % 60 === 0) {
-      if (enemy.stats.health !== enemy.stats.maxhhealth) {
+      if (enemy.stats.health < enemy.stats.maxhhealth) {
         enemy.stats.health += enemy.stats.vitality;
         // Cant generate over maxhealth
         if (enemy.stats.health > enemy.stats.maxhhealth) {

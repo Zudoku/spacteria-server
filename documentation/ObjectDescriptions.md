@@ -52,6 +52,11 @@
  - height: INTEGER
  - onTerrainCollision: function
 
+## Zone
+ - x: INTEGER
+ - y: INTEGER
+ - enemies: Array[Enemy]
+
 ## Item slots
  - 0 = Helmet
  - 1 = Pants

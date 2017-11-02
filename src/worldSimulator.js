@@ -103,16 +103,19 @@ module.exports = {
 
     const NMCA = gameplayconfig.NPC_MOVE_CYCLE_AMOUNT;
 
-    for (let currentDelta = 0.0; currentDelta < maxDelta; currentDelta += NMCA) {
+
+    for (let currentDelta = 0.001; currentDelta < maxDelta; currentDelta += NMCA) {
       // Move in X
       if (currentDelta < Math.abs(target.deltaX) && !collidedX) {
+        const fullMoveX = Math.abs(target.deltaX);
+        const realChunkX = Math.min(Math.min(NMCA, fullMoveX - currentDelta), fullMoveX);
         const copiedShape = new SAT.Box(new SAT.Vector(target.shape.pos.x, target.shape.pos.y), target.shape.w, target.shape.h);
-        copiedShape.pos.x += (target.deltaX > 0) ? NMCA : -NMCA;
+        copiedShape.pos.x += (target.deltaX > 0) ? realChunkX : -realChunkX;
         if (target.collideToTerrain) {
           if (!terrainCollision.collidesToTerrain(copiedShape.toPolygon(), room)) {
-            target.x += ((target.deltaX > 0) ? NMCA : -NMCA);
+            target.x += ((target.deltaX > 0) ? realChunkX : -realChunkX);
             target.shape.pos = new SAT.Vector(target.x, target.y);
-            if (module.exports.projectileMovingForward(target, room, type)) {
+            if (module.exports.projectileMovingForward(target, room, type, realChunkX)) {
               return;
             }
           } else {
@@ -120,22 +123,24 @@ module.exports = {
             collidedX = true;
           }
         } else {
-          target.x += ((target.deltaX > 0) ? NMCA : -NMCA);
+          target.x += ((target.deltaX > 0) ? realChunkX : -realChunkX);
           target.shape.pos = new SAT.Vector(target.x, target.y);
-          if (module.exports.projectileMovingForward(target, room, type)) {
+          if (module.exports.projectileMovingForward(target, room, type, realChunkX)) {
             return;
           }
         }
       }
       // Move in Y
       if (currentDelta < Math.abs(target.deltaY) && !collidedY) {
+        const fullMoveY = Math.abs(target.deltaY);
+        const realChunkY = Math.min(Math.min(NMCA, fullMoveY - currentDelta), fullMoveY);
         const copiedShape = new SAT.Box(new SAT.Vector(target.shape.pos.x, target.shape.pos.y), target.shape.w, target.shape.h);
-        copiedShape.pos.y += (target.deltaY > 0) ? NMCA : -NMCA;
+        copiedShape.pos.y += (target.deltaY > 0) ? realChunkY : -realChunkY;
         if (target.collideToTerrain) {
           if (!terrainCollision.collidesToTerrain(copiedShape.toPolygon(), room)) {
-            target.y += ((target.deltaY > 0) ? NMCA : -NMCA);
+            target.y += ((target.deltaY > 0) ? realChunkY : -realChunkY);
             target.shape.pos = new SAT.Vector(target.x, target.y);
-            if (module.exports.projectileMovingForward(target, room, type)) {
+            if (module.exports.projectileMovingForward(target, room, type, realChunkY)) {
               return;
             }
           } else {
@@ -143,9 +148,9 @@ module.exports = {
             collidedY = true;
           }
         } else {
-          target.y += ((target.deltaY > 0) ? NMCA : -NMCA);
+          target.y += ((target.deltaY > 0) ? realChunkY : -realChunkY);
           target.shape.pos = new SAT.Vector(target.x, target.y);
-          if (module.exports.projectileMovingForward(target, room, type)) {
+          if (module.exports.projectileMovingForward(target, room, type, realChunkY)) {
             return;
           }
         }
@@ -155,16 +160,15 @@ module.exports = {
     target.deltaX = 0;
     target.deltaY = 0;
     if (type === 'projectile') {
-      debugger;
       const newZone = worldUtil.getZoneForCoord(room.zones, target.x, target.y);
       if (target.zone === undefined || newZone.x !== target.zone.x || newZone.y !== target.zone.y) {
         target.zone = newZone;
       }
     }
   },
-  projectileMovingForward(target, room, type) {
+  projectileMovingForward(target, room, type, moveAmount) {
     if (type === 'projectile') {
-      target.travelDistance += gameplayconfig.NPC_MOVE_CYCLE_AMOUNT;
+      target.travelDistance += moveAmount;
       if (target.travelDistance > target.maxTravelDistance) {
         module.exports.removeBulletFromGame(target, room);
         return true;

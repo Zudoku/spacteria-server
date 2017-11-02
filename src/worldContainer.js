@@ -36,7 +36,7 @@ module.exports = {
       mapDescription: {
         filename: 'temp',
         startX: 5 * 64,
-        startY: 5 * 64,
+        startY: 128,
       },
       gameobjects: [], // Static objects that can't be
       enemies: [], // Enemies that can be harmed
@@ -49,7 +49,7 @@ module.exports = {
     player.x = room.mapDescription.startX;
     player.y = room.mapDescription.startY;
     player.shape = new SAT.Box(new SAT.Vector(player.x,
-      player.y - 32), 32, 32);
+      player.y), 32, 32);
     room.players.push(player);
 
     rooms.push(room);
@@ -65,7 +65,7 @@ module.exports = {
     player.x = room.mapDescription.startX;
     player.y = room.mapDescription.startY;
     player.shape = new SAT.Box(new SAT.Vector(player.x,
-      player.y - 32), 32, 32);
+      player.y), 32, 32);
     room.players.push(player);
   },
   removePlayerFromRoom(player, room) {
@@ -85,7 +85,7 @@ module.exports = {
     player.x = nx;
     player.y = ny;
     player.shape = new SAT.Box(new SAT.Vector(player.x,
-      player.y - 32), 32, 32);
+      player.y), 32, 32);
   },
   playerAttack(player, payload) {
     // TODO: make projectile serverside, dont trust user input
@@ -110,7 +110,7 @@ module.exports = {
     projectile.x = player.x + (16);
     projectile.y = player.y + (16);
     projectile.angle = payload.projectile.angle % 360;
-    projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y - projectile.height), projectile.width, projectile.height);
+    projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y), projectile.width, projectile.height);
 
 
     const foundRoom = rooms.find(x => x.name === player.room);

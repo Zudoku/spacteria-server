@@ -79,8 +79,8 @@ module.exports = {
       damage: damageP,
       cooldown: 1,
       lastShotTime: 0,
-      width: 16,
-      height: 16,
+      width: 10,
+      height: 10,
     };
   },
   slimebrother_dance(E, damageP) {
@@ -93,8 +93,8 @@ module.exports = {
       damage: damageP,
       cooldown: 1,
       lastShotTime: 0,
-      width: 16,
-      height: 16,
+      width: 10,
+      height: 10,
     };
   },
   slimebrother_dance_slow(E, damageP) {
@@ -103,12 +103,12 @@ module.exports = {
       path: 'STRAIGHT',
       speed: 20,
       collideToTerrain: false,
-      maxTravelDistance: 600,
+      maxTravelDistance: 800,
       damage: damageP,
       cooldown: 1,
       lastShotTime: 0,
-      width: 27,
-      height: 27,
+      width: 16,
+      height: 16,
     };
   },
 };
