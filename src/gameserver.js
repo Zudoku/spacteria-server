@@ -110,6 +110,12 @@ module.exports = {
         }
       });
 
+      socket.on(evts.incoming.CREATE_CHARACTER, (payload) => {
+        if (module.exports.checkIfIdentified(socket.id)) {
+          loadingEventHandler.addCharacter(payload.charactername, socket, worldContainer, connections[socket.id]);
+        }
+      });
+
       socket.on('disconnect', () => {
         module.exports.handleDisconnect(socket);
       });

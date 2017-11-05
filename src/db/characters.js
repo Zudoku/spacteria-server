@@ -39,14 +39,14 @@ module.exports = {
       });
     });
   },
-  addCharacter(characterObj, userid) {
+  addCharacter(characterName, userid) {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
           resolve({ success: false });
         }
-        const arguments = [userid, characterObj.name, characterObj.cclass, characterObj.level, characterObj.experience];
-        connection.client.query('INSERT INTO gamecharacter (userid, name, cclass, level, experience, created) VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)',arguments , (err, result) => {
+        const arguments = [userid, characterName, 1, 0];
+        connection.client.query('INSERT INTO gamecharacter (userid, name, level, experience, created) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP)', arguments , (err, result) => {
           connection.done(err);
           if (err) {
             resolve({ success: false, msg: 'DB error' });

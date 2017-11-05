@@ -38,5 +38,7 @@ module.exports = {
     UPDATE_CHARATER_STATUS: 'updatecharacterstatus',
     UPDATE_LOOTBAG_STATUS: 'updatelootbagstatus',
     LOAD_NEW_MAP: 'loadnewmap',
+    BAD_CHARACTERNAME: 'badcharactername',
+    CHARACTER_CREATED: 'charactercreated',
   },
 };
