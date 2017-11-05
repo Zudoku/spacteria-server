@@ -104,21 +104,29 @@ module.exports = {
   checkPlayerOwnsCharacter(connections, socketId, character) {
     return (connections[socketId].id === character.userid);
   },
-  addCharacter(characternameUnsanitized, socket, worldContainer, connectionObj) {
+  addCharacter(characternameUnsanitized, socket, connectionObj) {
     console.log(characternameUnsanitized, socket.id);
     if (characternameUnsanitized !== undefined && /^[a-zA-Z0-9_-]*$/.test(characternameUnsanitized)) {
       characters.addCharacter(characternameUnsanitized, connectionObj.id).then((result) => {
         if (result.success) {
-          console.log('s');
           socket.emit(evts.outgoing.CHARACTER_CREATED, {});
         } else {
-          console.log(`n ${connectionObj.id}`);
           socket.emit(evts.outgoing.BAD_CHARACTERNAME, { info: 'Character with that name already exists.' });
         }
       });
     } else {
-      console.log('b');
       socket.emit(evts.outgoing.BAD_CHARACTERNAME, { info: 'Character name can only contain letters, numbers and symbols _ -' });
     }
+  },
+  deleteCharacter(characterID, socket, connections) {
+    characters.getCharacter(characterID).then((characterinfo) => {
+      if (characterinfo.success) {
+        if (module.exports.checkPlayerOwnsCharacter(connections, socket.id, { userid: characterinfo.character.userid })) {
+          characters.deleteCharacter(characterID).then(() => {
+            module.exports.characterlist(connections, socket);
+          });
+        }
+      }
+    });
   },
 };

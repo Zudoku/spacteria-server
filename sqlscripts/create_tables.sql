@@ -32,7 +32,7 @@ UNIQUE(name)
 
 CREATE TABLE gamecharactercurrency
 (
-characterid INTEGER REFERENCES gamecharacter(uniqueid),
+characterid INTEGER REFERENCES gamecharacter(uniqueid) ON DELETE CASCADE,
 coin INTEGER NOT NULL,
 bugbounty INTEGER NOT NULL,
 rollticket INTEGER NOT NULL
@@ -62,13 +62,13 @@ attributevalue INTEGER NOT NULL
 
 CREATE TABLE gameequipment
 (
-characterid INTEGER REFERENCES gamecharacter(uniqueid),
+characterid INTEGER REFERENCES gamecharacter(uniqueid) ON DELETE CASCADE,
 itemid INTEGER REFERENCES gameitem(uniqueid)
 );
 
 CREATE TABLE gameinventory
 (
-characterid INTEGER REFERENCES Gamecharacter(uniqueid),
+characterid INTEGER REFERENCES Gamecharacter(uniqueid) ON DELETE CASCADE,
 itemid INTEGER REFERENCES Gameitem(uniqueid),
 quantity INTEGER NOT NULL,
 slot INTEGER NOT NULL

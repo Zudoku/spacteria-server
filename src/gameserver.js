@@ -112,7 +112,12 @@ module.exports = {
 
       socket.on(evts.incoming.CREATE_CHARACTER, (payload) => {
         if (module.exports.checkIfIdentified(socket.id)) {
-          loadingEventHandler.addCharacter(payload.charactername, socket, worldContainer, connections[socket.id]);
+          loadingEventHandler.addCharacter(payload.charactername, socket, connections[socket.id]);
+        }
+      });
+      socket.on(evts.incoming.DELETE_CHARACTER, (payload) => {
+        if (module.exports.checkIfIdentified(socket.id)) {
+          loadingEventHandler.deleteCharacter(payload.characterID, socket, connections);
         }
       });
 
