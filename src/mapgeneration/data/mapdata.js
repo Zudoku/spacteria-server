@@ -1,7 +1,18 @@
  module.exports = {
    1: { // Spawn area
-     portals: [{ id: 6, prob: 1.0, x: 2 * 64, y: 18 * 64 }],
-     npcs: [],
+     portals: [{ id: 4, prob: 1.0, x: 2 * 64, y: 18 * 64 }],
+     npcs: [
+       {
+         type: 'VENDOR',
+         name: 'Worm the vendor',
+         prob: 1.0,
+         x: 8 * 64,
+         y: 1.5 * 64,
+         image: 10,
+         width: 64,
+         height: 64,
+       },
+     ],
      enemies: [],
      lootbags: [],
      generationData: undefined,

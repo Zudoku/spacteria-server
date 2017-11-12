@@ -67,6 +67,10 @@ module.exports = {
         module.exports.tryToAddPortal(room, description.portals[i], 0, 0);
       }
     }
+    // add NPCs
+    for (let i = 0; i < description.npcs.length; i++) {
+      module.exports.tryToAddNPC(room, description.npcs[i], 0, 0);
+    }
     console.log(`Enemies + portals + players initialized for map ${room.mapDescription.filename}`);
     return true;
   },
@@ -95,6 +99,17 @@ module.exports = {
       spawnY = parseInt(spawnY, 10);
       const portal = gameobjects.getPortal(portalObj.id, spawnX, spawnY);
       room.gameobjects.push(portal);
+    }
+  },
+  tryToAddNPC(room, NPCObj, x, y) {
+    const spawnRoll = Math.random();
+    if (NPCObj.prob >= spawnRoll) {
+      let spawnX = (NPCObj.x !== undefined) ? NPCObj.x : x;
+      let spawnY = (NPCObj.y !== undefined) ? NPCObj.y : y;
+      spawnX = parseInt(spawnX, 10);
+      spawnY = parseInt(spawnY, 10);
+      const npc = gameobjects.getNPC(NPCObj.image, NPCObj.type, spawnX, spawnY, NPCObj.width, NPCObj.height);
+      room.gameobjects.push(npc);
     }
   },
   getDescs() {
