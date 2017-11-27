@@ -26,6 +26,9 @@ module.exports = {
     if (description.spawn !== undefined) {
       room.mapDescription.startX = description.spawn.x;
       room.mapDescription.startY = description.spawn.y;
+    } else {
+      room.mapDescription.startX = 5 * 64;
+      room.mapDescription.startY = 5 * 64;
     }
     // room.mapDescription.filename = id;
     for (let i = 0; i < room.players.length; i++) {
@@ -108,7 +111,7 @@ module.exports = {
       let spawnY = (NPCObj.y !== undefined) ? NPCObj.y : y;
       spawnX = parseInt(spawnX, 10);
       spawnY = parseInt(spawnY, 10);
-      const npc = gameobjects.getNPC(NPCObj.image, NPCObj.type, spawnX, spawnY, NPCObj.width, NPCObj.height);
+      const npc = gameobjects.getNPC(NPCObj.image, NPCObj.type, NPCObj.name, NPCObj.lines, spawnX, spawnY, NPCObj.width, NPCObj.height);
       room.gameobjects.push(npc);
     }
   },

@@ -32,7 +32,7 @@ module.exports = {
           } else if (result.rows.length === 0) {
             resolve({ success: true, currencies: {} });
           } else {
-            resolve({ success: true, currencies: result[0] });
+            resolve({ success: true, currencies: result.rows[0] });
           }
         });
       });

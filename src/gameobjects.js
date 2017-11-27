@@ -32,13 +32,15 @@ module.exports = {
     };
     return lootBag;
   },
-  getNPC(image, type, x, y, w, h) {
+  getNPC(image, type, name, lines, x, y, w, h) {
     const guid = SF.guid();
     const npc = {
       type: 3,
       npc: {
         image,
         type,
+        name,
+        lines,
         x,
         y,
         width: w,

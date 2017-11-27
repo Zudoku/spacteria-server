@@ -34,15 +34,15 @@ module.exports = {
   initialize(serlogic) {
     gameserver = serlogic;
   },
-  simulate(rooms, ioref) {
+  simulate(rooms, ioref, count) {
     roomsRef = rooms;
     for (let index = 0; index < roomsRef.length; index++) {
       const simulatedRoom = roomsRef[index];
 
-      module.exports.simulateRoom(simulatedRoom, ioref);
+      module.exports.simulateRoom(simulatedRoom, ioref, count);
     }
   },
-  simulateRoom(room, ioref) {
+  simulateRoom(room, ioref, count) {
     // Give projectiles momentum
     // And move them
     for (let i = 0; i < room.projectiles.length; i++) {
@@ -66,6 +66,22 @@ module.exports = {
         // Test if we should broadcast new position
         module.exports.checkIfBroadcastNPC(enemy, room);
       }
+    }
+    // Regen players
+    if (count % gameplayconfig.PLAYER_REGEN_INTERVAL === 0) {
+      for (let i = 0; i < room.players.length; i++) {
+        const playerObj = room.players[i];
+        module.exports.regenPlayerLife(playerObj);
+      }
+    }
+  },
+  regenPlayerLife(playerObj) {
+    if (playerObj.stats.health < playerObj.stats.maxhealth) {
+      playerObj.stats.health += playerObj.stats.vitality;
+      if (playerObj.stats.health > playerObj.stats.maxhealth) {
+        playerObj.stats.health = playerObj.stats.maxhealth;
+      }
+      gameserver.broadcastCharacterStatus(playerObj.id);
     }
   },
   giveMomentum(target, angle, speed, moveTarget) {
@@ -306,21 +322,23 @@ module.exports = {
           lootContents.push(addedLoot);
         }
       }
-      // Add the gameobject to the game
-      const lootBag = {
-        type: 1,
-        lootbag: {
-          quality: lootQuality,
-          items: lootContents,
+      if (lootContents.length > 0) {
+        // Add the gameobject to the game
+        const lootBag = {
+          type: 1,
+          lootbag: {
+            quality: lootQuality,
+            items: lootContents,
+            x,
+            y,
+          },
           x,
           y,
-        },
-        x,
-        y,
-        hash: SF.guid(),
-      };
-      room.gameobjects.push(lootBag);
-      gameserver.broadcastLootBagToGame(lootBag.lootbag, lootBag.hash, room);
+          hash: SF.guid(),
+        };
+        room.gameobjects.push(lootBag);
+        gameserver.broadcastLootBagToGame(lootBag.lootbag, lootBag.hash, room);
+      }
     });
   },
   checkIfBroadcastNPC(enemy, room) {

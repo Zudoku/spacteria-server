@@ -40,7 +40,7 @@ module.exports = {
     // TODO: check input validity
     if (worldContainer.equipItem(currentPlayer, payload.index)) {
       currentPlayer = worldContainer.getPlayers()[socket.id];
-      worldUtil.tryToSaveItemData(currentPlayer, true, true);
+      worldUtil.tryToSaveItemData(currentPlayer, true, true, false);
       setTimeout(() => {
         gameserver.refreshStatsForPlayer(currentPlayer);
         gameserver.broadcastCharacterStatus(socket.id);
@@ -51,7 +51,7 @@ module.exports = {
     let currentPlayer = worldContainer.getPlayers()[socket.id];
     if (worldContainer.unEquipItem(currentPlayer, payload.slot)) {
       currentPlayer = worldContainer.getPlayers()[socket.id];
-      worldUtil.tryToSaveItemData(currentPlayer, true, true);
+      worldUtil.tryToSaveItemData(currentPlayer, true, true, false);
       setTimeout(() => {
         gameserver.refreshStatsForPlayer(currentPlayer);
         gameserver.broadcastCharacterStatus(socket.id);
@@ -66,6 +66,17 @@ module.exports = {
       const lootBag = gameobjects.getLootBag(1, [itemWrapperReference], currentPlayer.x, currentPlayer.y);
       worldContainer.getRooms().find(x => x.name === currentPlayer.room).gameobjects.push(lootBag);
       gameserver.broadcastLootBagToGame(lootBag.lootbag, lootBag.hash, { name: currentPlayer.room });
+      worldUtil.tryToSaveItemData(currentPlayer, false, true, false);
+    }
+  },
+  sellItem(gameserver, worldContainer, socket, payload) {
+    const currentPlayer = worldContainer.getPlayers()[socket.id];
+    if (worldContainer.sellItem(currentPlayer, payload.slot)) {
+      socket.emit(evts.outgoing.UPDATE_CHARATER_STATUS, { character: currentPlayer.characterdata });
+      worldUtil.tryToSaveItemData(currentPlayer, false, true, true);
+      setTimeout(() => {
+        gameserver.broadcastCharacterStatus(socket.id);
+      }, 250);
     }
   },
 };

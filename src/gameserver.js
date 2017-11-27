@@ -4,6 +4,7 @@ const evts = require('./networkingevents.js');
 const worldSimulator = require('./worldSimulator.js');
 const worldContainer = require('./worldContainer.js');
 const userlogin = require('./db/userlogin.js');
+const chatManager = require('./chat/chatManager.js');
 
 const loadingEventHandler = require('./loadingEventHandler.js');
 const gameplayEventHandler = require('./gameplayEventHandler.js');
@@ -26,6 +27,7 @@ module.exports = {
     io.on('connection', (socket) => {
       socket.on(evts.incoming.IDENTIFY, (identifyInfo) => {
         module.exports.handleIdentify(identifyInfo, socket);
+        chatManager.emit('foo', 'bar', io);
       });
 
       socket.on(evts.incoming.LOAD_CHARACTER, (payload) => {
@@ -95,6 +97,12 @@ module.exports = {
       socket.on(evts.incoming.DROP_ITEM, (payload) => {
         if (module.exports.checkIfInRoom(socket.id)) {
           gameplayEventHandler.dropItem(this, worldContainer, socket, payload);
+        }
+      });
+
+      socket.on(evts.incoming.SELL_ITEM, (payload) => {
+        if (module.exports.checkIfInRoom(socket.id)) {
+          gameplayEventHandler.sellItem(this, worldContainer, socket, payload);
         }
       });
 
@@ -221,7 +229,7 @@ module.exports = {
     function instance() {
       count++;
       tickAmount++;
-      worldSimulator.simulate(worldContainer.getRooms(), ioref);
+      worldSimulator.simulate(worldContainer.getRooms(), ioref, count);
 
       const diff = (new Date().getTime() - start) - (count * speed);
       setTimeout(instance, (speed - diff));
@@ -230,7 +238,7 @@ module.exports = {
     setTimeout(instance, speed);
   },
   callSimulation() {
-    worldSimulator.simulate(worldContainer.getRooms(), ioref);
+    // worldSimulator.simulate(worldContainer.getRooms(), ioref);
   },
   refreshStatsForPlayer(player) {
     /* eslint no-param-reassign: "off"*/

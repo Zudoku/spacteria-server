@@ -1,5 +1,6 @@
 const gameplayconfig = require('./../config/gameplayconfig.js');
 const itemDB = require('./db/items.js');
+const currencyDB = require('./db/currencies.js');
 
 module.exports = {
   getZones(w, h) {
@@ -75,7 +76,7 @@ module.exports = {
     }
     return result;
   },
-  tryToSaveItemData(player, saveEquipment, saveInventory) {
+  tryToSaveItemData(player, saveEquipment, saveInventory, saveCurrency) {
     if (gameplayconfig.data_percistence) {
       if (saveEquipment) {
         itemDB.saveEquipmentForCharacter(player.characterdata.uniqueid, player.characterdata.equipment.data).then(
@@ -92,6 +93,15 @@ module.exports = {
           (result) => {
             if (!result.success) {
               console.log(`Error while saving inventory: ${result.msg}`);
+            }
+          }
+        );
+      }
+      if (saveCurrency) {
+        currencyDB.saveCurrencies(player.characterdata.currencies, player.characterdata.uniqueid).then(
+          (result) => {
+            if (!result.success) {
+              console.log(`Error while saving currencies: ${result.msg}`);
             }
           }
         );

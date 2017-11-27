@@ -1,14 +1,38 @@
  module.exports = {
    1: { // Spawn area
-     portals: [{ id: 4, prob: 1.0, x: 2 * 64, y: 18 * 64 }],
+     portals: [{ id: 2, prob: 1.0, x: 2 * 64, y: 18 * 64 }],
      npcs: [
        {
          type: 'VENDOR',
          name: 'Worm the vendor',
+         lines: {
+           interact: [
+             'Hey there trooper! You look overburdened as hell. Let me exchange some of that equipment for some shiny mula.',
+             'Ooh wow! Look at all that loot in your inventory... I want it!',
+           ],
+           random: [],
+         },
          prob: 1.0,
          x: 8 * 64,
          y: 1.5 * 64,
          image: 10,
+         width: 64,
+         height: 64,
+       },
+       {
+         type: 'IDLE',
+         name: 'Han',
+         lines: {
+           interact: [
+             'Shǒuzhǐ Guānmén',
+             'Ching choong ling long! wǒ hěn xǐhuan',
+           ],
+           random: [],
+         },
+         prob: 1.0,
+         x: 12 * 64,
+         y: 1.5 * 64,
+         image: 21,
          width: 64,
          height: 64,
        },

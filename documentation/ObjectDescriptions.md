@@ -67,6 +67,13 @@
  - 6 = Ring
  - 7 = Relic
 
+## Item rarity
+ - 0 = basic / white
+ - 1 = good / green
+ - 2 = great / yellow
+ - 3 = epic / magenta
+
+
 ## Item attribute mapping
  - 1 = maxhealth
  - 2 = vitality
@@ -75,3 +82,5 @@
  - 5 = defence
  - 6 = speed
  - 10 = weapon projectile
+ - 11 = projectile speed
+ - 12 = projectile maxTravelDistance

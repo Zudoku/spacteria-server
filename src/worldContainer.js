@@ -125,9 +125,15 @@ module.exports = {
       return undefined;
     }
     const itemwrapper = lootbag.lootbag.items[index];
+    if (itemwrapper.uniqueid === -1) {
+      player.characterdata.currencies.coin += itemwrapper.amount;
+      lootbag.lootbag.items.splice(index, 1);
+      worldUtil.tryToSaveItemData(player, false, false, true);
+      return lootbag.lootbag.items;
+    }
     if (module.exports.addItemToInventory(player, itemwrapper)) {
       lootbag.lootbag.items.splice(index, 1);
-      worldUtil.tryToSaveItemData(player, false, true);
+      worldUtil.tryToSaveItemData(player, false, true, false);
       return lootbag.lootbag.items;
     }
     return undefined;
@@ -210,6 +216,15 @@ module.exports = {
     const unequippedItemWrapper = { amount: 1, uniqueid: unequippedItem.uniqueid, data: unequippedItem };
     if (module.exports.addItemToInventory(player, unequippedItemWrapper)) {
       delete equipmentReference[slot];
+      return true;
+    }
+    return false;
+  },
+  sellItem(player, slot) {
+    const invReference = player.characterdata.inventory.data;
+    const soldItem = invReference[slot];
+    if (module.exports.removeItemFromInventory(player, slot, 1)) {
+      player.characterdata.currencies.coin += soldItem.data.sellvalue;
       return true;
     }
     return false;

@@ -15,6 +15,7 @@ module.exports = {
     EQUIP_ITEM: 'equipitem',
     UNEQUIP_ITEM: 'unequipitem',
     DROP_ITEM: 'dropitem',
+    SELL_ITEM: 'sellitem',
     MOVE_ITEM_IN_INVENTORY: 'moveitemininventory',
     MAP_LOADED: 'maploaded',
     ENTER_PORTAL: 'enterportal',
