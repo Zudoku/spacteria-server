@@ -19,6 +19,7 @@ module.exports = {
     MOVE_ITEM_IN_INVENTORY: 'moveitemininventory',
     MAP_LOADED: 'maploaded',
     ENTER_PORTAL: 'enterportal',
+    TELEPORT_TO_CAMP: 'teleportcamp',
   },
   outgoing: {
     SEND_ROOMLIST: 'displayroomlist',
@@ -41,5 +42,6 @@ module.exports = {
     LOAD_NEW_MAP: 'loadnewmap',
     BAD_CHARACTERNAME: 'badcharactername',
     CHARACTER_CREATED: 'charactercreated',
+    CHARACTERS_ALL_DEAD: 'charactersalldead',
   },
 };

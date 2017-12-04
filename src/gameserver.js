@@ -27,7 +27,7 @@ module.exports = {
     io.on('connection', (socket) => {
       socket.on(evts.incoming.IDENTIFY, (identifyInfo) => {
         module.exports.handleIdentify(identifyInfo, socket);
-        chatManager.emit('foo', 'bar', io);
+        // chatManager.emit('foo', 'bar', io);
       });
 
       socket.on(evts.incoming.LOAD_CHARACTER, (payload) => {
@@ -103,6 +103,12 @@ module.exports = {
       socket.on(evts.incoming.SELL_ITEM, (payload) => {
         if (module.exports.checkIfInRoom(socket.id)) {
           gameplayEventHandler.sellItem(this, worldContainer, socket, payload);
+        }
+      });
+
+      socket.on(evts.incoming.TELEPORT_TO_CAMP, (payload) => {
+        if (module.exports.checkIfInRoom(socket.id)) {
+          loadingEventHandler.changeMap(this, worldContainer, worldSimulator, socket, { to: 1 });
         }
       });
 
@@ -206,9 +212,11 @@ module.exports = {
         if (module.exports.checkIfInRoom(disconnectedId)) {
           const disconnectionRoom = worldContainer.getRooms().find(x => x.players.indexOf(disconnectedPlayer) !== -1);
           worldContainer.removePlayerFromRoom(disconnectedPlayer, disconnectionRoom);
+          // worldUtil.tryToSaveItemData(disconnectedPlayer, true, true, true);
           if (disconnectionRoom.players.length === 0) {
             worldContainer.removeRoom(disconnectionRoom);
           } else {
+            worldSimulator.checkAllDeadInRoom(disconnectionRoom);
             ioref.to(disconnectionRoom.name).emit(evts.outgoing.PLAYER_LEFT_YOUR_GAME, { id: disconnectedId });
           }
         }
@@ -281,5 +289,7 @@ module.exports = {
     };
     ioref.to(room.name).emit(evts.outgoing.LOAD_NEW_MAP, payloadEvent);
   },
-
+  broadcastAllDead(room) {
+    ioref.to(room.name).emit(evts.outgoing.CHARACTERS_ALL_DEAD, {});
+  },
 };

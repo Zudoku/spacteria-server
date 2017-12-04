@@ -37,6 +37,10 @@ module.exports = {
       player.y = room.mapDescription.startY;
       player.shape.x = room.mapDescription.startX;
       player.shape.y = room.mapDescription.startY;
+      player.characterdata.status = 'ALIVE';
+      if (player.characterdata.health < 0) {
+        player.characterdata.health = 1;
+      }
     }
 
     // add position defined enemies

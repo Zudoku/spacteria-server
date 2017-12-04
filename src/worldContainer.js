@@ -64,6 +64,7 @@ module.exports = {
     player.room = room.name;
     player.x = room.mapDescription.startX;
     player.y = room.mapDescription.startY;
+    player.characterdata.status = 'ALIVE';
     player.shape = new SAT.Box(new SAT.Vector(player.x,
       player.y), 32, 32);
     room.players.push(player);

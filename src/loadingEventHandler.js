@@ -27,6 +27,7 @@ module.exports = {
               character.equipment = { data: equipmentData.equipment || { } };
               character.inventory = { data: inventoryData.inventory || { } };
               character.currencies = currencyData.currencies || { };
+              character.status = 'ALIVE';
               const playerRef = worldContainer.addPlayer(socket.id, character);
               connections[socket.id].charactername = character.name;
               socket.emit(evts.outgoing.CHARACTER_LOAD_SUCCESSFUL, { character, stats: playerRef.stats });

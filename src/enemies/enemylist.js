@@ -105,7 +105,7 @@ module.exports = {
       state: 0,
       simulations: 0,
       projectiles: [
-        projectileList.blob_guardian(E, 6),
+        projectileList.blob_guardian(E, 10),
         projectileList.blob_guardian_slow(E, 50),
       ],
       zone: undefined,
@@ -131,7 +131,7 @@ module.exports = {
       collideToTerrain: true,
       state: 0,
       simulations: 0,
-      projectiles: [projectileList.charger(E, 6)],
+      projectiles: [projectileList.charger(E, 15)],
       zone: undefined,
       loot: [
         {
@@ -151,11 +151,11 @@ module.exports = {
       hitsound: 'BLOB',
       deathsound: 'BLOB',
       extra: {},
-      stats: { health: 100000, maxhealth: 100000, vitality: 0, strength: 10, dexterity: 10, defence: 1, speed: 200 },
+      stats: { health: 15300, maxhealth: 15300, vitality: 0, strength: 10, dexterity: 10, defence: 1, speed: 200 },
       collideToTerrain: false,
       state: 0,
       simulations: 0,
-      projectiles: [projectileList.slimebrother_dance_circle(E, 100), projectileList.slimebrother_dance(E, 55)],
+      projectiles: [projectileList.slimebrother_dance_circle(E, 40), projectileList.slimebrother_dance(E, 30)],
       zone: undefined,
       loot: [
         {
@@ -175,11 +175,11 @@ module.exports = {
       hitsound: 'BLOB',
       deathsound: 'BLOB',
       extra: {},
-      stats: { health: 100000, maxhealth: 100000, vitality: 0, strength: 10, dexterity: 10, defence: 1, speed: 200 },
+      stats: { health: 15300, maxhealth: 15300, vitality: 0, strength: 10, dexterity: 10, defence: 1, speed: 200 },
       collideToTerrain: false,
       state: 0,
       simulations: 0,
-      projectiles: [projectileList.slimebrother_dance_slow(E, 200)],
+      projectiles: [projectileList.slimebrother_dance_slow(E, 100)],
       zone: undefined,
       loot: [
         {

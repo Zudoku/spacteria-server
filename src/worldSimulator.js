@@ -76,7 +76,7 @@ module.exports = {
     }
   },
   regenPlayerLife(playerObj) {
-    if (playerObj.stats.health < playerObj.stats.maxhealth) {
+    if (playerObj.stats.health < playerObj.stats.maxhealth && playerObj.characterdata.status !== 'DEAD') {
       playerObj.stats.health += playerObj.stats.vitality;
       if (playerObj.stats.health > playerObj.stats.maxhealth) {
         playerObj.stats.health = playerObj.stats.maxhealth;
@@ -215,7 +215,7 @@ module.exports = {
     } else if (target.team === 2) {
       for (let i = 0; i < room.players.length; i++) {
         const foundPlayer = room.players[i];
-        if (SAT.testPolygonPolygon(target.shape.toPolygon(), foundPlayer.shape.toPolygon())) {
+        if (SAT.testPolygonPolygon(target.shape.toPolygon(), foundPlayer.shape.toPolygon()) && foundPlayer.characterdata.status === 'ALIVE') {
           module.exports.takeDamage(foundPlayer, 'player', target.damage, room);
           return true;
         }
@@ -236,7 +236,23 @@ module.exports = {
       }
     } else if (type === 'player') {
       target.stats.health -= takenDamage;
+      if (target.stats.health < 0) {
+        target.characterdata.status = 'DEAD';
+        module.exports.checkAllDeadInRoom(room);
+      }
       gameserver.broadcastCharacterStatus(target.id);
+    }
+  },
+  checkAllDeadInRoom(room) {
+    let allDead = true;
+    for (let i = 0; i < room.players.length; i++) {
+      if (room.players[i].characterdata.status !== 'DEAD') {
+        allDead = false;
+        console.log(room.players[i].id);
+      }
+    }
+    if (allDead) {
+      gameserver.broadcastAllDead(room);
     }
   },
   objectCollidedWithTerrain(target, room, type) {

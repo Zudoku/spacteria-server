@@ -60,7 +60,7 @@ INSERT INTO gameitemattribute
 
 INSERT INTO gameitem
 (displayname, description, itemtypeid, stackable, levelreq, tradeable, rarity, sellvalue, imageid) VALUES
-('Deterrent Chestplate', 'Effective against the slime', 4,FALSE,3,TRUE, 1, 5, 12);
+('Deterrent Chestplate', 'Effective against the slime', 4,FALSE,3,TRUE, 1, 5, 22);
 
 INSERT INTO gameitemattribute
 (itemid, attributeid, attributevalue) VALUES
