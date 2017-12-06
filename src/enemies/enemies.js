@@ -9,6 +9,7 @@ module.exports = {
     const foundFunc = enemyList[monsterID];
     const foundMonster = foundFunc();
     foundMonster.shape.pos.x = initX;
+    foundMonster.tag = monsterID;
     foundMonster.shape.pos.y = initY;
     foundMonster.x = initX;
     foundMonster.y = initY;

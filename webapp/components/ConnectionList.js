@@ -4,7 +4,6 @@ import {
   Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn
 
 } from 'material-ui/Table';
-import PropTypes from 'prop-types';
 import SocketConnection from './SocketConnection';
 
 let ConnectionList = ({connections}, {}) => (
@@ -24,17 +23,6 @@ let ConnectionList = ({connections}, {}) => (
     </TableBody>
   </Table>
 )
-
-ConnectionList.propTypes = {
-  connections: PropTypes.arrayOf(
-    PropTypes.shape({
-      ip: PropTypes.string.isRequired,
-      name: PropTypes.string,
-      type: PropTypes.string.isRequired,
-      info: PropTypes.string
-    }).isRequired
-  ).isRequired
-}
 
 const mapStateToProps = state => {
   return {

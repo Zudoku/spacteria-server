@@ -7,7 +7,7 @@
     "btoa": "^1.1.2",
     "discord.io": "^2.5.3",
     "express": "^4.15.5",
-    "material-ui": "^0.19.2",
+    "material-ui": "^0.20.0",
     "pako": "^1.0.5",
     "pathfinding": "^0.4.18",
     "pg": "^6.1.2",

@@ -4,3 +4,9 @@ export function refreshConnections(payload) {
     payload
   }
 }
+export function refreshRooms(payload) {
+  return {
+    type: 'SET_ROOMS',
+    payload
+  }
+}

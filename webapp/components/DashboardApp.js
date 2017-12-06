@@ -1,5 +1,6 @@
 import React from 'react'
 import ConnectionList from './ConnectionList'
+import RoomList from './RoomList'
 import AppBar from 'material-ui/AppBar'
 
 const DashboardApp = () => (
@@ -8,6 +9,7 @@ const DashboardApp = () => (
       title="Spacteria Dashboard"
       />
       <ConnectionList />
+      <RoomList />
   </div>
 )
 
