@@ -8,6 +8,7 @@ const maputil = require('./mapgeneration/maputil.js');
 const gamemapDescriptions = require('./gamemapDescriptions.js');
 
 const evts = require('./networkingevents.js');
+const fs = require('fs');
 
 module.exports = {
   loadCharacter(worldContainer, connections, socket, payload) {
@@ -128,6 +129,19 @@ module.exports = {
           });
         }
       }
+    });
+  },
+  uploadItemData(socket, payload) {
+    items.saveItemsToDatabase(payload.items).then((msg) => {
+      socket.emit(evts.outgoing.ALERT_DASHBOARD, { msg });
+    });
+  },
+  getDataForDashBoard(socket) {
+    Promise.all([
+      items.getAllItems(),
+      1,
+    ]).then((data) => {
+      socket.emit(evts.outgoing.DATADASHBOARD_SET_DATA, { items: data[0] });
     });
   },
 };

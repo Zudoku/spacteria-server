@@ -134,6 +134,16 @@ module.exports = {
           loadingEventHandler.deleteCharacter(payload.characterID, socket, connections);
         }
       });
+      socket.on(evts.incoming.UPLOAD_ITEMDATA, (payload) => {
+        if (module.exports.checkIfIdentified(socket.id)) {
+          loadingEventHandler.uploadItemData(socket, payload);
+        }
+      });
+      socket.on(evts.incoming.RELOAD_DASHBOARD_DATA, (payload) => {
+        if (module.exports.checkIfIdentified(socket.id)) {
+          module.exports.sendDataInfo(socket);
+        }
+      });
 
       socket.on('disconnect', () => {
         module.exports.handleDisconnect(socket);
@@ -177,15 +187,21 @@ module.exports = {
       });
     }
     if (identifyInfo.type === 'browser') {
-      console.log(`${socket.id} joined the observers`);
-      socket.join('observers');
       connections[socket.id] = {
         id: '-',
-        username: '-',
+        username: identifyInfo.page,
         charactername: '-',
         ip: socket.request.connection.remoteAddress,
         type: identifyInfo.type,
       };
+      if (identifyInfo.page === 'livedashboard') {
+        socket.join('observers');
+        console.log(`${socket.id} joined the observers`);
+      } else if (identifyInfo.page === 'datadashboard') {
+        module.exports.sendDataInfo(socket);
+      }
+
+
       module.exports.updateObservers();
     }
   },
@@ -238,19 +254,21 @@ module.exports = {
       count++;
       tickAmount++;
       worldSimulator.simulate(worldContainer.getRooms(), ioref, count);
+      if (tickAmount % 100 === 0) {
+        module.exports.updateObservers();
+      }
 
       const diff = (new Date().getTime() - start) - (count * speed);
       setTimeout(instance, (speed - diff));
     }
-
     setTimeout(instance, speed);
-  },
-  callSimulation() {
-    // worldSimulator.simulate(worldContainer.getRooms(), ioref);
   },
   refreshStatsForPlayer(player) {
     /* eslint no-param-reassign: "off"*/
     player.stats = worldUtil.calculateStatsForCharacter(player.characterdata, player.stats.health);
+  },
+  sendDataInfo(socket) {
+    loadingEventHandler.getDataForDashBoard(socket);
   },
   //            |||
   // BROADCASTS |||

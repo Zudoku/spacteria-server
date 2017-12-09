@@ -7,6 +7,14 @@ module.exports = {
         if (connection.err) {
           resolve({ success: false });
         }
+        // TODO
+        // TODO  HOX HOX HOX HOX HOX HOX HOX HOX HOX
+        // TODO
+        // TODO  REDO PASSWORD STORING COMPLETELY. THIS IS JUST A MOCKUP TO MOCK LOGIN SCREEN.
+        // TODO  FOR THE REAL DEAL USE HASHING + SALT + PEPPER
+        // TODO
+        // TODO  HOX HOX HOX HOX HOX HOX HOX HOX HOX
+        // TODO
         connection.client.query('SELECT * FROM gameuser WHERE username = $1 AND password = $2', [username, password], (err, result) => {
           connection.done(err);
           if (err) {

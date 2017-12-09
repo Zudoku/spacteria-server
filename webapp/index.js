@@ -5,31 +5,55 @@ import { createStore } from 'redux'
 import App from './components/App'
 import appi from './reducers/reducers'
 import io from 'socket.io-client'
-import { refreshConnections, refreshRooms } from './actions/actions'
+import { refreshConnections, refreshRooms, setItems } from './actions/actions'
 
 let store = createStore(appi);
-
 let socket = io();
-socket.on('info', function(payload){
+let dataDashBoard = window.location.pathname === '/datadashboard';
 
+if(dataDashBoard){
+  setUpDataDashboard();
+} else {
+  setUpLiveDashboard();
+}
 
-  document.getElementById("content").innerHTML = JSON.stringify(payload, null,4);
-
-
-  const mutatedConnections = Object.entries(payload.connections).map(([key, value]) => {
-    return { ip: value.ip, type: value.type, name: value.username,
-      info: 'socket=' + key + ' ID=' + value.id + ' characterName=' + value.charactername};
+function setUpDataDashboard(){
+  socket.on('alert', function(payload){
+    alert(JSON.stringify(payload));
   });
-  store.dispatch(refreshConnections(mutatedConnections));
-  store.dispatch(refreshRooms(payload.rooms));
-});
-socket.emit('identify', { type: "browser"});
+  socket.on('datadashboarddata', function(payload){
+    const items = payload.items;
+    for(let modifiedItem of items){
+      modifiedItem.stats = JSON.stringify(modifiedItem.stats, null, 4);
+    }
+    store.dispatch(setItems(items));
+  });
+  socket.emit('identify', { type: "browser", page: 'datadashboard'});
+}
+
+function setUpLiveDashboard(){
+  socket.on('info', function(payload){
+    // document.getElementById("content").innerHTML = JSON.stringify(payload, null,4);
+    const mutatedConnections = Object.entries(payload.connections).map(([key, value]) => {
+      return { ip: value.ip, type: value.type, name: value.username,
+        info: 'socket=' + key + ' ID=' + value.id + ' characterName=' + value.charactername};
+    });
+    store.dispatch(refreshConnections(mutatedConnections));
+    store.dispatch(refreshRooms(payload.rooms));
+  });
+  socket.emit('identify', { type: "browser", page: 'livedashboard'});
+}
 
 
+const getSocket = function(){
+  return socket;
+}
+
+export default getSocket;
 
 render(
   <Provider store={store}>
-    <App />
+    <App dataDashBoard={dataDashBoard} />
   </Provider>,
   document.getElementById('root')
 )

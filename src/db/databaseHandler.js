@@ -28,4 +28,7 @@ module.exports = {
       });
     });
   },
+  getConfig() {
+    return pgconfig;
+  },
 };

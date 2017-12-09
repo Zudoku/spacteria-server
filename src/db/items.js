@@ -1,4 +1,6 @@
 const dbHandler = require('./databaseHandler.js');
+const { exec } = require('child_process');
+const fs = require('fs');
 
 module.exports = {
   getItem(uniqueid) {
@@ -14,15 +16,8 @@ module.exports = {
             resolve({ success: false, msg: 'no such itemid' });
           } else {
             const itemdata = result.rows[0];
-            connection.client.query('SELECT * FROM gameitemattribute WHERE itemid = $1', [uniqueid], (err2, resultAttributes) => {
-              connection.done(err2);
-              if (err2) {
-                resolve({ success: false, msg: 'DB error' });
-              } else {
-                itemdata.attributes = resultAttributes.rows.map(x => ({ attributeid: x.attributeid, attributevalue: x.attributevalue }));
-                resolve({ success: true, item: itemdata });
-              }
-            });
+            itemdata.attributes = itemdata.stats.map(x => ({ attributeid: x.id, attributevalue: x.value }));
+            resolve({ success: true, item: itemdata });
           }
         });
       });
@@ -159,6 +154,7 @@ module.exports = {
           connection.client.query(
               'INSERT INTO gameinventory(characterid, itemid, quantity, slot) VALUES($1, $2, $3, $4)',
                [characterid, itemid, quantity, index], (err, result) => {
+                 connection.done(err);
                  if (err) {
                    reject({ success: false, msg: 'DB error' });
                  } else {
@@ -178,6 +174,89 @@ module.exports = {
               });
         }
       });
+    });
+  },
+  saveItemsToDatabase(payload) {
+    return new Promise((resolve, reject) => {
+      dbHandler.getConnection().then((connection) => {
+        const shouldAbort = (err) => {
+          if (err) {
+            connection.client.query('ROLLBACK', (err2) => {
+              connection.done();
+              resolve({ msg: `ERROR ${err}` });
+            });
+          }
+          return !!err;
+        };
+        module.exports.getLastItemIndex(connection.client).then((data, reject) => {
+          connection.client.query('BEGIN', (err) => {
+            if (shouldAbort(err)) return;
+            const itemPromises = [];
+            for (const itemSaved of payload) {
+              itemPromises.push(module.exports.saveItemToDatabase(itemSaved, connection.client, itemSaved.uniqueid <= data && data !== 1));
+            }
+            Promise.all(itemPromises).then((data) => {
+              connection.client.query('COMMIT', (err) => {
+                connection.done();
+                if (err) {
+                  resolve({ msg: 'ERROR' });
+                } else {
+                  resolve({ msg: 'Success' });
+                  module.exports.makeItemDatabaseDump();
+                }
+              });
+            }).catch((reason) => {
+              if (shouldAbort(reason)) return;
+            });
+          });
+        });
+      });
+    });
+  },
+  saveItemToDatabase(item, client, updateInsteadOfInsert) {
+    return new Promise((resolve, reject) => {
+      if (updateInsteadOfInsert) {
+        client.query('UPDATE gameitem SET displayname=$1, description=$2, itemtypeid=$3, stackable=$4, levelreq=$5, tradeable=$6, rarity=$7, sellvalue=$8, imageid=$9, stats=$10 WHERE uniqueid=$11',
+        [item.displayname, item.description, item.itemtypeid, item.stackable, item.levelreq, item.tradeable, item.rarity, item.sellvalue, item.imageid, item.stats, item.uniqueid], (err, res) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      } else {
+        client.query('INSERT INTO gameitem (displayname, description, itemtypeid, stackable, levelreq, tradeable, rarity, sellvalue, imageid, stats) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)',
+        [item.displayname, item.description, item.itemtypeid, item.stackable, item.levelreq, item.tradeable, item.rarity, item.sellvalue, item.imageid, item.stats], (err, res) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      }
+    });
+  },
+  getLastItemIndex(client) {
+    return new Promise((resolve, reject) => {
+      client.query('SELECT last_value FROM gameitem_uniqueid_seq', (err, res) => {
+        resolve(res.rows[0].last_value);
+      });
+    });
+  },
+  getAllItems() {
+    return new Promise((resolve, reject) => {
+      dbHandler.getConnection().then((connection) => {
+        connection.client.query('SELECT * FROM gameitem', (err, res) => {
+          connection.done();
+          resolve(res.rows);
+        });
+      });
+    });
+  },
+  makeItemDatabaseDump() {
+    const pc = dbHandler.getConfig();
+    exec(`pg_dump --dbname=postgresql://${pc.user}:${pc.password}@localhost:${pc.port}/spacteriagame -t gameitem`, (err, stdout, stderr) => {
+      fs.writeFile(`${__dirname}/../../sqlscripts/dump/items.sql`, `${stdout}`, (err) => {});
     });
   },
 };

@@ -20,6 +20,8 @@ module.exports = {
     MAP_LOADED: 'maploaded',
     ENTER_PORTAL: 'enterportal',
     TELEPORT_TO_CAMP: 'teleportcamp',
+    UPLOAD_ITEMDATA: 'uploaditems',
+    RELOAD_DASHBOARD_DATA: 'reloaddata',
   },
   outgoing: {
     SEND_ROOMLIST: 'displayroomlist',
@@ -43,5 +45,7 @@ module.exports = {
     BAD_CHARACTERNAME: 'badcharactername',
     CHARACTER_CREATED: 'charactercreated',
     CHARACTERS_ALL_DEAD: 'charactersalldead',
+    ALERT_DASHBOARD: 'alert',
+    DATADASHBOARD_SET_DATA: 'datadashboarddata',
   },
 };

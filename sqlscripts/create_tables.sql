@@ -50,26 +50,20 @@ tradeable BOOLEAN NOT NULL,
 rarity INTEGER NOT NULL,
 sellvalue INTEGER NOT NULL,
 imageid INTEGER NOT NULL,
+stats json NOT NULL,
 PRIMARY KEY(uniqueid)
-);
-
-CREATE TABLE gameitemattribute
-(
-itemid INTEGER REFERENCES gameitem(uniqueid),
-attributeid INTEGER NOT NULL,
-attributevalue INTEGER NOT NULL
 );
 
 CREATE TABLE gameequipment
 (
 characterid INTEGER REFERENCES gamecharacter(uniqueid) ON DELETE CASCADE,
-itemid INTEGER REFERENCES gameitem(uniqueid)
+itemid INTEGER NOT NULL
 );
 
 CREATE TABLE gameinventory
 (
 characterid INTEGER REFERENCES Gamecharacter(uniqueid) ON DELETE CASCADE,
-itemid INTEGER REFERENCES Gameitem(uniqueid),
+itemid INTEGER NOT NULL,
 quantity INTEGER NOT NULL,
 slot INTEGER NOT NULL
 );
