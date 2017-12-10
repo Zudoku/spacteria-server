@@ -27,8 +27,11 @@ module.exports = {
     io.on('connection', (socket) => {
       socket.on(evts.incoming.IDENTIFY, (identifyInfo) => {
         module.exports.handleIdentify(identifyInfo, socket);
-        // chatManager.emit('foo', 'bar', io);
       });
+
+      setTimeout(() => {
+        socket.emit(evts.outgoing.VERSION_DATA, { version: gameplayconfig.VERSION_STRING, changelog: gameplayconfig.VERSION_CHANGELOG });
+      }, 100);
 
       socket.on(evts.incoming.LOAD_CHARACTER, (payload) => {
         if (module.exports.checkIfIdentified(socket.id)

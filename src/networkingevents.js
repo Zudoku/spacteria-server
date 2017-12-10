@@ -47,5 +47,6 @@ module.exports = {
     CHARACTERS_ALL_DEAD: 'charactersalldead',
     ALERT_DASHBOARD: 'alert',
     DATADASHBOARD_SET_DATA: 'datadashboarddata',
+    VERSION_DATA: 'versiondata',
   },
 };

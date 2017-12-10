@@ -66,6 +66,7 @@ let ItemConfigurator = (props , {}) => (
           <MenuItem value={5} primaryText="Boots" />
           <MenuItem value={6} primaryText="Ring" />
           <MenuItem value={7} primaryText="Relic" />
+          <MenuItem value={8} primaryText="Junk" />
         </SelectField>
         <br />
         <b>Stackable</b> <br />
@@ -87,7 +88,7 @@ let ItemConfigurator = (props , {}) => (
         <b>Image</b> <br />
         <TextField id="imageid" onChange={function(event, newValue){props.modifyItem(props.itemData.selectedItem.uniqueid, 'imageid', parseInt(newValue))}} value={props.itemData.selectedItem.imageid} type="number" min="0" max="500" /> <br />
         <b>Item attributes</b> <br />
-        <TextField id="stats" onChange={function(event, newValue){props.modifyItem(props.itemData.selectedItem.stats, 'stats', newValue)}} value={props.itemData.selectedItem.stats}  multiLine={true} rows={6} /> <br />
+        <TextField id="stats" onChange={function(event, newValue){props.modifyItem(props.itemData.selectedItem.uniqueid, 'stats', newValue)}} value={props.itemData.selectedItem.stats}  multiLine={true} rows={6} /> <br />
       </div>
       }
     </div>

@@ -11397,7 +11397,7 @@ function setUpDataDashboard() {
 
 function setUpLiveDashboard() {
   socket.on('info', function (payload) {
-    // document.getElementById("content").innerHTML = JSON.stringify(payload, null,4);
+    document.getElementById("content").innerHTML = JSON.stringify(payload, null, 4);
     var mutatedConnections = Object.entries(payload.connections).map(function (_ref) {
       var _ref2 = _slicedToArray(_ref, 2),
           key = _ref2[0],
@@ -47306,7 +47306,8 @@ var ItemConfigurator = function ItemConfigurator(props, _ref) {
           _react2.default.createElement(_MenuItem2.default, { value: 4, primaryText: 'Chest' }),
           _react2.default.createElement(_MenuItem2.default, { value: 5, primaryText: 'Boots' }),
           _react2.default.createElement(_MenuItem2.default, { value: 6, primaryText: 'Ring' }),
-          _react2.default.createElement(_MenuItem2.default, { value: 7, primaryText: 'Relic' })
+          _react2.default.createElement(_MenuItem2.default, { value: 7, primaryText: 'Relic' }),
+          _react2.default.createElement(_MenuItem2.default, { value: 8, primaryText: 'Junk' })
         ),
         _react2.default.createElement('br', null),
         _react2.default.createElement(
@@ -47395,7 +47396,7 @@ var ItemConfigurator = function ItemConfigurator(props, _ref) {
         ' ',
         _react2.default.createElement('br', null),
         _react2.default.createElement(_TextField2.default, { id: 'stats', onChange: function onChange(event, newValue) {
-            props.modifyItem(props.itemData.selectedItem.stats, 'stats', newValue);
+            props.modifyItem(props.itemData.selectedItem.uniqueid, 'stats', newValue);
           }, value: props.itemData.selectedItem.stats, multiLine: true, rows: 6 }),
         ' ',
         _react2.default.createElement('br', null)
@@ -57822,7 +57823,7 @@ function loadItemdata() {
         items: action.payload,
         modified: false,
         syncedAt: new Date(),
-        currentItemIndex: action.payload,
+        currentItemIndex: action.payload[action.payload.length - 1].uniqueid,
         selectedItem: undefined
       });
       break;

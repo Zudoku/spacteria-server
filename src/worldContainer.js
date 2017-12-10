@@ -89,24 +89,52 @@ module.exports = {
       player.y), 32, 32);
   },
   playerAttack(player, payload) {
-    // TODO: make projectile serverside, dont trust user input
-
     const projectile = {
       deltaX: 0,
       deltaY: 0,
-      image: payload.projectile.image,
+      image: 'BASIC',
       team: 1,
       path: 'STRAIGHT',
-      speed: payload.projectile.speed,
+      speed: 130,
       guid: payload.projectile.guid,
       collideToTerrain: true,
-      maxTravelDistance: payload.projectile.maxTravelDistance,
+      maxTravelDistance: 500,
       travelDistance: 0,
       damage: player.stats.strength,
       onTerrainCollision: undefined,
       width: 2,
       height: 2,
     };
+
+    const projectileImgs = {
+      0: 'BASIC',
+      1: 'BLOBGUARDIAN',
+      2: 'BLOBGUARDIANSLOW',
+      3: 'CHARGER',
+      4: 'SLIMEGUARDIANSLOW',
+      5: 'MINIBLOB',
+      6: 'GUN',
+      7: 'ELECTRICITY',
+      8: 'SPRAY',
+    };
+
+    if (player.characterdata.equipment.data[3] !== undefined) {
+      const weapon = player.characterdata.equipment.data[3];
+      for (const attribute of weapon.attributes) {
+        if (attribute.attributeid === 10) {
+          if (projectileImgs[attribute.attributevalue] !== undefined) {
+            projectile.image = projectileImgs[attribute.attributevalue];
+          }
+        }
+        if (attribute.attributeid === 11) {
+          projectile.speed = attribute.attributevalue;
+        }
+        if (attribute.attributeid === 12) {
+          projectile.maxTravelDistance = attribute.attributevalue;
+        }
+      }
+    }
+
 
     projectile.x = player.x + (16);
     projectile.y = player.y + (16);

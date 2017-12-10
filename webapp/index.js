@@ -22,7 +22,7 @@ function setUpDataDashboard(){
     alert(JSON.stringify(payload));
   });
   socket.on('datadashboarddata', function(payload){
-    const items = payload.items;
+    let items = payload.items;
     for(let modifiedItem of items){
       modifiedItem.stats = JSON.stringify(modifiedItem.stats, null, 4);
     }
@@ -33,7 +33,7 @@ function setUpDataDashboard(){
 
 function setUpLiveDashboard(){
   socket.on('info', function(payload){
-    // document.getElementById("content").innerHTML = JSON.stringify(payload, null,4);
+     document.getElementById("content").innerHTML = JSON.stringify(payload, null,4);
     const mutatedConnections = Object.entries(payload.connections).map(([key, value]) => {
       return { ip: value.ip, type: value.type, name: value.username,
         info: 'socket=' + key + ' ID=' + value.id + ' characterName=' + value.charactername};

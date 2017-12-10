@@ -7,9 +7,11 @@ module.exports = {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
+          connection.done(connection.err);
           resolve({ success: false });
         }
         connection.client.query('SELECT * FROM gameitem WHERE uniqueid = $1', [uniqueid], (err, result) => {
+          connection.done(err);
           if (err) {
             resolve({ success: false, msg: 'DB error' });
           } else if (result.rows.length <= 0) {
@@ -17,6 +19,7 @@ module.exports = {
           } else {
             const itemdata = result.rows[0];
             itemdata.attributes = itemdata.stats.map(x => ({ attributeid: x.id, attributevalue: x.value }));
+            delete itemdata.stats;
             resolve({ success: true, item: itemdata });
           }
         });
@@ -27,6 +30,7 @@ module.exports = {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
+          connection.done(connection.err);
           resolve({ success: false });
         }
         connection.client.query('SELECT * FROM gameequipment WHERE characterid = $1', [uniqueid], (err, result) => {
@@ -58,6 +62,7 @@ module.exports = {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
+          connection.done(connection.err);
           resolve({ success: false });
         }
         connection.client.query('SELECT * FROM gameinventory WHERE characterid = $1', [uniqueid], (err, result) => {
@@ -92,6 +97,7 @@ module.exports = {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
+          connection.done(connection.err);
           resolve({ success: false });
         }
         connection.client.query('DELETE FROM gameequipment WHERE characterid = $1', [characterid], (err, result) => {
@@ -120,6 +126,7 @@ module.exports = {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
+          connection.done(connection.err);
           resolve({ success: false });
         }
         connection.client.query('DELETE FROM gameinventory WHERE characterid = $1', [characterid], (err, result) => {
@@ -149,6 +156,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
+          connection.done(connection.err);
           reject({ success: false });
         } else if (destination === 1) {
           connection.client.query(
@@ -182,7 +190,7 @@ module.exports = {
         const shouldAbort = (err) => {
           if (err) {
             connection.client.query('ROLLBACK', (err2) => {
-              connection.done();
+              connection.done(err);
               resolve({ msg: `ERROR ${err}` });
             });
           }
@@ -247,7 +255,7 @@ module.exports = {
     return new Promise((resolve, reject) => {
       dbHandler.getConnection().then((connection) => {
         connection.client.query('SELECT * FROM gameitem', (err, res) => {
-          connection.done();
+          connection.done(err);
           resolve(res.rows);
         });
       });

@@ -28,7 +28,7 @@ module.exports = {
       hitsound: 'BLOB',
       deathsound: 'BLOB',
       extra: {},
-      stats: { health: 500, maxhealth: 500, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 20 },
+      stats: { health: 80, maxhealth: 80, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 20 },
       collideToTerrain: true,
       state: 0,
       simulations: 0,
@@ -36,8 +36,16 @@ module.exports = {
       zone: undefined,
       loot: [
         {
+          chance: 4,
+          items: [{ id: 5, amount: 1 }],
+        },
+        {
+          chance: 4,
+          items: [{ id: 6, amount: 1 }],
+        },
+        {
           chance: 10,
-          items: [{ id: -1, amount: 1 }, { id: 3, amount: 1 }],
+          items: [{ id: 2, amount: 1 }],
         },
       ],
       exp: 100,
@@ -52,7 +60,7 @@ module.exports = {
       hitsound: 'BLOB',
       deathsound: 'BLOB',
       extra: {},
-      stats: { health: 200, maxhealth: 200, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 20 },
+      stats: { health: 40, maxhealth: 40, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 20 },
       collideToTerrain: true,
       state: 0,
       simulations: 0,

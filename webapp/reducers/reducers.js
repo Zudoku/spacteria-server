@@ -49,7 +49,7 @@ function loadItemdata(state = initialStateItemLoadData, action) {
           items: action.payload,
           modified : false,
           syncedAt: new Date(),
-          currentItemIndex: action.payload,
+          currentItemIndex: action.payload[action.payload.length - 1].uniqueid,
           selectedItem: undefined,
         });
       break;

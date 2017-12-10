@@ -66,6 +66,7 @@
  - 5 = Boots
  - 6 = Ring
  - 7 = Relic
+ - 8 = Junk
 
 ## Item rarity
  - 0 = basic / white

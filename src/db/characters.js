@@ -5,6 +5,7 @@ module.exports = {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
+          connection.done();
           resolve({ success: false });
         }
         connection.client.query('SELECT * FROM gamecharacter WHERE userid = $1', [userid], (err, result) => {
@@ -22,6 +23,7 @@ module.exports = {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
+          connection.done();
           resolve({ success: false });
         }
         connection.client.query('SELECT * FROM gamecharacter WHERE uniqueid = $1', [characterId], (err, result) => {
@@ -43,6 +45,7 @@ module.exports = {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
+          connection.done();
           resolve({ success: false });
         }
         const arguments = [userid, characterName, 1, 0];
@@ -51,6 +54,8 @@ module.exports = {
             connection.client.query('INSERT INTO gamecharactercurrency (characterid, coin, bugbounty, rollticket) VALUES ($1, $2, $3, $4)', [result.rows[0].uniqueid, 0, 0, 0]),
           ]).then( (data) => {
             connection.done();
+          }).catch( (error) => {
+            connection.done(error);
           });
           if (err) {
             resolve({ success: false, msg: 'DB error' });
@@ -66,6 +71,7 @@ module.exports = {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
+          connection.done();
           resolve({ success: false });
         }
         connection.client.query('DELETE FROM gamecharacter WHERE uniqueid = $1', [characterId], (err, result) => {
@@ -83,6 +89,7 @@ module.exports = {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
+          connection.done();
           resolve({ success: false });
         }
         connection.client.query('UPDATE gamecharacter SET level = $1, experience = $2 WHERE uniqueid = $3', [characterObj.level, characterObj.experience, characterObj.uniqueid], (err, result) => {
