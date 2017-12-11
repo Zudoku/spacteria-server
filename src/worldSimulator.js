@@ -17,14 +17,14 @@ module.exports = {
     setTimeout(() => {
       terrainCollision.initializeMap(filename, (result) => {
         if (result === true) {
-          console.log(`Tilemap successfully read for map: ${filename}`);
+          console.log(`[${room.name}]: Tilemap successfully read for map: ${filename}`);
         } else {
           console.log('wtf..?');
         }
         room.mapDescription.filename = filename;
         if (mapDescription.initializeMap(room, terrainCollision.getTypes(filename).type, terrainCollision, reset, maprooms)) {
           if (broadcast) {
-            console.log('broadcasting map change');
+            console.log(`[${room.name}]: Broadcasting map change`);
             gameserver.broadcastUpdateRoomDescription(room);
           }
         }
@@ -233,6 +233,10 @@ module.exports = {
       target.stats.health -= takenDamage;
       if (target.stats.health <= 0) {
         module.exports.npcDie(target, room);
+      } else {
+        if (enemy.target === undefined) {
+          enemySimulator.enemylookForTarget(enemy, room, 1000);
+        }
       }
     } else if (type === 'player') {
       target.stats.health -= takenDamage;
