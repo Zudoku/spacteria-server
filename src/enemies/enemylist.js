@@ -53,7 +53,7 @@ module.exports = {
   },
   mini_gelatinous_blob() {
     return {
-      shape: new SAT.Box(new SAT.Vector(0, 0), 8, 8),
+      shape: new SAT.Box(new SAT.Vector(0, 0), 12, 12),
       image: 2,
       name: 'mini gelatinous blob',
       type: 'wandering',
@@ -69,7 +69,11 @@ module.exports = {
       loot: [
         {
           chance: 10,
-          items: [{ id: 1, amount: 1 }, { id: -1, amount: 1 }, { id: 5, amount: 1 }],
+          items: [{ id: 1, amount: 1 }],
+        },
+        {
+          chance: 4,
+          items: [{ id: 5, amount: 1 }],
         },
       ],
       exp: 20,
@@ -93,7 +97,7 @@ module.exports = {
       loot: [
         {
           chance: 1,
-          items: [{ id: 2, amount: 1 }, { id: 3, amount: 1 }, { id: 4, amount: 1 }, { id: 5, amount: 1 }],
+          items: [{ id: 3, amount: 1 }, { id: 4, amount: 1 }],
         },
       ],
       exp: 20,
@@ -103,7 +107,7 @@ module.exports = {
     return {
       shape: new SAT.Box(new SAT.Vector(0, 0), 60, 60),
       image: 5,
-      name: 'blob guardian',
+      name: 'Molecyloid',
       type: 'static',
       hitsound: 'BLOB',
       deathsound: 'BLOB',

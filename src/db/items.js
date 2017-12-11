@@ -254,7 +254,7 @@ module.exports = {
   getAllItems() {
     return new Promise((resolve, reject) => {
       dbHandler.getConnection().then((connection) => {
-        connection.client.query('SELECT * FROM gameitem', (err, res) => {
+        connection.client.query('SELECT * FROM gameitem ORDER BY uniqueid ASC', (err, res) => {
           connection.done(err);
           resolve(res.rows);
         });
