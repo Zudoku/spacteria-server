@@ -247,6 +247,7 @@ module.exports = {
           wallReference = walls.east[SF.getRandomIntInclusive(0, walls.east.length - 1)];
           deltaX = SF.getRandomIntInclusive(data.minroomdistance, data.maxroomdistance);
           break;
+        default:
       }
       if (wallReference === undefined) {
         continue;

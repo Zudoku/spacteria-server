@@ -19,7 +19,7 @@ module.exports = {
         if (result === true) {
           console.log(`[${room.name}]: Tilemap successfully read for map: ${filename}`);
         } else {
-          console.log('wtf..?');
+          console.log(`[${room.name}]: ERROR, don't know what to do...`);
         }
         room.mapDescription.filename = filename;
         if (mapDescription.initializeMap(room, terrainCollision.getTypes(filename).type, terrainCollision, reset, maprooms)) {
@@ -233,10 +233,8 @@ module.exports = {
       target.stats.health -= takenDamage;
       if (target.stats.health <= 0) {
         module.exports.npcDie(target, room);
-      } else {
-        if (enemy.target === undefined) {
-          enemySimulator.enemylookForTarget(enemy, room, 1000);
-        }
+      } else if (target.target === undefined) {
+        enemySimulator.enemylookForTarget(target, room, 1000);
       }
     } else if (type === 'player') {
       target.stats.health -= takenDamage;
@@ -252,7 +250,6 @@ module.exports = {
     for (let i = 0; i < room.players.length; i++) {
       if (room.players[i].characterdata.status !== 'DEAD') {
         allDead = false;
-        console.log(room.players[i].id);
       }
     }
     if (allDead) {
@@ -330,9 +327,7 @@ module.exports = {
     Promise.all(lootPromises.map(u => u.promise)).then((data) => {
       for (let index = 0; index < data.length; index++) {
         const result = data[index];
-        if (!result.success) {
-          console.log('WTF');
-        } else {
+        if (result.success) {
           const lootItem = result.item;
           if (lootItem.rarity > lootQuality) {
             lootQuality = lootItem.rarity;

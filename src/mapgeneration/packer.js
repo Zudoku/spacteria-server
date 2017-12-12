@@ -23,7 +23,7 @@ module.exports = {
 
     const rawdata = pako.inflate(binData);
 
-    const strData = String.fromCharCode.apply(null, new Uint16Array(rawdata));
+    // const strData = String.fromCharCode.apply(null, new Uint16Array(rawdata));
 
     const result = [rawdata.length / 4];
     for (let i = 0; i < rawdata.length; i++) {

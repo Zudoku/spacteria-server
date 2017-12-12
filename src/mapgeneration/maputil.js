@@ -9,7 +9,7 @@ module.exports = {
   },
   saveTilemap(tiledata, name, width, height, id, cb) {
     if (tiledata === undefined) {
-      console.log('Not trying to save map...');
+      console.log('[IO]: ERROR, Not trying to save map: corrupt tiledata.');
       return;
     }
 
@@ -30,7 +30,7 @@ module.exports = {
       stream.write(' </layer>\n');
       stream.write('</map>\n');
       stream.end();
-      console.log(`map ${name} written.`);
+      console.log(`[IO]: map ${name} written.`);
       cb();
     });
   },

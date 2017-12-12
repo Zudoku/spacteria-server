@@ -8,7 +8,6 @@ const maputil = require('./mapgeneration/maputil.js');
 const gamemapDescriptions = require('./gamemapDescriptions.js');
 
 const evts = require('./networkingevents.js');
-const fs = require('fs');
 
 module.exports = {
   loadCharacter(worldContainer, connections, socket, payload) {
@@ -107,7 +106,7 @@ module.exports = {
     return (connections[socketId].id === character.userid);
   },
   addCharacter(characternameUnsanitized, socket, connectionObj) {
-    console.log(characternameUnsanitized, socket.id);
+    console.log(`[CHARACTER]: ${characternameUnsanitized} created.`, socket.id);
     if (characternameUnsanitized !== undefined && /^[a-zA-Z0-9_-]*$/.test(characternameUnsanitized)) {
       characters.addCharacter(characternameUnsanitized, connectionObj.id).then((result) => {
         if (result.success) {

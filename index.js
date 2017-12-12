@@ -18,5 +18,5 @@ app.get('/*', (req, res) => {
 });
 
 http.listen(serverconfig.webserver_port, serverconfig.webserver_bind, () => {
-  console.log(`Listening on ${serverconfig.webserver_bind}:${serverconfig.webserver_port}`);
+  console.log(`[WEBSERVER]: Listening on ${serverconfig.webserver_bind}:${serverconfig.webserver_port}`);
 });

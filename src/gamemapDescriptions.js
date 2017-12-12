@@ -12,7 +12,7 @@ module.exports = {
     const height = terrainCollision.getTypes(room.mapDescription.filename).height;
     const description = mapDescs[`${id}`];
     if (description === undefined) {
-      console.log(`Unknown maptype: ${id} Cannot initialize game elements to map.`);
+      console.log(`[${room.name}]: Unknown maptype: ${id} Cannot initialize game elements to map.`);
       return true;
     }
     if (reset) {
@@ -78,7 +78,7 @@ module.exports = {
     for (let i = 0; i < description.npcs.length; i++) {
       module.exports.tryToAddNPC(room, description.npcs[i], 0, 0);
     }
-    console.log(`Enemies + portals + players initialized for map ${room.mapDescription.filename}`);
+    console.log(`[${room.name}]: Enemies, portals and players initialized for map ${room.mapDescription.filename}`);
     return true;
   },
   tryToAddEnemy(room, enemyObj, x, y) {

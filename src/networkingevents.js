@@ -32,6 +32,7 @@ module.exports = {
     CORRECT_PLAYER_POSITION: 'correctnpcposition',
     SPAWN_PROJECTILE: 'newprojectilespawned',
     SPAWN_LOOTBAG: 'newlootbagspawned',
+    SPAWN_ENEMY: 'newenemyspawned',
     DESPAWN_GAMEOBJECT: 'despawngameobject',
     REFRESH_ROOM_DESCRIPTION: 'refreshroomdesc',
     UPDATE_NPC_POSITION: 'correctnpcposition',

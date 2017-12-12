@@ -48,7 +48,7 @@ module.exports = {
           items: [{ id: 2, amount: 1 }],
         },
       ],
-      exp: 60,
+      exp: 100,
     };
   },
   mini_gelatinous_blob() {
@@ -92,7 +92,7 @@ module.exports = {
       collideToTerrain: true,
       state: 0,
       simulations: 0,
-      projectiles: [projectileList.mini_blob_projectile(E, 35)],
+      projectiles: [projectileList.mini_blob_projectile(E, 20)],
       zone: undefined,
       loot: [
         {
@@ -101,10 +101,18 @@ module.exports = {
         },
         {
           chance: 1,
-          items: [{ id: 7, amount: 1 }],
+          items: [{ id: 7, amount: 2 }],
+        },
+        {
+          chance: 4,
+          items: [{ id: 5, amount: 1 }],
+        },
+        {
+          chance: 4,
+          items: [{ id: 5, amount: 1 }],
         },
       ],
-      exp: 200,
+      exp: 20,
     };
   },
   blob_guardian() {
@@ -116,30 +124,22 @@ module.exports = {
       hitsound: 'BLOB',
       deathsound: 'BLOB',
       extra: {},
-      stats: { health: 500, maxhealth: 500, vitality: 0, strength: 10, dexterity: 10, defence: 1, speed: 20 },
+      stats: { health: 1000, maxhealth: 1000, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 20 },
       collideToTerrain: true,
       state: 0,
       simulations: 0,
       projectiles: [
-        projectileList.blob_guardian(E, 20),
-        projectileList.blob_guardian_slow(E, 65),
+        projectileList.blob_guardian(E, 10),
+        projectileList.blob_guardian_slow(E, 50),
       ],
       zone: undefined,
       loot: [
         {
-          chance: 40,
-          items: [{ id: 3, amount: 1 }, { id: 4, amount: 1 }],
-        },
-        {
-          chance: 25,
-          items: [{ id: 8, amount: 1 }],
-        },
-        {
-          chance: 8,
-          items: [{ id: 9, amount: 3 }],
+          chance: 10,
+          items: [{ id: 3, amount: 1 }, { id: 4, amount: 1 }, { id: 5, amount: 1 }],
         },
       ],
-      exp: 100,
+      exp: 20,
     };
   },
   charger() {
@@ -151,27 +151,19 @@ module.exports = {
       hitsound: 'BLOB',
       deathsound: 'BLOB',
       extra: {},
-      stats: { health: 400, maxhealth: 400, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 200 },
+      stats: { health: 1000, maxhealth: 1000, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 200 },
       collideToTerrain: true,
       state: 0,
       simulations: 0,
-      projectiles: [projectileList.charger(E, 20)],
+      projectiles: [projectileList.charger(E, 15)],
       zone: undefined,
       loot: [
         {
           chance: 5,
-          items: [{ id: 11, amount: 1 }],
-        },
-        {
-          chance: 5,
-          items: [{ id: 12, amount: 1 }],
-        },
-        {
-          chance: 25,
-          items: [{ id: 4, amount: 1 }],
+          items: [{ id: 2, amount: 1 }],
         },
       ],
-      exp: 100,
+      exp: 20,
     };
   },
   slimeguardian_a() {

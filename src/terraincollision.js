@@ -1,5 +1,6 @@
 const tmxparser = require('tmx-parser');
 const PF = require('pathfinding');
+const util = require('util');
 
 const tilemaps = {};
 const tilemapTypes = { temp: { type: '1', width: 20, height: 20 } };
@@ -10,22 +11,16 @@ const TMXPARSER_OFFSET = 1;
 module.exports = {
   initializeMap(filename, cb) {
     tmxparser.parseFile(`maps/${filename}.tmx`, (err, map) => {
-      if (err) {
-        console.log(err);
-        console.log('error ar reading file');
-        cb(false);
-        return false;
-      }
-      if (map === null || map === undefined) {
-        console.log(require('util').inspect(map, { depth: null }));
-        console.log('error!!!!');
+      if (err || map === null || map === undefined) {
+        const mapString = util.inspect(map, { depth: null });
+        console.log(`[IO]: ERROR, error ar reading tilemap file: ${err} | ${mapString}`);
         cb(false);
         return false;
       }
       const collisionMap = new PF.Grid(map.width, map.height);
 
 
-      console.log(`initializing collision for map: ${filename}`);
+      console.log(`[COLLISION]: Initializing collision for map: ${filename}`);
       tilemapTypes[filename] = { type: map.layers[0].name, width: map.width, height: map.height };
       for (let x = 0; x < map.width; x++) {
         // collisionMap[x] = new Array(map.height);
@@ -74,8 +69,8 @@ module.exports = {
 
     for (let y = 0; y < result.height; y++) {
       for (let x = 0; x < result.width; x++) {
-        const blocking = result.isWalkableAt(x, y);
-        result.setWalkableAt(x, y, !blocking);
+        const tileIsBlocking = result.isWalkableAt(x, y);
+        result.setWalkableAt(x, y, !tileIsBlocking);
       }
     }
 

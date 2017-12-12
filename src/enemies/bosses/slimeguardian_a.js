@@ -1,5 +1,8 @@
-const SF = require('./../../staticFuncs.js');
 const SAT = require('sat');
+
+const SF = require('./../../staticFuncs.js');
+const enemies = require('./../enemies.js');
+const worldUtil = require('./../../worldUtil.js');
 
 
 const PHASE_NEUTRAL = 0;
@@ -17,24 +20,22 @@ module.exports = {
 
     enemySimulator.regenLife(enemy);
 
-    if (enemy.stats.health < 0.05 * enemy.stats.maxhealth && enemy.state !== PHASE_DYING) {
-      enemy.extra.dying = true;
-      enemy.stats.health = 100000000000;
-      enemy.stats.defence = 10000000;
-      enemy.stats.maxhealth = enemy.stats.health;
-    }
+    module.exports.checkIfDead(enemy);
 
-    if (enemy.extra.phaseChangeCounter <= simulationIndex && enemy.state !== PHASE_NEUTRAL) {
-      if (SF.getRandomIntInclusive(1, 2) === 1) {
+    if (module.exports.shouldChangeState(enemy, simulationIndex)) {
+      if (enemy.state !== PHASE_AGGRO) {
+        enemy.state = PHASE_AGGRO;
+        module.exports.findBrother(room).state = PHASE_AGGRO;
+        enemy.extra.phaseChangeCounter = simulationIndex + 500;
+      } else if (SF.getRandomIntInclusive(1, 2) === 1) {
         enemy.state = PHASE_DANCE;
         module.exports.findBrother(room).state = PHASE_DANCE;
         enemy.extra.phaseChangeCounter = simulationIndex + 1800;
         module.exports.castDanceRing(enemy, room, gameserver, enemySimulator);
       } else {
-        enemy.state = PHASE_DANCE;
-        module.exports.findBrother(room).state = PHASE_DANCE;
+        enemy.state = PHASE_BLOB;
+        module.exports.findBrother(room).state = PHASE_BLOB;
         enemy.extra.phaseChangeCounter = simulationIndex + 1800;
-        module.exports.castDanceRing(enemy, room, gameserver, enemySimulator);
       }
     }
 
@@ -60,7 +61,7 @@ module.exports = {
         break;
 
       case PHASE_BLOB:
-
+        module.exports.tryToSpawnBlob(enemy, room, gameserver, enemySimulator, simulationIndex);
         break;
 
       case PHASE_DYING:
@@ -125,5 +126,31 @@ module.exports = {
   },
   findBrother(room) {
     return room.enemies.find(x => x.type === 'slimeguardian_b');
+  },
+  checkIfDead(enemy) {
+    if (enemy.stats.health < 0.05 * enemy.stats.maxhealth && enemy.state !== PHASE_DYING) {
+      enemy.extra.dying = true;
+      enemy.stats.health = 100000000000;
+      enemy.stats.defence = 10000000;
+      enemy.stats.maxhealth = enemy.stats.health;
+    }
+  },
+  shouldChangeState(enemy, simulationIndex) {
+    return (enemy.extra.phaseChangeCounter <= simulationIndex && enemy.state !== PHASE_NEUTRAL);
+  },
+  tryToSpawnBlob(enemy, room, gameserver, enemySimulator, simulationIndex) {
+    if (simulationIndex % 40 === 0) {
+      const t = (2 * Math.PI) / (Math.random() + 0.001);
+      const spawnX = enemy.x + (SF.getRandomIntInclusive(100, 500) * Math.cos(t));
+      const spawnY = enemy.y + (SF.getRandomIntInclusive(100, 500) * Math.cos(t));
+
+      const spawnedEnemy = enemies.getMonster('mini_gelatinous_blob', room.difficulty, spawnX, spawnY);
+      spawnedEnemy.simulations = SF.getRandomIntInclusive(0, 1000);
+      worldUtil.getZoneForCoord(room.zones, spawnX, spawnY).enemies[spawnedEnemy.hash] = { shape: spawnedEnemy.shape };
+      spawnedEnemy.zone = worldUtil.getZoneForCoord(room.zones, spawnX, spawnY);
+      spawnedEnemy.target = room.players[SF.getRandomIntInclusive(0, room.players.length - 1)];
+      room.enemies.push(spawnedEnemy);
+      gameserver.broadcastEnemyToGame(spawnedEnemy, spawnedEnemy.hash, room);
+    }
   },
 };

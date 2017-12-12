@@ -169,13 +169,13 @@ module.exports = {
             Object.entries(connections).forEach(([key, value]) => {
               if (value.type !== 'browser' && value.id === result.uniqueid) {
                 socket.emit(evts.outgoing.LOGIN_FAIL, { reason: 'User already logged in!' });
-                console.log(`User ${identifyInfo.username} already logged on, failing login.`);
+                console.log(`[LOGIN]: User ${identifyInfo.username} already logged on, failing login.`);
                 allowLogin = false;
               }
             });
           }
           if (allowLogin) {
-            console.log(`${socket.id} joined the server`);
+            // console.log(`${socket.id} joined the server`);
             connections[socket.id] = {
               id: result.uniqueid,
               username: identifyInfo.username,
@@ -199,7 +199,7 @@ module.exports = {
       };
       if (identifyInfo.page === 'livedashboard') {
         socket.join('observers');
-        console.log(`${socket.id} joined the observers`);
+        // console.log(`${socket.id} joined the observers`);
       } else if (identifyInfo.page === 'datadashboard') {
         module.exports.sendDataInfo(socket);
       }
@@ -224,7 +224,7 @@ module.exports = {
   },
   handleDisconnect(socket) {
     const disconnectedId = socket.id;
-    console.log(`${socket.id} left the server`);
+    console.log(`[LOGIN]: ${socket.id} left the server`);
     const disconnectedPlayer = worldContainer.getPlayers()[disconnectedId];
     if (module.exports.checkIfIdentified(disconnectedId)) {
       if (module.exports.checkIfPlayerSelected(disconnectedId)) {
@@ -288,6 +288,10 @@ module.exports = {
   broadcastLootBagToGame(lootbag, hash, room) {
     const payload = { lootbag, guid: hash };
     ioref.to(room.name).emit(evts.outgoing.SPAWN_LOOTBAG, payload);
+  },
+  broadcastEnemyToGame(enemy, hash, room) {
+    const payload = { enemy, hash };
+    ioref.to(room.name).emit(evts.outgoing.SPAWN_ENEMY, payload);
   },
   broadcastLootBagChangeToGame(lootbag, hash, room) {
     const payload = { lootbag, guid: hash };
