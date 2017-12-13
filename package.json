@@ -1,0 +1,40 @@
+{
+  "name": "spacteria-server",
+  "version": "1.0.0",
+  "description": "",
+  "dependencies": {
+    "atob": "^2.0.3",
+    "btoa": "^1.1.2",
+    "discord.io": "^2.5.3",
+    "express": "^4.15.5",
+    "material-ui": "^0.20.0",
+    "pako": "^1.0.5",
+    "pathfinding": "^0.4.18",
+    "pg": "^6.1.2",
+    "prop-types": "^15.5.10",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-redux": "^5.0.6",
+    "redux": "^3.7.2",
+    "sat": "^0.6.0",
+    "socket.io": "^1.4.8",
+    "socket.io-client": "^2.0.3",
+    "tmx-parser": "^1.4.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "eslint": "^3.6.1",
+    "eslint-config-airbnb": "^12.0.0",
+    "eslint-plugin-es6-recommended": "^0.1.2",
+    "eslint-plugin-import": "^2.0.0",
+    "eslint-plugin-jsx-a11y": "^2.2.2",
+    "eslint-plugin-react": "^6.3.0",
+    "webpack": "^3.6.0"
+  },
+  "scripts": {
+    "build": "webpack"
+  }
+}

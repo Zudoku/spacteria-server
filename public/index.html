@@ -1,0 +1,12 @@
+<script src="http://cdn.socket.io/socket.io-1.4.0.js"></script>
+<script>
+  var socket = io();
+  socket.on('info',function(payload){
+    console.log(payload);
+    document.getElementById("content").innerHTML = JSON.stringify(payload, null,4);
+  });
+  socket.emit('identify',{type : "browser"});
+
+</script>
+
+<pre id="content" style="height:500px; width:500px;"></pre>
