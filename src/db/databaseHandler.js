@@ -4,6 +4,7 @@ const serverconfig = require('./../../config/serverconfig.js');
 const pgconfig = {
   user: serverconfig.database_username,
   database: 'spacteriagame',
+  host: 'db',
   password: serverconfig.database_password,
   port: 5432,
   max: 10,
