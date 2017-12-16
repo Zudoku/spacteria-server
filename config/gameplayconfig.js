@@ -5,8 +5,8 @@ config.data_percistence = true;
 config.zone_amount = 40;
 config.publish_gameplay_config = false;// TODO
 
-config.VERSION_STRING = '0004 - 10.12.2017';
-config.VERSION_CHANGELOG = 'Item revamp';
+config.VERSION_STRING = '0005 - 16.12.2017';
+config.VERSION_CHANGELOG = '-';
 
 
 config.NPC_POSITION_BROADCAST_BUFFER = 4;
