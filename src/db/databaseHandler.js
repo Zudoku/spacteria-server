@@ -21,6 +21,9 @@ module.exports = {
   getConnection() {
     return new Promise((resolve) => {
       pool.connect((err, client, done) => {
+        if (err) {
+          console.log(err);
+        }
         resolve({
           err,
           client,
