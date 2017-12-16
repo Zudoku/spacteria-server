@@ -9,7 +9,6 @@ const PHASE_NEUTRAL = 0;
 const PHASE_AGGRO = 1;
 const PHASE_DANCE = 2;
 const PHASE_BLOB = 3;
-const PHASE_DYING = 4;
 
 const DANCE_RING_INTERVAL = 10;
 
@@ -20,7 +19,8 @@ module.exports = {
 
     enemySimulator.regenLife(enemy);
 
-    module.exports.checkIfDead(enemy);
+    module.exports.checkIfDead(enemy, gameserver, room);
+    module.exports.checkBothDead(enemy, room);
 
     if (module.exports.shouldChangeState(enemy, simulationIndex)) {
       if (enemy.state !== PHASE_AGGRO) {
@@ -32,7 +32,6 @@ module.exports = {
         enemy.state = PHASE_DANCE;
         module.exports.findBrother(room).state = PHASE_DANCE;
         enemy.extra.phaseChangeCounter = simulationIndex + 1800;
-        module.exports.castDanceRing(enemy, room, gameserver, enemySimulator);
         gameserver.broadcastChatMessageRoom('[???]: You can\'t escape us!', 2, room);
       } else {
         enemy.state = PHASE_BLOB;
@@ -64,6 +63,9 @@ module.exports = {
         break;
 
       case PHASE_DANCE:
+        if (enemy.extra.dying) {
+          break;
+        }
         if (enemy.simulations % DANCE_RING_INTERVAL === 0) {
           module.exports.castDanceRing(enemy, room, gameserver, enemySimulator);
         }
@@ -71,13 +73,12 @@ module.exports = {
         break;
 
       case PHASE_BLOB:
+        if (enemy.extra.dying) {
+          break;
+        }
         module.exports.tryToSpawnBlob(enemy, room, gameserver, enemySimulator, simulationIndex);
         break;
 
-      case PHASE_DYING:
-
-
-        break;
 
       default:
 
@@ -137,12 +138,20 @@ module.exports = {
   findBrother(room) {
     return room.enemies.find(x => x.type === 'slimeguardian_b');
   },
-  checkIfDead(enemy) {
-    if (enemy.stats.health < 0.05 * enemy.stats.maxhealth && enemy.state !== PHASE_DYING) {
+  checkIfDead(enemy, gameserver, room) {
+    if (enemy.stats.health < 0.05 * enemy.stats.maxhealth) {
       enemy.extra.dying = true;
-      enemy.stats.health = 100000000000;
+      enemy.stats.health = 1000000;
       enemy.stats.defence = 10000000;
       enemy.stats.maxhealth = enemy.stats.health;
+      gameserver.broadcastChatMessageRoom('[PURPLE]: Squish! ', 2, room);
+    }
+  },
+  checkBothDead(enemy, room) {
+    if (enemy.extra.dying && module.exports.findBrother(room).extra.dying) {
+      const worldSimulator = require('./../../worldSimulator.js');
+      worldSimulator.npcDie(enemy, room);
+      worldSimulator.npcDie(module.exports.findBrother(room), room);
     }
   },
   shouldChangeState(enemy, simulationIndex) {

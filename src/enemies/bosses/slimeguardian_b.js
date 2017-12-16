@@ -6,7 +6,6 @@ const PHASE_NEUTRAL = 0;
 const PHASE_AGGRO = 1;
 const PHASE_DANCE = 2;
 const PHASE_BLOB = 3;
-const PHASE_DYING = 4;
 
 const DANCE_ATTACK_INTERVAL = 30;
 
@@ -17,11 +16,11 @@ module.exports = {
 
     enemySimulator.regenLife(enemy);
 
-    module.exports.checkIfDead(enemy);
+    module.exports.checkIfDead(enemy, gameserver, room);
 
     switch (enemy.state) {
       case PHASE_NEUTRAL:
-        module.exports.checkIfAggro(enemy, room, simulationIndex);
+        module.exports.checkIfAggro(enemy, room, simulationIndex, gameserver);
 
         break;
       case PHASE_AGGRO:
@@ -29,16 +28,17 @@ module.exports = {
         break;
 
       case PHASE_DANCE:
+        if (enemy.extra.dying) {
+          break;
+        }
         module.exports.tryToCastRandomSlowProjectiles(enemy, room, gameserver, enemySimulator, false);
         break;
 
       case PHASE_BLOB:
+        if (enemy.extra.dying) {
+          break;
+        }
         module.exports.tryToCastRandomSlowProjectiles(enemy, room, gameserver, enemySimulator, true);
-        break;
-
-      case PHASE_DYING:
-
-
         break;
 
       default:
@@ -74,19 +74,27 @@ module.exports = {
   findBrother(room) {
     return room.enemies.find(x => x.type === 'slimeguardian_a');
   },
-  checkIfDead(enemy) {
-    if (enemy.stats.health < 0.05 * enemy.stats.maxhealth && enemy.state !== PHASE_DYING) {
+  checkIfDead(enemy, gameserver, room) {
+    if (enemy.stats.health < 0.05 * enemy.stats.maxhealth) {
       enemy.extra.dying = true;
-      enemy.stats.health = 100000000000;
+      enemy.stats.health = 1000000;
       enemy.stats.defence = 10000000;
       enemy.stats.maxhealth = enemy.stats.health;
+      gameserver.broadcastChatMessageRoom('[RED]: Squish! ', 2, room);
     }
   },
-  checkIfAggro(enemy, room, simulationIndex) {
+  checkIfAggro(enemy, room, simulationIndex, gameserver) {
     if (enemy.stats.health < enemy.stats.maxhealth) {
       enemy.state = PHASE_AGGRO;
       module.exports.findBrother(room).state = PHASE_AGGRO;
       module.exports.findBrother(room).extra.phaseChangeCounter = simulationIndex + 300 + SF.getRandomIntInclusive(1, 300);
+      gameserver.broadcastChatMessageRoom('[???]: ........ ', 2, room);
+      setTimeout(() => {
+        gameserver.broadcastChatMessageRoom('[???]: You don\'t belong here Alienoid', 2, room);
+      }, 500);
+      setTimeout(() => {
+        gameserver.broadcastChatMessageRoom('[???]: Prepare to gelatinate!', 2, room);
+      }, 500);
     }
   },
 };

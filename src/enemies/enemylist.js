@@ -44,7 +44,7 @@ module.exports = {
           items: [{ id: 6, amount: 1 }],
         },
         {
-          chance: 10,
+          chance: 25,
           items: [{ id: 2, amount: 1 }],
         },
       ],
@@ -68,7 +68,7 @@ module.exports = {
       zone: undefined,
       loot: [
         {
-          chance: 10,
+          chance: 25,
           items: [{ id: 1, amount: 1 }],
         },
         {
@@ -160,7 +160,15 @@ module.exports = {
       loot: [
         {
           chance: 5,
-          items: [{ id: 2, amount: 1 }],
+          items: [{ id: 10, amount: 1 }],
+        },
+        {
+          chance: 5,
+          items: [{ id: 11, amount: 1 }],
+        },
+        {
+          chance: 20,
+          items: [{ id: 3, amount: 1 }],
         },
       ],
       exp: 20,
@@ -184,7 +192,19 @@ module.exports = {
       loot: [
         {
           chance: 1,
-          items: [{ id: 1, amount: 1 }],
+          items: [{ id: 13, amount: 1 }, { id: 15, amount: 1 }],
+        },
+        {
+          chance: 1,
+          items: [{ id: 14, amount: 1 }],
+        },
+        {
+          chance: 4,
+          items: [{ id: 12, amount: 15 }],
+        },
+        {
+          chance: 4,
+          items: [{ id: 6, amount: 5 }],
         },
       ],
       exp: 20,
@@ -208,7 +228,7 @@ module.exports = {
       loot: [
         {
           chance: 1,
-          items: [{ id: 1, amount: 1 }],
+          items: [{ id: 16, amount: 1 }, { id: 17, amount: 1 }],
         },
       ],
       exp: 20,
