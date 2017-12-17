@@ -166,6 +166,7 @@ module.exports = {
       if (!SF.isString(identifyInfo.username) || !SF.isString(identifyInfo.password)) {
         return;
       }
+      console.log('t');
       userlogin.login(identifyInfo.username, identifyInfo.password).then((result) => {
         if (result.success) {
           let allowLogin = true;

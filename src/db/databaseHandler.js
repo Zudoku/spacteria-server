@@ -24,10 +24,10 @@ let pool;
 
 function configureDBConnection() {
   pool = new pg.Pool(pgconfig);
-  console.log(pool);
+  console.error(pool);
 
   pool.on('error', (err, client) => {
-    console.log('idle client error', err.message, err.stack, client);
+    console.error('idle client error', err.message, err.stack, client);
   });
 }
 
@@ -40,9 +40,9 @@ module.exports = {
         configureDBConnection();
       }
       pool.connect((err, client, done) => {
-        console.log(err);
-        console.log(client);
-        console.log(done);
+        console.error(err);
+        console.error(client);
+        console.error(done);
         resolve({
           err,
           client,
