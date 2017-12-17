@@ -2,12 +2,10 @@ version: '3'
 services:
   db:
     image: postgres
-    restart: always
     volumes:
       - ./sqlscripts/create_tables.sql:/docker-entrypoint-initdb.d/init.sql
   web:
     build: .
-    restart: always
     depends_on:
       - db
     ports:

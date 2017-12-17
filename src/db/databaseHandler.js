@@ -2,10 +2,10 @@ const pg = require('pg');
 const serverconfig = require('./../../config/serverconfig.js');
 
 const pgconfig = {
-  user: serverconfig.database_username,
-  database: 'spacteriagame',
+  user: 'postgres',
+  database: 'postgres',
   host: 'db',
-  password: serverconfig.database_password,
+  password: 'postgres',
   port: 5432,
   max: 10,
   idleTimeoutMills: 30000,
