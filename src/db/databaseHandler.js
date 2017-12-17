@@ -24,6 +24,7 @@ let pool;
 
 function configureDBConnection() {
   pool = new pg.Pool(pgconfig);
+  console.log(pool);
 
   pool.on('error', (err, client) => {
     console.log('idle client error', err.message, err.stack, client);

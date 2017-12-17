@@ -15,6 +15,7 @@ module.exports = {
         // TODO
         // TODO  HOX HOX HOX HOX HOX HOX HOX HOX HOX
         // TODO
+        console.log(connection.client);
         connection.client.query('SELECT * FROM gameuser WHERE username = $1 AND password = $2', [username, password], (err, result) => {
           connection.done(err);
           if (err) {
