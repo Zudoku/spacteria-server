@@ -39,9 +39,9 @@ module.exports = {
         configureDBConnection();
       }
       pool.connect((err, client, done) => {
-        if (err) {
-          console.log(err);
-        }
+        console.log(err);
+        console.log(client);
+        console.log(done);
         resolve({
           err,
           client,
