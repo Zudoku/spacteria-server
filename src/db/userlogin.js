@@ -16,19 +16,23 @@ module.exports = {
         // TODO  HOX HOX HOX HOX HOX HOX HOX HOX HOX
         // TODO
         console.log(connection.client);
-        connection.client.query('SELECT * FROM gameuser WHERE username = $1 AND password = $2', [username, password], (err, result) => {
-          connection.done(err);
-          if (err) {
-            resolve({ success: false, msg: 'DB connection error' });
-          }
-          if (result.rows.length <= 0) {
-            resolve({ success: false, msg: 'Wrong user / pass' });
-          } else {
-            const gameuser = result.rows[0];
-            // TODO: rework to use gamesessiontoken
-            resolve({ success: true, uniqueid: gameuser.uniqueid });
-          }
-        });
+        try {
+          connection.client.query('SELECT * FROM gameuser WHERE username = $1 AND password = $2', [username, password], (err, result) => {
+            connection.done(err);
+            if (err) {
+              resolve({ success: false, msg: 'DB connection error' });
+            }
+            if (result.rows.length <= 0) {
+              resolve({ success: false, msg: 'Wrong user / pass' });
+            } else {
+              const gameuser = result.rows[0];
+              // TODO: rework to use gamesessiontoken
+              resolve({ success: true, uniqueid: gameuser.uniqueid });
+            }
+          });
+        } catch (error) {
+          console.log(error);
+        }
       });
     });
   },
