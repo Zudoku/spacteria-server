@@ -19,7 +19,7 @@ module.exports = {
       });
     });
   },
-  addBossKill(room) {
+  addBossKill(room, boss) {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
@@ -27,12 +27,12 @@ module.exports = {
           resolve({ success: false });
         }
         connection.client.query('INSERT INTO bosskill(bossid,killtime,difficulty,achievedat, participants) VALUES ($1, $2, $3, $4, $5)',
-        [], (err, result) => {
+        [boss, room], (err, result) => {
           connection.done(err);
           if (err) {
             resolve({ success: false, msg: 'DB error' });
           } else {
-            resolve({ success: true, leaderboard: result.rows });
+            resolve({ success: true });
           }
         });
       });

@@ -92,3 +92,7 @@ INSERT INTO gamecharacter
 INSERT INTO gamecharactercurrency
 (characterid,coin,bugbounty,rollticket) VALUES
 (1,10,0,1);
+
+INSERT INTO gameinventory
+(characterid, itemid, quantity, slot) VALUES
+(1,1,1,1);
