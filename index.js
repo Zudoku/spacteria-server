@@ -21,3 +21,5 @@ app.get('/*', (req, res) => {
 http.listen(serverconfig.webserver_port, serverconfig.webserver_bind, () => {
   console.log(`[WEBSERVER]: Listening on ${serverconfig.webserver_bind}:${serverconfig.webserver_port}`);
 });
+
+process.on('unhandledRejection', r => console.log(r));
