@@ -68,6 +68,18 @@ quantity INTEGER NOT NULL,
 slot INTEGER NOT NULL
 );
 
+-- LEADERBOARDS
+
+CREATE TABLE bosskill
+(
+uniqueid SERIAL,
+bossid INTEGER NOT NULL,
+killtime INTEGER NOT NULL,
+difficulty INTEGER NOT NULL,
+achievedat TIMESTAMP,
+participants json NOT NULL
+);
+
 
 INSERT INTO gameuser
 (joined,username,password,email) VALUES
