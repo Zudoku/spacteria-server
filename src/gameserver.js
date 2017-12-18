@@ -193,6 +193,8 @@ module.exports = {
         } else {
           socket.emit(evts.outgoing.LOGIN_FAIL, { reason: result.msg });
         }
+      }).catch(error => {
+        console.log(error);
       });
     }
     if (identifyInfo.type === 'browser') {
