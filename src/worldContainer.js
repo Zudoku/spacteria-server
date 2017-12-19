@@ -37,6 +37,7 @@ module.exports = {
         filename: 'temp',
         startX: 5 * 64,
         startY: 128,
+        spent: 0,
       },
       gameobjects: [], // Static objects that can't be
       enemies: [], // Enemies that can be harmed

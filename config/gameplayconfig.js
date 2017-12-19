@@ -5,10 +5,8 @@ config.data_percistence = true;
 config.zone_amount = 40;
 config.publish_gameplay_config = false;
 
-config.VERSION_STRING = '0006 - 18.12.2017';
-config.VERSION_CHANGELOG = JSON.stringify([
-  { text: '' }
-]);
+config.VERSION_STRING = '0007 - 19.12.2017';
+config.VERSION_CHANGELOG = 'Server:;Client:;- Change server URL by pressing C in login;- Mouse clickable textboxes in login;- Copy-paste in login;By Zudoku';
 
 
 config.NPC_POSITION_BROADCAST_BUFFER = 4;

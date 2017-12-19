@@ -43,6 +43,7 @@ module.exports = {
     }
   },
   simulateRoom(room, ioref, count) {
+    room.mapDescription.spent++;
     // Give projectiles momentum
     // And move them
     for (let i = 0; i < room.projectiles.length; i++) {

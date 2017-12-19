@@ -20,6 +20,7 @@ module.exports = {
       room.gameobjects = [];
       room.enemies = [];
       room.projectiles = [];
+      room.mapDescription.spent = 0;
     }
     room.zones = worldUtil.getZones(width, height);
     // Set players to right place
