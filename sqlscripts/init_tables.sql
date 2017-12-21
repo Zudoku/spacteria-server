@@ -96,3 +96,19 @@ INSERT INTO gamecharactercurrency
 INSERT INTO gameinventory
 (characterid, itemid, quantity, slot) VALUES
 (1,1,1,1);
+
+INSERT INTO gameuser
+(joined,username,password,email) VALUES
+(CURRENT_TIMESTAMP,'arttu','1234567','aaaa@bbbbb.com');
+
+INSERT INTO gamecharacter
+(userid,name,level,experience,created) VALUES
+(2,'foo',1,0,CURRENT_TIMESTAMP);
+
+INSERT INTO gamecharactercurrency
+(characterid,coin,bugbounty,rollticket) VALUES
+(2,10,0,1);
+
+INSERT INTO gameinventory
+(characterid, itemid, quantity, slot) VALUES
+(2,1,1,1);
