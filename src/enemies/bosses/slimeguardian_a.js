@@ -3,6 +3,7 @@ const SAT = require('sat');
 const SF = require('./../../staticFuncs.js');
 const enemies = require('./../enemies.js');
 const worldUtil = require('./../../worldUtil.js');
+const leaderboards = require('./../../db/leaderboards.js');
 
 
 const PHASE_NEUTRAL = 0;
@@ -152,6 +153,9 @@ module.exports = {
       const worldSimulator = require('./../../worldSimulator.js');
       worldSimulator.npcDie(enemy, room);
       worldSimulator.npcDie(module.exports.findBrother(room), room);
+      leaderboards.addBossKill(room, 1).then((data) => {
+
+      });
     }
   },
   shouldChangeState(enemy, simulationIndex) {

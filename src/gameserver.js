@@ -58,6 +58,10 @@ module.exports = {
         socket.emit(evts.outgoing.SEND_ROOMLIST, { roomlist: worldContainer.getRooms() });
       });
 
+      socket.on(evts.incoming.LIST_LEADERBOARDS, () => {
+        loadingEventHandler.leaderboardslist(socket);
+      });
+
       socket.on(evts.incoming.ASK_TO_JOIN_GAME, (payload) => {
         if (module.exports.checkIfPlayerSelected(socket.id)
          && !module.exports.checkIfInRoom(socket.id)) {
@@ -166,7 +170,6 @@ module.exports = {
       if (!SF.isString(identifyInfo.username) || !SF.isString(identifyInfo.password)) {
         return;
       }
-      console.log('t');
       userlogin.login(identifyInfo.username, identifyInfo.password).then((result) => {
         if (result.success) {
           let allowLogin = true;
@@ -194,7 +197,7 @@ module.exports = {
         } else {
           socket.emit(evts.outgoing.LOGIN_FAIL, { reason: result.msg });
         }
-      }).catch(error => {
+      }).catch((error) => {
         console.log(error);
       });
     }

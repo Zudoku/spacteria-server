@@ -4,6 +4,7 @@ services:
     image: postgres
     volumes:
       - ./sqlscripts/init_tables.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./sqlscripts/dump/items.sql:/docker-entrypoint-initdb.d/init2.sql
   web:
     build: .
     depends_on:

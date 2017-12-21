@@ -28,7 +28,7 @@ module.exports = {
       hitsound: 'BLOB',
       deathsound: 'BLOB',
       extra: {},
-      stats: { health: 80, maxhealth: 80, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 20 },
+      stats: { health: 40, maxhealth: 40, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 20 },
       collideToTerrain: true,
       state: 0,
       simulations: 0,
@@ -60,7 +60,7 @@ module.exports = {
       hitsound: 'BLOB',
       deathsound: 'BLOB',
       extra: {},
-      stats: { health: 40, maxhealth: 40, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 20 },
+      stats: { health: 20, maxhealth: 20, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 20 },
       collideToTerrain: true,
       state: 0,
       simulations: 0,
@@ -88,7 +88,7 @@ module.exports = {
       hitsound: 'BLOB',
       deathsound: 'BLOB',
       extra: {},
-      stats: { health: 1000, maxhealth: 1000, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 20 },
+      stats: { health: 200, maxhealth: 200, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 20 },
       collideToTerrain: true,
       state: 0,
       simulations: 0,
@@ -112,7 +112,7 @@ module.exports = {
           items: [{ id: 5, amount: 1 }],
         },
       ],
-      exp: 20,
+      exp: 200,
     };
   },
   blob_guardian() {
@@ -124,7 +124,7 @@ module.exports = {
       hitsound: 'BLOB',
       deathsound: 'BLOB',
       extra: {},
-      stats: { health: 1000, maxhealth: 1000, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 20 },
+      stats: { health: 250, maxhealth: 250, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 20 },
       collideToTerrain: true,
       state: 0,
       simulations: 0,
@@ -139,7 +139,7 @@ module.exports = {
           items: [{ id: 3, amount: 1 }, { id: 4, amount: 1 }, { id: 5, amount: 1 }],
         },
       ],
-      exp: 20,
+      exp: 100,
     };
   },
   charger() {
@@ -151,7 +151,7 @@ module.exports = {
       hitsound: 'BLOB',
       deathsound: 'BLOB',
       extra: {},
-      stats: { health: 1000, maxhealth: 1000, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 200 },
+      stats: { health: 300, maxhealth: 300, vitality: 1, strength: 10, dexterity: 10, defence: 1, speed: 200 },
       collideToTerrain: true,
       state: 0,
       simulations: 0,
@@ -171,7 +171,7 @@ module.exports = {
           items: [{ id: 3, amount: 1 }],
         },
       ],
-      exp: 20,
+      exp: 200,
     };
   },
   slimeguardian_a() {
@@ -183,7 +183,7 @@ module.exports = {
       hitsound: 'BLOB',
       deathsound: 'BLOB',
       extra: {},
-      stats: { health: 15300, maxhealth: 15300, vitality: 0, strength: 10, dexterity: 10, defence: 1, speed: 200 },
+      stats: { health: 4000, maxhealth: 4000, vitality: 0, strength: 10, dexterity: 10, defence: 1, speed: 200 },
       collideToTerrain: false,
       state: 0,
       simulations: 0,
@@ -207,7 +207,7 @@ module.exports = {
           items: [{ id: 6, amount: 5 }],
         },
       ],
-      exp: 20,
+      exp: 1000,
     };
   },
   slimeguardian_b() {
@@ -219,7 +219,7 @@ module.exports = {
       hitsound: 'BLOB',
       deathsound: 'BLOB',
       extra: {},
-      stats: { health: 15300, maxhealth: 15300, vitality: 0, strength: 10, dexterity: 10, defence: 1, speed: 200 },
+      stats: { health: 4000, maxhealth: 4000, vitality: 0, strength: 10, dexterity: 10, defence: 1, speed: 200 },
       collideToTerrain: false,
       state: 0,
       simulations: 0,
@@ -231,7 +231,7 @@ module.exports = {
           items: [{ id: 16, amount: 1 }, { id: 17, amount: 1 }],
         },
       ],
-      exp: 20,
+      exp: 1000,
     };
   },
   test_monster() {

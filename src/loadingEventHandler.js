@@ -3,6 +3,7 @@ const SF = require('./staticFuncs.js');
 const characters = require('./db/characters.js');
 const items = require('./db/items.js');
 const currencies = require('./db/currencies.js');
+const leaderboards = require('./db/leaderboards.js');
 
 const maputil = require('./mapgeneration/maputil.js');
 const gamemapDescriptions = require('./gamemapDescriptions.js');
@@ -62,6 +63,14 @@ module.exports = {
       } else {
         // TODO: Handle error
       }
+    });
+  },
+  leaderboardslist(socket) {
+    Promise.all([
+      leaderboards.getTopTen(),
+      characters.getTopTen(),
+    ]).then((data) => {
+      socket.emit(evts.outgoing.SEND_LEADERBOARDS, { leaderboards: data[0].leaderboard, characters: data[1].chars });
     });
   },
   joinRoom(worldContainer, socket, payload) {

@@ -23,9 +23,11 @@ module.exports = {
     UPLOAD_ITEMDATA: 'uploaditems',
     RELOAD_DASHBOARD_DATA: 'reloaddata',
     EMIT_CHAT_MSG: 'emitchatmsg',
+    LIST_LEADERBOARDS: 'listleaderboards',
   },
   outgoing: {
     SEND_ROOMLIST: 'displayroomlist',
+    SEND_LEADERBOARDS: 'displayleaderboards',
     JOIN_ROOM: 'joinroom',
     PLAYER_JOINED_YOUR_GAME: 'playerjoin',
     PLAYER_LEFT_YOUR_GAME: 'playerleft',

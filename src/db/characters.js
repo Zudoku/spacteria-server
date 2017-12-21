@@ -41,6 +41,24 @@ module.exports = {
       });
     });
   },
+  getTopTen(){
+    return new Promise((resolve) => {
+      dbHandler.getConnection().then((connection) => {
+        if (connection.err) {
+          connection.done(connection.err);
+          resolve({ success: false });
+        }
+        connection.client.query('SELECT * FROM gamecharacter ORDER BY level DESC, experience DESC LIMIT 10;', [], (err, result) => {
+          connection.done(err);
+          if (err) {
+            resolve({ success: false, msg: 'DB error' });
+          } else {
+            resolve({ success: true, chars: result.rows });
+          }
+        });
+      });
+    });
+  },
   addCharacter(characterName, userid) {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
