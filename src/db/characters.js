@@ -70,6 +70,7 @@ module.exports = {
         connection.client.query('INSERT INTO gamecharacter (userid, name, level, experience, created) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING uniqueid', arguments , (err, result) => {
           Promise.all([
             connection.client.query('INSERT INTO gamecharactercurrency (characterid, coin, bugbounty, rollticket) VALUES ($1, $2, $3, $4)', [result.rows[0].uniqueid, 0, 0, 0]),
+            connection.client.query('INSERT INTO gameinventory (characterid, itemid, quantity, slot) VALUES ($1, 1, 1, 1)', [result.rows[0].uniqueid])
           ]).then( (data) => {
             connection.done();
           }).catch( (error) => {
