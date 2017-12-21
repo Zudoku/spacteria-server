@@ -103,7 +103,7 @@ INSERT INTO gameuser
 
 INSERT INTO gamecharacter
 (userid,name,level,experience,created) VALUES
-(2,'foo',1,0,CURRENT_TIMESTAMP);
+(2,'arttu',1,0,CURRENT_TIMESTAMP);
 
 INSERT INTO gamecharactercurrency
 (characterid,coin,bugbounty,rollticket) VALUES
