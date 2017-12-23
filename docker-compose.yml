@@ -10,4 +10,4 @@ services:
     depends_on:
       - db
     ports:
-      - "3590:3590"
+      - "443:443"

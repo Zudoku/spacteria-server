@@ -2,7 +2,7 @@
   "name": "spacteria-server",
   "version": "1.0.0",
   "description": "Javascript game server for a java game called Spacteria.",
-  "repository": { 
+  "repository": {
     "type": "git",
     "url": "https://bitbucket.org/Arap/spacteria-server.git"
   },
@@ -12,9 +12,9 @@
     "btoa": "^1.1.2",
     "discord.io": "^2.5.3",
     "express": "^4.15.5",
+    "greenlock-express": "^2.0.6",
     "le-challenge-fs": "^2.0.8",
     "le-store-certbot": "^2.0.5",
-    "greenlock-express": "^2.0.6",
     "material-ui": "^0.20.0",
     "pako": "^1.0.5",
     "pathfinding": "^0.4.18",
@@ -23,6 +23,7 @@
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-redux": "^5.0.6",
+    "redirect-https": "^1.1.4",
     "redux": "^3.7.2",
     "sat": "^0.6.0",
     "socket.io": "^1.4.8",

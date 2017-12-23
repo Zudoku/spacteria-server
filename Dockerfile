@@ -6,6 +6,6 @@ WORKDIR /spacteria-server
 RUN npm install
 RUN npm run build
 
-EXPOSE 3590
+EXPOSE 443
 
 CMD ["node", "index.js"]
