@@ -22,8 +22,8 @@ const lexObj = LEX.create({
   approveDomains: ['www.spacteria.com'],
   app,
 });
-const servers = lexObj.listen(80, 443);
-console.log(servers);
+const server = lexObj.listen(80, 443);
+console.log(server);
 
 /*
 const httpsServer = https.createServer(lexObj.httpsOptions, lexObj.middleware(app));
@@ -35,7 +35,7 @@ http.createServer(lexObj.middleware(require('redirect-https')())).listen(9992, s
   console.log('Listening for ACME http-01 challenges on', this.address());
 });
  */
-// const io = socketIO.listen(httpsServer);
-// gameserver.init(io);
+const io = socketIO.listen(server);
+gameserver.init(io);
 
 process.on('unhandledRejection', r => console.log(r));
