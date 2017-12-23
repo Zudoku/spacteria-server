@@ -15,37 +15,24 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'webapp', 'index.html'));
 });
 
-function approveDomains(opts, certs, cb) {
-  /* eslint no-param-reassign: "off"*/
-  if (certs) {
-    opts.domains = ['www.spacteria.com'];
-  } else {
-    console.log(certs);
-    console.log(opts.domains);
-    opts.email = 'arttu.siren@gmail.com';
-    opts.agreeTos = true;
-  }
-
-  cb(null, { options: opts, certs });
-}
-
 const lexObj = LEX.create({
   server: serverconfig.profile === '----' ? 'https://acme-v01.api.letsencrypt.org/directory' : 'staging',
-  challenges: { 'http-01': leChallengeFS.create({ webrootPath: '/tmp/acme-challenges' }) },
-  store: leStoreCertbot.create({ webrootPath: '/tmp/acme-challenges' }),
-  approveDomains,
-});
+  email: 'arttu.siren@gmail.com',
+  agreeTos: true,
+  approveDomains: ['www.spacteria.com'],
+  app,
+}).listen(80, 443);
 
-
+/*
 const httpsServer = https.createServer(lexObj.httpsOptions, lexObj.middleware(app));
 httpsServer.listen(serverconfig.webserver_port, serverconfig.webserver_bind, () => {
   console.log(`[WEBSERVER]: Listening on ${serverconfig.webserver_bind}:${serverconfig.webserver_port}`);
 });
-
-http.createServer(lexObj.middleware(require('redirect-https')())).listen(80, serverconfig.webserver_bind, function () {
+/*
+http.createServer(lexObj.middleware(require('redirect-https')())).listen(9992, serverconfig.webserver_bind, function () {
   console.log('Listening for ACME http-01 challenges on', this.address());
 });
-
+ */
 // const io = socketIO.listen(httpsServer);
 // gameserver.init(io);
 
