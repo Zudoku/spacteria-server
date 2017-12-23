@@ -22,7 +22,7 @@ const lexObj = LEX.create({
   approveDomains: ['www.spacteria.com'],
   app,
 });
-const server = lexObj.listen(80, 443);
+const server = lexObj.listen(5555, 5556);
 console.log(server);
 
 /*
