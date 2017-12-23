@@ -19,6 +19,7 @@ function approveDomains(opts, certs, cb) {
   if (certs) {
     opts.domains = ['www.spacteria.com'];
   } else {
+    console.log(certs);
     opts.email = 'arttu.siren@gmail.com';
     opts.agreeTos = true;
   }
@@ -39,7 +40,7 @@ httpsServer.listen(serverconfig.webserver_port, serverconfig.webserver_bind, () 
   console.log(`[WEBSERVER]: Listening on ${serverconfig.webserver_bind}:${serverconfig.webserver_port}`);
 });
 
-const io = socketIO.listen(httpsServer);
-gameserver.init(io);
+// const io = socketIO.listen(httpsServer);
+// gameserver.init(io);
 
 process.on('unhandledRejection', r => console.log(r));
