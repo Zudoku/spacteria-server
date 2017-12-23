@@ -22,11 +22,8 @@ const lexObj = LEX.create({
   approveDomains: ['www.spacteria.com'],
   app,
 });
-console.log(lexObj);
-
-lexObj.listen(80, 443);
-
-console.log(lexObj);
+const servers = lexObj.listen(80, 443);
+console.log(servers);
 
 /*
 const httpsServer = https.createServer(lexObj.httpsOptions, lexObj.middleware(app));
