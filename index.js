@@ -1,5 +1,5 @@
 const express = require('express');
-const LEX = require('letsencrypt-express');
+const LEX = require('greenlock-express');
 const path = require('path');
 const socketIO = require('socket.io');
 const https = require('https');
@@ -24,7 +24,7 @@ function approveDomains(opts, certs, cb) {
 }
 
 const lexObj = LEX.create({
-  server: serverconfig.profile === 'production' : 'https://acme-v01.api.letsencrypt.org/directory' ? 'staging',
+  server: serverconfig.profile === 'production' ? 'https://acme-v01.api.letsencrypt.org/directory' : 'staging',
   challenges: { 'http-01': leChallengeFS.create({ webrootPath: '/tmp/acme-challenges' }) },
   store: leStoreCertbot.create({ webrootPath: '/tmp/acme-challenges' }),
   approveDomains,
