@@ -13,10 +13,10 @@ app.get('/', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  res.send(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${serverconfig.google_oauth_client_id}&redirect_uri=${serverconfig.google_oauth_callback_uri}&scope=email&access_type=online&state=123456`);
+  res.send(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${serverconfig.google_oauth_client_id}&redirect_uri=${serverconfig.google_oauth_callback_uri}&scope=email&access_type=online&state=123456&response_type=code`);
 });
 
-app.post('/google/redirect', (req, res) => {
+app.get('/google/redirect', (req, res) => {
   const googleCode = req.query.code;
   const state = req.query.state;
 
