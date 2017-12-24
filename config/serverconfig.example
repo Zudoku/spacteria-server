@@ -10,6 +10,10 @@ config.database_host = 'db';
 config.database_databasename = 'postgres';
 config.database_port = 5432;
 
+config.google_oauth_client_id = '';
+config.google_oauth_client_secret = '';
+config.google_oauth_callback_uri = '';
+
 config.profile = 'debug';
 
 module.exports = config;
