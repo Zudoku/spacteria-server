@@ -26,16 +26,18 @@ app.get('/google/redirect', (req, res) => {
       code: googleCode,
       client_id: serverconfig.google_oauth_client_id,
       client_secret: serverconfig.google_oauth_client_secret,
-      redirect_uri: 'https://spacteria.com/google/done',
+      redirect_uri: 'https://spacteria.com/google/redirect',
       grant_type: 'authorization_code',
     },
   };
+  if (googleCode !== undefined) {
+    request(options, (error, response, body) => {
+      const jsonBody = JSON.parse(body);
+      const accessToken = jsonBody.access_token;
+      console.log(jsonBody);
+    });
+  }
 
-  request(options, (error, response, body) => {
-    const jsonBody = JSON.parse(body);
-    const accessToken = jsonBody.access_token;
-    console.log(jsonBody);
-  });
   res.send(200);
 });
 
