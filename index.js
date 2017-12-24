@@ -34,20 +34,7 @@ app.get('/google/redirect', (req, res) => {
   request(options, (error, response, body) => {
     const jsonBody = JSON.parse(body);
     const accessToken = jsonBody.access_token;
-    if (jsonBody.error !== undefined) {
-      request({
-        method: 'GET',
-        url: 'https://www.googleapis.com/oauth2/v2/userinfo',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }, (error2, response2, body2) => {
-        const jsonBody2 = JSON.parse(body2);
-        console.log(jsonBody2);
-      });
-    } else {
-      // res.send(400);
-    }
+    console.log(jsonBody);
   });
   res.send(200);
 });
