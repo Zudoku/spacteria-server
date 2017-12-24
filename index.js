@@ -19,16 +19,16 @@ app.get('/register', (req, res) => {
 app.get('/google/redirect', (req, res) => {
   const googleCode = req.query.code;
   const state = req.query.state;
-
-  const bodyData = `code=${googleCode}&client_id=${serverconfig.google_oauth_client_id}&client_secret=${serverconfig.google_oauth_client_secret}&redirect_uri=${serverconfig.google_oauth_callback_uri}&grant_type=authorization_code`;
-
   const options = {
     url: 'https://www.googleapis.com/oauth2/v4/token',
     method: 'POST',
-    headers: {
-      'Content-type': 'application/x-www-form-urlencoded',
+    form: {
+      code: googleCode,
+      client_id: serverconfig.google_oauth_client_id,
+      client_secret: serverconfig.google_oauth_client_secret,
+      redirect_uri: 'https://spacteria.com/google/done',
+      grant_type: 'authorization_code',
     },
-    body: bodyData,
   };
 
   request(options, (error, response, body) => {
@@ -36,6 +36,10 @@ app.get('/google/redirect', (req, res) => {
     const accessToken = jsonBody.access_token;
     console.log(jsonBody);
   });
+  res.send(200);
+});
+
+app.get('/google/done', (req, res) => {
   res.send(200);
 });
 
