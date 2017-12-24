@@ -20,29 +20,29 @@ app.get('/google/redirect', (req, res) => {
   const googleCode = req.query.code;
   const state = req.query.state;
 
-  request.post('https://www.googleapis.com/oauth2/v4/token',
-    {
-      code: googleCode,
-      client_id: serverconfig.google_oauth_client_id,
-      client_secret: serverconfig.google_oauth_client_secret,
-      redirect_uri: serverconfig.google_oauth_callback_uri,
-      grant_type: 'authorization_code',
-    }, (error, response, body) => {
-      const jsonBody = JSON.parse(body);
-      console.log(jsonBody);
-      const accessToken = jsonBody.access_token;
-      if (!jsonBody.error) {
-        request({
-          url: 'https://www.googleapis.com/oauth2/v2/userinfo',
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }, (error2, response2, body2) => {
-          const jsonBody2 = JSON.parse(body2);
-          console.log(jsonBody2);
-        });
-      }
-    });
+  request.post('https://www.googleapis.com/oauth2/v4/token').form({
+    code: googleCode,
+    client_id: serverconfig.google_oauth_client_id,
+    client_secret: serverconfig.google_oauth_client_secret,
+    redirect_uri: serverconfig.google_oauth_callback_uri,
+    grant_type: 'authorization_code',
+  }, (error, response, body) => {
+    const jsonBody = JSON.parse(body);
+    console.log(jsonBody);
+    const accessToken = jsonBody.access_token;
+    if (!jsonBody.error) {
+      request({
+        method: 'GET',
+        url: 'https://www.googleapis.com/oauth2/v2/userinfo',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }, (error2, response2, body2) => {
+        const jsonBody2 = JSON.parse(body2);
+        console.log(jsonBody2);
+      });
+    }
+  });
 
 
   res.send(200);
