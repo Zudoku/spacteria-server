@@ -10,6 +10,7 @@ const loadingEventHandler = require('./loadingEventHandler.js');
 const gameplayEventHandler = require('./gameplayEventHandler.js');
 
 const gameplayconfig = require('./../config/gameplayconfig.js');
+const serverconfig = require('./../config/serverconfig.js');
 
 const connections = {};
 let ioref;
@@ -201,7 +202,7 @@ module.exports = {
         console.log(error);
       });
     }
-    if (identifyInfo.type === 'browser') {
+    if (identifyInfo.type === 'browser' && serverconfig.profile !== 'production') {
       connections[socket.id] = {
         id: '-',
         username: identifyInfo.page,
