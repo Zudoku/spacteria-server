@@ -28,19 +28,18 @@ app.get('/google/redirect', (req, res) => {
       redirect_uri: serverconfig.google_oauth_callback_uri,
       grant_type: 'authorization_code',
     }, (error, response, body) => {
-      console.log(body);
-      console.log(response);
-      const accessToken = response.access_token;
-      if (!response.error) {
+      const jsonBody = JSON.parse(body);
+      console.log(jsonBody);
+      const accessToken = jsonBody.access_token;
+      if (!jsonBody.error) {
         request({
           url: 'https://www.googleapis.com/oauth2/v2/userinfo',
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         }, (error2, response2, body2) => {
-          console.log(error2);
-          console.log(response2);
-          console.log(body2);
+          const jsonBody2 = JSON.parse(body2);
+          console.log(jsonBody2);
         });
       }
     });
