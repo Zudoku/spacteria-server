@@ -35,7 +35,7 @@ module.exports = {
         module.exports.handleIdentify(identifyInfo, socket);
       });
 
-      socket.on(evts.ASK_REGISTER, (payload) => {
+      socket.on(evts.incoming.ASK_REGISTER, (payload) => {
         loginEventHandler.askRegister(socket, payload);
       });
 
