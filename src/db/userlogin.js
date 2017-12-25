@@ -70,8 +70,10 @@ module.exports = {
     return new Promise((resolve) => {
       module.exports.nullifyRegisterTokensForSocketId(socketid).then((result) => {
         if (result.success) {
+          console.log('nullify ok');
           module.exports.getUniqueRegisterToken(socketid, undefined).then((tokenResult) => {
             if (tokenResult.success) {
+              console.log('token ok');
               resolve({ success: true, token: tokenResult.token });
             } else {
               resolve({ success: false });

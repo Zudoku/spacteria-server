@@ -12,7 +12,7 @@ UNIQUE(token)
 CREATE TABLE gameregistertoken
 (
 uniqueid SERIAL,
-token varchar(1024) NOT NULL,
+token varchar(2048) NOT NULL,
 socketid varchar(100) NOT NULL,
 openregister BOOLEAN NOT NULL,
 allowgoogle BOOLEAN NOT NULL,
