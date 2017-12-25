@@ -86,12 +86,11 @@ module.exports = {
     });
   },
   getUniqueRegisterToken(socketid, resolve, generationTry) {
-    if (resolve !== undefined) {
+    if (resolve === undefined) {
       return new Promise((resolveNew) => {
         module.exports.tryAddRegisterToken(socketid, resolveNew, 0);
       });
-    }
-    if (generationTry < 5) {
+    } else if (generationTry < 5) {
       module.exports.tryAddRegisterToken(socketid, resolve, generationTry + 1);
     } else {
       resolve({ success: false });
