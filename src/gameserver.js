@@ -341,4 +341,7 @@ module.exports = {
   broadcastAllDead(room) {
     ioref.to(room.name).emit(evts.outgoing.CHARACTERS_ALL_DEAD, {});
   },
+  sendPasswordToken(token, socketid) {
+    ioref.to(socketid).emit(evts.outgoing.GIVE_LOGIN_TOKEN, { token });
+  },
 };

@@ -14,12 +14,24 @@ app.get('/', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  res.send(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${serverconfig.google_oauth_client_id}&redirect_uri=${serverconfig.google_oauth_callback_uri}&scope=email&access_type=online&state=123456&response_type=code`);
+  const registerToken = req.query.token;
+  if (registerToken) {
+    userlogin.getValidRegisterToken(registerToken).then((result) => {
+      if (result.success) {
+        /* eslint max-len: "off"*/
+        res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${serverconfig.google_oauth_client_id}&redirect_uri=${serverconfig.google_oauth_callback_uri}&scope=email&access_type=online&state=${registerToken}&response_type=code`);
+      } else {
+        res.sendStatus(500);
+      }
+    });
+  } else {
+    res.sendStatus(500);
+  }
 });
 
 app.get('/google/redirect', (req, res) => {
   const googleCode = req.query.code;
-  const state = req.query.state;
+  const registerToken = req.query.state;
   const options = {
     url: 'https://www.googleapis.com/oauth2/v4/token',
     method: 'POST',
@@ -46,8 +58,9 @@ app.get('/google/redirect', (req, res) => {
         };
         request(options2, (error2, response2, body2) => {
           const jsonBody2 = JSON.parse(body2);
-          userlogin.tryRegisteringUser(jsonBody2).then((result) => {
-            if (result) {
+          userlogin.tryRegisteringUser(jsonBody2, registerToken).then((result) => {
+            if (result.success) {
+              gameserver.sendPasswordToken(result.token, result.socketid);
               res.sendStatus(200);
             } else {
               res.sendStatus(500);
