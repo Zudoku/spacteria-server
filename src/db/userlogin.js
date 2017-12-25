@@ -251,7 +251,7 @@ module.exports = {
           promiseResolve({ success: false });
           return;
         }
-        const token = buffer.toString('hex');
+        const token = buffer.toString('base64');
         connection.client.query('SELECT * FROM gameuser WHERE token = $1', [token], (err, result) => {
           connection.done(err);
           if (err) {

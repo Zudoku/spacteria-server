@@ -2,11 +2,10 @@ CREATE TABLE gameuser
 (
 uniqueid SERIAL,
 joined TIMESTAMP NOT NULL,
-token varchar(4097) NOT NULL,
+token varchar(2733) NOT NULL,
 email varchar(100) NOT NULL,
 PRIMARY KEY(uniqueid),
-UNIQUE(email),
-UNIQUE(token)
+UNIQUE(email)
 );
 
 CREATE TABLE gameregistertoken
