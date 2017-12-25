@@ -239,7 +239,7 @@ module.exports = {
       resolve({ success: false });
     }
   },
-  tryGetPasswordToken(socketid, promiseResolve, generationTry) {
+  tryGetPasswordToken(promiseResolve, generationTry) {
     dbHandler.getConnection().then((connection) => {
       if (connection.err) {
         connection.done(connection.err);
