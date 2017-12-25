@@ -37,7 +37,7 @@ module.exports = {
             module.exports.nullifyRegisterToken(registerToken),
           ]).then((result) => {
             if (result[0].success) {
-              module.exports.changeUserPassword(validPasswordToken, googleProfile.email).then((userResult) => {
+              module.exports.changeUserPassword(validPasswordToken.token, googleProfile.email).then((userResult) => {
                 if (userResult.success) {
                   resolve({ success: true, token: validPasswordToken, socketid: validRegisterToken.token.socketid });
                 } else {
@@ -45,7 +45,7 @@ module.exports = {
                 }
               });
             } else {
-              module.exports.addUser(validPasswordToken, googleProfile.email).then((userResult) => {
+              module.exports.addUser(validPasswordToken.token, googleProfile.email).then((userResult) => {
                 if (userResult.success) {
                   resolve({ success: true, token: validPasswordToken, socketid: validRegisterToken.token.socketid });
                 } else {
@@ -65,6 +65,7 @@ module.exports = {
           connection.done(connection.err);
           resolve({ success: false });
         }
+        console.log(token.length);
         connection.client.query('INSERT INTO gameuser (joined,token,email) VALUES (CURRENT_TIMESTAMP, $1, $2)', [token, email], (err, result) => {
           connection.done(err);
           if (err) {
