@@ -29,36 +29,36 @@ module.exports = {
         module.exports.getValidRegisterToken(registerToken),
         module.exports.getUniquePasswordToken(undefined, 0),
       ]).then((data) => {
-          const validRegisterToken = data[0];
-          const validPasswordToken = data[1];
-          if (validPasswordToken.success && validPasswordToken.success && googleProfile.email !== undefined && googleProfile.verified_email) {
-            Promise.all([
-              module.exports.getUserWithEmail(googleProfile.email),
-              module.exports.nullifyRegisterToken(registerToken)
-            ]).then((result) => {
-              if(result[0].success) {
-                module.exports.changeUserPassword(validPasswordToken, googleProfile.email).then(userResult => {
-                  if (userResult.success) {
-                    resolve({ success: true, token: validPasswordToken, socketid: validRegisterToken.token.socketid });
-                  } else {
-                    resolve({ success: false });
-                  }
-                });
-              } else {
-                module.exports.addUser(validPasswordToken, googleProfile.email).then(userResult => {
-                  if (userResult.success) {
-                    resolve({ success: true, token: validPasswordToken, socketid: validRegisterToken.token.socketid });
-                  } else {
-                    resolve({ success: false });
-                  }
-                });
-              }
-            });
-          }
+        const validRegisterToken = data[0];
+        const validPasswordToken = data[1];
+        if (validPasswordToken.success && validPasswordToken.success && googleProfile.email !== undefined && googleProfile.verified_email) {
+          Promise.all([
+            module.exports.getUserWithEmail(googleProfile.email),
+            module.exports.nullifyRegisterToken(registerToken),
+          ]).then((result) => {
+            if (result[0].success) {
+              module.exports.changeUserPassword(validPasswordToken, googleProfile.email).then((userResult) => {
+                if (userResult.success) {
+                  resolve({ success: true, token: validPasswordToken, socketid: validRegisterToken.token.socketid });
+                } else {
+                  resolve({ success: false });
+                }
+              });
+            } else {
+              module.exports.addUser(validPasswordToken, googleProfile.email).then((userResult) => {
+                if (userResult.success) {
+                  resolve({ success: true, token: validPasswordToken, socketid: validRegisterToken.token.socketid });
+                } else {
+                  resolve({ success: false });
+                }
+              });
+            }
+          });
+        }
       });
     });
   },
-  addUser(token, email){
+  addUser(token, email) {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
@@ -76,7 +76,7 @@ module.exports = {
       });
     });
   },
-  changeUserPassword(token, email){
+  changeUserPassword(token, email) {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
@@ -94,7 +94,7 @@ module.exports = {
       });
     });
   },
-  getUserWithEmail(email){
+  getUserWithEmail(email) {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
@@ -114,7 +114,7 @@ module.exports = {
         });
       });
     });
-  }
+  },
   nullifyRegisterToken(registerToken) {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
@@ -122,6 +122,8 @@ module.exports = {
           connection.done(connection.err);
           resolve({ success: false });
         }
+        /* eslint max-len: "off"*/
+        /* eslint no-unused-vars: "off"*/
         connection.client.query('UPDATE gameregistertoken SET nullified = TRUE WHERE token = $1', [registerToken], (err, result) => {
           connection.done(err);
           if (err) {
@@ -168,6 +170,7 @@ module.exports = {
       });
     });
   },
+  /* eslint consistent-return: "off"*/
   getUniqueRegisterToken(socketid, resolve, generationTry) {
     if (resolve === undefined) {
       return new Promise((resolveNew) => {
@@ -204,7 +207,7 @@ module.exports = {
       });
     });
   },
-  getValidRegisterToken(token){
+  getValidRegisterToken(token) {
     return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         if (connection.err) {
@@ -223,6 +226,7 @@ module.exports = {
           }
         });
       });
+    });
   },
   getUniquePasswordToken(resolve, generationTry) {
     if (resolve === undefined) {
