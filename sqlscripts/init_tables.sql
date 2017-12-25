@@ -2,7 +2,7 @@ CREATE TABLE gameuser
 (
 uniqueid SERIAL,
 joined TIMESTAMP NOT NULL,
-token varchar(2048) NOT NULL,
+token varchar(4097) NOT NULL,
 email varchar(100) NOT NULL,
 PRIMARY KEY(uniqueid),
 UNIQUE(email),
@@ -12,7 +12,7 @@ UNIQUE(token)
 CREATE TABLE gameregistertoken
 (
 uniqueid SERIAL,
-token varchar(2048) NOT NULL,
+token varchar(257) NOT NULL,
 socketid varchar(100) NOT NULL,
 openregister BOOLEAN NOT NULL,
 allowgoogle BOOLEAN NOT NULL,

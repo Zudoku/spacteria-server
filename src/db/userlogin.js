@@ -85,22 +85,26 @@ module.exports = {
       });
     });
   },
-  getUniqueRegisterToken(socketid, resolve) {
+  getUniqueRegisterToken(socketid, resolve, generationTry) {
     if (resolve !== undefined) {
       return new Promise((resolveNew) => {
-        module.exports.tryAddRegisterToken(socketid, resolveNew);
+        module.exports.tryAddRegisterToken(socketid, resolveNew, 0);
       });
     }
-    module.exports.tryAddRegisterToken(socketid, resolve);
+    if (generationTry < 5) {
+      module.exports.tryAddRegisterToken(socketid, resolve, generationTry + 1);
+    } else {
+      resolve({ success: false });
+    }
   },
-  tryAddRegisterToken(socketid, promiseResolve) {
+  tryAddRegisterToken(socketid, promiseResolve, generationTry) {
     dbHandler.getConnection().then((connection) => {
       if (connection.err) {
         connection.done(connection.err);
         promiseResolve({ success: false });
         return;
       }
-      crypto.randomBytes(2048, (errCrypto, buffer) => {
+      crypto.randomBytes(128, (errCrypto, buffer) => {
         if (errCrypto) {
           promiseResolve({ success: false });
           return;
@@ -110,7 +114,7 @@ module.exports = {
         connection.client.query('INSERT INTO gameregistertoken (token,socketid,openregister,allowgoogle,registercomplete,nullified,expires) VALUES ($1, $2, $3, $4, $5, $6, $7)', [token, socketid, false, false, false, false, expires], (err, result) => {
           connection.done(err);
           if (err) {
-            module.exports.getUniqueRegisterToken(socketid, promiseResolve);
+            module.exports.getUniqueRegisterToken(socketid, promiseResolve, generationTry);
           } else {
             promiseResolve({ success: true, token });
           }
