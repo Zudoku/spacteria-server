@@ -3,7 +3,8 @@ const LEX = require('greenlock-express');
 const path = require('path');
 const socketIO = require('socket.io');
 const request = require('request');
-const gameserver = require('./src/gameserver');
+const gameserver = require('./src/gameserver.js');
+const userlogin = require('./src/db/userlogin.js');
 const serverconfig = require('./config/serverconfig.js');
 
 const app = express();
@@ -34,23 +35,32 @@ app.get('/google/redirect', (req, res) => {
     request(options, (error, response, body) => {
       const jsonBody = JSON.parse(body);
       const accessToken = jsonBody.access_token;
-      console.log(jsonBody);
-      const options2 = {
-        url: 'https://www.googleapis.com/userinfo/v2/me',
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      };
 
-      request(options2, (error2, response2, body2) => {
-        console.log(error2);
-        console.log(body2);
-      });
+      if (accessToken !== undefined) {
+        const options2 = {
+          url: 'https://www.googleapis.com/userinfo/v2/me',
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        };
+        request(options2, (error2, response2, body2) => {
+          const jsonBody2 = JSON.parse(body2);
+          userlogin.tryRegisteringUser(jsonBody2).then((result) => {
+            if (result) {
+              res.sendStatus(200);
+            } else {
+              res.sendStatus(500);
+            }
+          });
+        });
+      } else {
+        res.sendStatus(500);
+      }
     });
+  } else {
+    res.sendStatus(200);
   }
-
-  res.send(200);
 });
 
 app.get('/google/done', (req, res) => {

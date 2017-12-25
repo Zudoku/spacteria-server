@@ -2,20 +2,25 @@ CREATE TABLE gameuser
 (
 uniqueid SERIAL,
 joined TIMESTAMP NOT NULL,
-username varchar(60) NOT NULL,
-password varchar(60) NOT NULL,
+token varchar(2048) NOT NULL,
 email varchar(100) NOT NULL,
 PRIMARY KEY(uniqueid),
-UNIQUE(username)
+UNIQUE(email),
+UNIQUE(token)
 );
 
-CREATE TABLE gamesessiontoken
+CREATE TABLE gameregistertoken
 (
 uniqueid SERIAL,
-userid INTEGER REFERENCES Gameuser(uniqueid),
-token varchar(200) NOT NULL,
+token varchar(1024) NOT NULL,
+socketid varchar(100) NOT NULL,
+openregister BOOLEAN NOT NULL,
+allowgoogle BOOLEAN NOT NULL,
+registercomplete BOOLEAN NOT NULL,
+nullified BOOLEAN NOT NULL,
 expires TIMESTAMP,
-PRIMARY KEY(uniqueid)
+PRIMARY KEY(uniqueid),
+UNIQUE(token)
 );
 
 CREATE TABLE gamecharacter
@@ -79,36 +84,3 @@ difficulty INTEGER NOT NULL,
 achievedat TIMESTAMP,
 participants json NOT NULL
 );
-
-
-INSERT INTO gameuser
-(joined,username,password,email) VALUES
-(CURRENT_TIMESTAMP,'testuser','1234567','aaaa@bbbbb.com');
-
-INSERT INTO gamecharacter
-(userid,name,level,experience,created) VALUES
-(1,'foo',1,0,CURRENT_TIMESTAMP);
-
-INSERT INTO gamecharactercurrency
-(characterid,coin,bugbounty,rollticket) VALUES
-(1,10,0,1);
-
-INSERT INTO gameinventory
-(characterid, itemid, quantity, slot) VALUES
-(1,1,1,1);
-
-INSERT INTO gameuser
-(joined,username,password,email) VALUES
-(CURRENT_TIMESTAMP,'arttu','1234567','aaaa@bbbbb.com');
-
-INSERT INTO gamecharacter
-(userid,name,level,experience,created) VALUES
-(2,'arttu',1,0,CURRENT_TIMESTAMP);
-
-INSERT INTO gamecharactercurrency
-(characterid,coin,bugbounty,rollticket) VALUES
-(2,10,0,1);
-
-INSERT INTO gameinventory
-(characterid, itemid, quantity, slot) VALUES
-(2,1,1,1);

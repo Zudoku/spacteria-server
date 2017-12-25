@@ -8,6 +8,7 @@ const chatManager = require('./chat/chatManager.js');
 
 const loadingEventHandler = require('./loadingEventHandler.js');
 const gameplayEventHandler = require('./gameplayEventHandler.js');
+const loginEventHandler = require('./eventhandlers/loginEventHandler.js');
 
 const gameplayconfig = require('./../config/gameplayconfig.js');
 const serverconfig = require('./../config/serverconfig.js');
@@ -26,13 +27,17 @@ module.exports = {
     module.exports.doTimer();
 
     io.on('connection', (socket) => {
+      setTimeout(() => {
+        socket.emit(evts.outgoing.VERSION_DATA, { version: gameplayconfig.VERSION_STRING, changelog: gameplayconfig.VERSION_CHANGELOG });
+      }, 100);
+
       socket.on(evts.incoming.IDENTIFY, (identifyInfo) => {
         module.exports.handleIdentify(identifyInfo, socket);
       });
 
-      setTimeout(() => {
-        socket.emit(evts.outgoing.VERSION_DATA, { version: gameplayconfig.VERSION_STRING, changelog: gameplayconfig.VERSION_CHANGELOG });
-      }, 100);
+      socket.on(evts.ASK_REGISTER, (payload) => {
+        loginEventHandler.askRegister(socket, payload);
+      });
 
       socket.on(evts.incoming.LOAD_CHARACTER, (payload) => {
         if (module.exports.checkIfIdentified(socket.id)
@@ -168,10 +173,10 @@ module.exports = {
       return;
     }
     if (identifyInfo.type === 'game-client') {
-      if (!SF.isString(identifyInfo.username) || !SF.isString(identifyInfo.password)) {
+      if (!SF.isString(identifyInfo.token)) {
         return;
       }
-      userlogin.login(identifyInfo.username, identifyInfo.password).then((result) => {
+      userlogin.login(identifyInfo.token).then((result) => {
         if (result.success) {
           let allowLogin = true;
           if (!gameplayconfig.allow_multiple_logins_on_account) {
