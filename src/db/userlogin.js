@@ -39,7 +39,7 @@ module.exports = {
             if (result[0].success) {
               module.exports.changeUserPassword(validPasswordToken.token, googleProfile.email).then((userResult) => {
                 if (userResult.success) {
-                  resolve({ success: true, token: validPasswordToken, socketid: validRegisterToken.token.socketid });
+                  resolve({ success: true, token: validPasswordToken.token, socketid: validRegisterToken.token.socketid });
                 } else {
                   resolve({ success: false });
                 }
@@ -47,7 +47,7 @@ module.exports = {
             } else {
               module.exports.addUser(validPasswordToken.token, googleProfile.email).then((userResult) => {
                 if (userResult.success) {
-                  resolve({ success: true, token: validPasswordToken, socketid: validRegisterToken.token.socketid });
+                  resolve({ success: true, token: validPasswordToken.token, socketid: validRegisterToken.token.socketid });
                 } else {
                   resolve({ success: false });
                 }
@@ -65,7 +65,6 @@ module.exports = {
           connection.done(connection.err);
           resolve({ success: false });
         }
-        console.log(token.length);
         connection.client.query('INSERT INTO gameuser (joined,token,email) VALUES (CURRENT_TIMESTAMP, $1, $2)', [token, email], (err, result) => {
           connection.done(err);
           if (err) {

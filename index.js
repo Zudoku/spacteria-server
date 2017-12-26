@@ -21,11 +21,11 @@ app.get('/register', (req, res) => {
         /* eslint max-len: "off"*/
         res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${serverconfig.google_oauth_client_id}&redirect_uri=${serverconfig.google_oauth_callback_uri}&scope=email&access_type=online&state=${registerToken}&response_type=code`);
       } else {
-        res.sendStatus(500);
+        res.sendFile(path.join(__dirname, 'webapp', 'registererror.html'));
       }
     });
   } else {
-    res.sendStatus(500);
+    res.sendFile(path.join(__dirname, 'webapp', 'registererror.html'));
   }
 });
 
@@ -61,14 +61,14 @@ app.get('/google/redirect', (req, res) => {
           userlogin.tryRegisteringUser(jsonBody2, registerToken).then((result) => {
             if (result.success) {
               gameserver.sendPasswordToken(result.token, result.socketid);
-              res.sendStatus(200);
+              res.sendFile(path.join(__dirname, 'webapp', 'registersuccess.html'));
             } else {
-              res.sendStatus(500);
+              res.sendFile(path.join(__dirname, 'webapp', 'registererror.html'));
             }
           });
         });
       } else {
-        res.sendStatus(500);
+        res.sendFile(path.join(__dirname, 'webapp', 'registererror.html'));
       }
     });
   } else {
