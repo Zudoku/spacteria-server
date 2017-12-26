@@ -71,21 +71,22 @@ module.exports = {
           if(err){
             connection.done(err);
             resolve({ success: false });
-          }
-          Promise.all([
-            connection.client.query('INSERT INTO gamecharactercurrency (characterid, coin, bugbounty, rollticket) VALUES ($1, $2, $3, $4)', [result.rows[0].uniqueid, 0, 0, 0]),
-            connection.client.query('INSERT INTO gameinventory (characterid, itemid, quantity, slot) VALUES ($1, 1, 1, 1)', [result.rows[0].uniqueid])
-          ]).then( (data) => {
-            connection.done();
-          }).catch( (error) => {
-            connection.done(error);
-          });
-          if (err) {
-            resolve({ success: false, msg: 'DB error' });
+            return;
           } else {
-            resolve({ success: true });
+            Promise.all([
+              connection.client.query('INSERT INTO gamecharactercurrency (characterid, coin, bugbounty, rollticket) VALUES ($1, $2, $3, $4)', [result.rows[0].uniqueid, 0, 0, 0]),
+              connection.client.query('INSERT INTO gameinventory (characterid, itemid, quantity, slot) VALUES ($1, 1, 1, 1)', [result.rows[0].uniqueid])
+            ]).then( (data) => {
+              connection.done();
+            }).catch( (error) => {
+              connection.done(error);
+            });
+            if (err) {
+              resolve({ success: false, msg: 'DB error' });
+            } else {
+              resolve({ success: true });
+            }
           }
-
         });
       });
     });
