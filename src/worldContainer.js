@@ -230,6 +230,9 @@ module.exports = {
       // special item
       return true;
     }
+    if (equippedItemReference.data.levelreq > player.characterdata.level) {
+      return false;
+    }
     if (module.exports.unEquipItem(player, equippedItemReference.data.itemtypeid)) {
       equipmentReference[equippedItemReference.data.itemtypeid] = equippedItemReference.data;
       module.exports.removeItemFromInventory(player, invslot, 1);
