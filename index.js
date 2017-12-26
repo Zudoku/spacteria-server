@@ -72,7 +72,7 @@ app.get('/google/redirect', (req, res) => {
       }
     });
   } else {
-    res.sendStatus(200);
+    res.sendFile(path.join(__dirname, 'webapp', 'registererror.html'));
   }
 });
 
