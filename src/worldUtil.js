@@ -56,7 +56,7 @@ module.exports = {
       maxhealth: (100 + (playerData.level * baseStats.health)),
     };
     // Go through items and add all stats
-    for (let i = 1; i <= 8; i++) {
+    for (let i = 0; i < 8; i++) {
       const equippeditem = playerData.equipment.data[i];
       if (equippeditem !== undefined) {
         for (let e = 0; e < equippeditem.attributes.length; e++) {

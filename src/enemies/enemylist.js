@@ -44,8 +44,28 @@ module.exports = {
           items: [{ id: 6, amount: 1 }],
         },
         {
-          chance: 25,
+          chance: 20,
           items: [{ id: 2, amount: 1 }],
+        },
+        {
+          chance: 30,
+          items: [{ id: 18, amount: 1 }],
+        },
+        {
+          chance: 30,
+          items: [{ id: 19, amount: 1 }],
+        },
+        {
+          chance: 30,
+          items: [{ id: 20, amount: 1 }],
+        },
+        {
+          chance: 30,
+          items: [{ id: 21, amount: 1 }],
+        },
+        {
+          chance: 30,
+          items: [{ id: 22, amount: 1 }],
         },
       ],
       exp: 100,
@@ -74,6 +94,26 @@ module.exports = {
         {
           chance: 4,
           items: [{ id: 5, amount: 1 }],
+        },
+        {
+          chance: 50,
+          items: [{ id: 18, amount: 1 }],
+        },
+        {
+          chance: 50,
+          items: [{ id: 19, amount: 1 }],
+        },
+        {
+          chance: 50,
+          items: [{ id: 20, amount: 1 }],
+        },
+        {
+          chance: 50,
+          items: [{ id: 21, amount: 1 }],
+        },
+        {
+          chance: 50,
+          items: [{ id: 22, amount: 1 }],
         },
       ],
       exp: 20,
@@ -111,6 +151,10 @@ module.exports = {
           chance: 4,
           items: [{ id: 5, amount: 1 }],
         },
+        {
+          chance: 2,
+          items: [{ id: 20, amount: 1 }, { id: 18, amount: 1 }],
+        },
       ],
       exp: 200,
     };
@@ -137,6 +181,14 @@ module.exports = {
         {
           chance: 10,
           items: [{ id: 3, amount: 1 }, { id: 4, amount: 1 }, { id: 5, amount: 1 }],
+        },
+        {
+          chance: 10,
+          items: [{ id: 18, amount: 1 }, { id: 19, amount: 1 }, { id: 20, amount: 1 }],
+        },
+        {
+          chance: 10,
+          items: [{ id: 21, amount: 1 }, { id: 22, amount: 1 }],
         },
       ],
       exp: 100,
@@ -169,6 +221,14 @@ module.exports = {
         {
           chance: 20,
           items: [{ id: 3, amount: 1 }],
+        },
+        {
+          chance: 10,
+          items: [{ id: 18, amount: 1 }, { id: 19, amount: 1 }, { id: 20, amount: 1 }],
+        },
+        {
+          chance: 10,
+          items: [{ id: 21, amount: 1 }, { id: 22, amount: 1 }],
         },
       ],
       exp: 200,
@@ -206,6 +266,14 @@ module.exports = {
           chance: 4,
           items: [{ id: 6, amount: 5 }],
         },
+        {
+          chance: 3,
+          items: [{ id: 18, amount: 1 }, { id: 19, amount: 1 }, { id: 20, amount: 1 }],
+        },
+        {
+          chance: 3,
+          items: [{ id: 21, amount: 1 }, { id: 22, amount: 1 }],
+        },
       ],
       exp: 1000,
     };
@@ -229,6 +297,14 @@ module.exports = {
         {
           chance: 1,
           items: [{ id: 16, amount: 1 }, { id: 17, amount: 1 }],
+        },
+        {
+          chance: 3,
+          items: [{ id: 18, amount: 1 }, { id: 19, amount: 1 }, { id: 20, amount: 1 }],
+        },
+        {
+          chance: 3,
+          items: [{ id: 21, amount: 1 }, { id: 22, amount: 1 }],
         },
       ],
       exp: 1000,

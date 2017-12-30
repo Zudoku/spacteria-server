@@ -25,16 +25,10 @@ module.exports = {
       },
       {
         type: 'IDLE',
-        name: 'Han',
+        name: 'Phanda',
         lines: {
           interact: [
-            'Moo.',
-            'Meow.',
-            'Woof.',
-            'Bark.',
             'Hoo hoo.',
-            'Oink.',
-            'Gobble gobble.',
           ],
           random: [],
         },
@@ -71,7 +65,7 @@ module.exports = {
     height: 20,
   },
   2: { // first street
-    portals: [{ id: 1, prob: 1.0, x: 3 * 64, y: 3 * 64 }, { id: 2, prob: 1.0 }, { id: 3, prob: 0.5 }],
+    portals: [{ id: 1, prob: 1.0, x: 3 * 64, y: 3 * 64 }, { id: 3, prob: 1.0 }],
     npcs: [],
     enemies: [{ id: 'gelatinous_blob', amount: 2, prob: 1.0 }, { id: 'mini_gelatinous_blob', amount: 8, prob: 0.4 }],
     lootbags: [],

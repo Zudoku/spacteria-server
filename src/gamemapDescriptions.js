@@ -80,6 +80,7 @@ module.exports = {
       module.exports.tryToAddNPC(room, description.npcs[i], 0, 0);
     }
     console.log(`[${room.name}]: Enemies, portals and players initialized for map ${room.mapDescription.filename}`);
+    room.roomState = 'LIVE';
     return true;
   },
   tryToAddEnemy(room, enemyObj, x, y) {

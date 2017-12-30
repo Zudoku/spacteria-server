@@ -4,209 +4,140 @@ const fs = require('fs');
 
 module.exports = {
   getItem(uniqueid) {
-    return new Promise((resolve) => {
-      dbHandler.getConnection().then((connection) => {
-        if (connection.err) {
-          connection.done(connection.err);
-          resolve({ success: false });
-        }
-        connection.client.query('SELECT * FROM gameitem WHERE uniqueid = $1', [uniqueid], (err, result) => {
-          connection.done(err);
-          if (err) {
-            resolve({ success: false, msg: 'DB error' });
-          } else if (result.rows.length <= 0) {
-            resolve({ success: false, msg: 'no such itemid' });
-          } else {
-            const itemdata = result.rows[0];
-            itemdata.attributes = itemdata.stats.map(x => ({ attributeid: x.id, attributevalue: x.value }));
-            delete itemdata.stats;
-            resolve({ success: true, item: itemdata });
-          }
-        });
-      });
+    return dbHandler.simpleQuery('SELECT * FROM gameitem WHERE uniqueid = $1', [uniqueid], false, (result, resolve) => {
+      if (result.rows.length <= 0) {
+        resolve({ success: false, msg: 'no such itemid' });
+      } else {
+        const itemdata = result.rows[0];
+        itemdata.attributes = itemdata.stats.map(x => ({ attributeid: x.id, attributevalue: x.value }));
+        delete itemdata.stats;
+        resolve({ success: true, item: itemdata });
+      }
     });
   },
   getEquipmentForCharacter(uniqueid) {
-    return new Promise((resolve) => {
-      dbHandler.getConnection().then((connection) => {
-        if (connection.err) {
-          connection.done(connection.err);
-          resolve({ success: false });
+    return dbHandler.simpleQuery('SELECT * FROM gameequipment WHERE characterid = $1', [uniqueid], false, (result, resolve) => {
+      if (result.rows.length === 0) {
+        resolve({ success: true, equipment: {} });
+      } else {
+        const equipmentPromises = [];
+        for (let j = 0; j < result.rows.length; j++) {
+          const equipmentSlot = result.rows[j];
+          equipmentPromises.push(module.exports.getItem(equipmentSlot.itemid));
         }
-        connection.client.query('SELECT * FROM gameequipment WHERE characterid = $1', [uniqueid], (err, result) => {
-          connection.done(err);
-          if (err) {
-            resolve({ success: false, msg: 'DB error' });
-          } else if (result.rows.length === 0) {
-            resolve({ success: true, equipment: {} });
-          } else {
-            const equipmentPromises = [];
-            for (let j = 0; j < result.rows.length; j++) {
-              const equipmentSlot = result.rows[j];
-              equipmentPromises.push(module.exports.getItem(equipmentSlot.itemid));
-            }
-            Promise.all(equipmentPromises).then((data) => {
-              const equipments = {};
-              for (let index = 0; index < data.length; index++) {
-                const resultL = data[index];
-                equipments[resultL.item.itemtypeid] = resultL.item;
-              }
-              resolve({ success: true, equipment: equipments });
-            });
+        Promise.all(equipmentPromises).then((data) => {
+          const equipments = {};
+          for (let index = 0; index < data.length; index++) {
+            const resultL = data[index];
+            equipments[resultL.item.itemtypeid] = resultL.item;
           }
+          resolve({ success: true, equipment: equipments });
         });
-      });
+      }
     });
   },
   getInventoryForCharacter(uniqueid) {
-    return new Promise((resolve) => {
-      dbHandler.getConnection().then((connection) => {
-        if (connection.err) {
-          connection.done(connection.err);
-          resolve({ success: false });
+    return dbHandler.simpleQuery('SELECT * FROM gameinventory WHERE characterid = $1', [uniqueid], false, (result, resolve) => {
+      if (result.rows.length === 0) {
+        resolve({ success: true, inventory: {} });
+      } else {
+        const inventoryPromises = [];
+        for (let j = 0; j < result.rows.length; j++) {
+          const inventorySlot = result.rows[j];
+          inventoryPromises.push(module.exports.getItem(inventorySlot.itemid));
         }
-        connection.client.query('SELECT * FROM gameinventory WHERE characterid = $1', [uniqueid], (err, result) => {
-          connection.done(err);
-          if (err) {
-            resolve({ success: false, msg: 'DB error' });
-          } else if (result.rows.length === 0) {
-            resolve({ success: true, inventory: {} });
-          } else {
-            const inventoryPromises = [];
-            for (let j = 0; j < result.rows.length; j++) {
-              const inventorySlot = result.rows[j];
-              inventoryPromises.push(module.exports.getItem(inventorySlot.itemid));
-            }
 
-            Promise.all(inventoryPromises).then((data) => {
-              const inventoryObj = {};
-              for (let index = 0; index < data.length; index++) {
-                const itemresult = data[index].item;
-                const originalRawData = result.rows.find(x => x.itemid === itemresult.uniqueid);
-                inventoryObj[originalRawData.slot] = { data: itemresult, amount: originalRawData.quantity, uniqueid: originalRawData.itemid };
-              }
-              resolve({ success: true, inventory: inventoryObj });
-            });
+        Promise.all(inventoryPromises).then((data) => {
+          const inventoryObj = {};
+          for (let index = 0; index < data.length; index++) {
+            const itemresult = data[index].item;
+            if (itemresult === undefined) {
+              console.log('[WARNING]: Character has illegal item. Maybe you forgot to import items?');
+            } else {
+              const originalRawData = result.rows.find(x => x.itemid === itemresult.uniqueid);
+              inventoryObj[originalRawData.slot] = { data: itemresult, amount: originalRawData.quantity, uniqueid: originalRawData.itemid };
+            }
           }
+          resolve({ success: true, inventory: inventoryObj });
         });
-      });
+      }
     });
   },
   saveEquipmentForCharacter(characterid, equipmentObj) {
     // Commit based implementation maybe needed here ? depending if this causes problems...
-    return new Promise((resolve) => {
-      dbHandler.getConnection().then((connection) => {
-        if (connection.err) {
-          connection.done(connection.err);
-          resolve({ success: false });
+    return dbHandler.simpleQuery('DELETE FROM gameequipment WHERE characterid = $1', [characterid], false, (result, resolve) => {
+      const equipmentPromises = [];
+      for (let j = 0; j < 8; j++) {
+        const equipmentSlot = equipmentObj[j];
+        const DESTINATION_EQUIPMENT = 2;
+        if (equipmentSlot !== undefined) {
+          equipmentPromises.push(module.exports.saveItemForCharacter(characterid, equipmentSlot.uniqueid, j, DESTINATION_EQUIPMENT));
         }
-        connection.client.query('DELETE FROM gameequipment WHERE characterid = $1', [characterid], (err, result) => {
-          connection.done(err);
-          if (err) {
-            resolve({ success: false, msg: 'DB error' });
-          } else {
-            const equipmentPromises = [];
-            for (let j = 1; j <= 8; j++) {
-              const equipmentSlot = equipmentObj[j];
-              const DESTINATION_EQUIPMENT = 2;
-              if (equipmentSlot !== undefined) {
-                equipmentPromises.push(module.exports.saveItemForCharacter(characterid, equipmentSlot.uniqueid, j, DESTINATION_EQUIPMENT));
-              }
-            }
-            Promise.all(equipmentPromises).then((data) => {
-              resolve({ success: true, equipment: equipmentObj });
-            });
-          }
-        });
+      }
+      Promise.all(equipmentPromises).then(() => {
+        resolve({ success: true, equipment: equipmentObj });
       });
     });
   },
   saveInventoryForCharacter(characterid, inventoryObj) {
     // Commit based implementation maybe needed here ? depending if this causes problems...
-    return new Promise((resolve) => {
-      dbHandler.getConnection().then((connection) => {
-        if (connection.err) {
-          connection.done(connection.err);
-          resolve({ success: false });
+    return dbHandler.simpleQuery('DELETE FROM gameinventory WHERE characterid = $1', [characterid], false, (result, resolve) => {
+      const inventoryPromises = [];
+      for (let j = 1; j <= 20; j++) {
+        const inventorySlot = inventoryObj[j];
+        const DESTINATION_INVENTORY = 1;
+        if (inventorySlot !== undefined) {
+          inventoryPromises.push(
+            module.exports.saveItemForCharacter(characterid, inventorySlot.uniqueid, j, DESTINATION_INVENTORY, inventorySlot.amount)
+          );
         }
-        connection.client.query('DELETE FROM gameinventory WHERE characterid = $1', [characterid], (err, result) => {
-          connection.done(err);
-          if (err) {
-            resolve({ success: false, msg: 'DB error' });
-          } else {
-            const inventoryPromises = [];
-            for (let j = 1; j <= 20; j++) {
-              const inventorySlot = inventoryObj[j];
-              const DESTINATION_INVENTORY = 1;
-              if (inventorySlot !== undefined) {
-                inventoryPromises.push(module.exports.saveItemForCharacter(characterid, inventorySlot.uniqueid, j, DESTINATION_INVENTORY, inventorySlot.amount));
-              }
-            }
+      }
 
-            Promise.all(inventoryPromises).then((data, reject) => {
-              resolve({ success: true, inventory: inventoryObj });
-            });
-          }
-        });
+      Promise.all(inventoryPromises).then(() => {
+        resolve({ success: true, inventory: inventoryObj });
       });
     });
   },
   saveItemForCharacter(characterid, itemid, index, destination, quantity) {
     // Destinations : 1 -> inventory, 2 -> equipment
-    return new Promise((resolve, reject) => {
-      dbHandler.getConnection().then((connection) => {
-        if (connection.err) {
-          connection.done(connection.err);
-          reject({ success: false });
-        } else if (destination === 1) {
-          connection.client.query(
-              'INSERT INTO gameinventory(characterid, itemid, quantity, slot) VALUES($1, $2, $3, $4)',
-               [characterid, itemid, quantity, index], (err, result) => {
-                 connection.done(err);
-                 if (err) {
-                   reject({ success: false, msg: 'DB error' });
-                 } else {
-                   resolve({ success: true });
-                 }
-               });
-        } else if (destination === 2) {
-          connection.client.query(
-              'INSERT INTO gameequipment(characterid, itemid) VALUES($1, $2)',
-              [characterid, itemid], (err, result) => {
-                connection.done(err);
-                if (err) {
-                  reject({ success: false, msg: 'DB error' });
-                } else {
-                  resolve({ success: true });
-                }
-              });
-        }
+    const DESTINATION_INVENTORY = 1;
+    const DESTINATION_EQUIPMENT = 2;
+    if (destination === DESTINATION_INVENTORY) {
+      return dbHandler.simpleQuery('INSERT INTO gameinventory(characterid, itemid, quantity, slot) VALUES($1, $2, $3, $4)',
+      [characterid, itemid, quantity, index], false, (result, resolve) => {
+        resolve({ success: true });
       });
-    });
+    } else if (destination === DESTINATION_EQUIPMENT) {
+      return dbHandler.simpleQuery('INSERT INTO gameequipment(characterid, itemid) VALUES($1, $2)',
+      [characterid, itemid], false, (result, resolve) => {
+        resolve({ success: true });
+      });
+    }
+    return new Promise(resolve => resolve({ success: false }));
   },
   saveItemsToDatabase(payload) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         const shouldAbort = (err) => {
           if (err) {
-            connection.client.query('ROLLBACK', (err2) => {
+            connection.client.query('ROLLBACK', () => {
               connection.done(err);
               resolve({ msg: `ERROR ${err}` });
             });
           }
           return !!err;
         };
-        module.exports.getLastItemIndex(connection.client).then((data, reject) => {
+        module.exports.getLastItemIndex(connection.client).then((data) => {
           connection.client.query('BEGIN', (err) => {
             if (shouldAbort(err)) return;
             const itemPromises = [];
             for (const itemSaved of payload) {
               itemPromises.push(module.exports.saveItemToDatabase(itemSaved, connection.client, itemSaved.uniqueid <= data && data !== 1));
             }
-            Promise.all(itemPromises).then((data) => {
-              connection.client.query('COMMIT', (err) => {
+            Promise.all(itemPromises).then(() => {
+              connection.client.query('COMMIT', (err2) => {
                 connection.done();
-                if (err) {
+                if (err2) {
                   resolve({ msg: 'ERROR' });
                 } else {
                   resolve({ msg: 'Success' });
@@ -245,14 +176,14 @@ module.exports = {
     });
   },
   getLastItemIndex(client) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       client.query('SELECT last_value FROM gameitem_uniqueid_seq', (err, res) => {
         resolve(res.rows[0].last_value);
       });
     });
   },
   getAllItems() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       dbHandler.getConnection().then((connection) => {
         connection.client.query('SELECT * FROM gameitem ORDER BY uniqueid ASC', (err, res) => {
           connection.done(err);
@@ -263,8 +194,8 @@ module.exports = {
   },
   makeItemDatabaseDump() {
     const pc = dbHandler.getConfig();
-    exec(`pg_dump --dbname=postgresql://${pc.user}:${pc.password}@localhost:${pc.port}/spacteriagame -t gameitem`, (err, stdout, stderr) => {
-      fs.writeFile(`${__dirname}/../../sqlscripts/dump/items.sql`, `${stdout}`, (err) => {});
+    exec(`pg_dump --dbname=postgresql://${pc.user}:${pc.password}@localhost:${pc.port}/spacteriagame -t gameitem`, (err, stdout) => {
+      fs.writeFile(`${__dirname}/../../sqlscripts/dump/items.sql`, `${stdout}`, () => {});
     });
   },
 };

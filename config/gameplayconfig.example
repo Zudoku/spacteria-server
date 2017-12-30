@@ -5,9 +5,6 @@ config.data_percistence = true;
 config.zone_amount = 40;
 config.publish_gameplay_config = false;
 
-config.VERSION_STRING = '0000 - 18.12.2017';
-config.VERSION_CHANGELOG = 'Server:;Client:;- Change server URL by pressing C in login;- Mouse clickable textboxes in login';
-
 
 config.NPC_POSITION_BROADCAST_BUFFER = 4;
 config.NPC_MOVE_CYCLE_AMOUNT = 0.25;

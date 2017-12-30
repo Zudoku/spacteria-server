@@ -12,6 +12,7 @@ const loginEventHandler = require('./eventhandlers/loginEventHandler.js');
 
 const gameplayconfig = require('./../config/gameplayconfig.js');
 const serverconfig = require('./../config/serverconfig.js');
+const changelog = require('./../documentation/changelog.js');
 
 const connections = {};
 let ioref;
@@ -28,7 +29,8 @@ module.exports = {
 
     io.on('connection', (socket) => {
       setTimeout(() => {
-        socket.emit(evts.outgoing.VERSION_DATA, { version: gameplayconfig.VERSION_STRING, changelog: gameplayconfig.VERSION_CHANGELOG });
+        const lastChange = changelog.changelog[0];
+        socket.emit(evts.outgoing.VERSION_DATA, lastChange);
       }, 100);
 
       socket.on(evts.incoming.IDENTIFY, (identifyInfo) => {

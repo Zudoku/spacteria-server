@@ -39,6 +39,7 @@ module.exports = {
         startY: 128,
         spent: 0,
       },
+      roomState: 'PAUSED',
       gameobjects: [], // Static objects that can't be
       enemies: [], // Enemies that can be harmed
       projectiles: [], // Projectiles
@@ -117,6 +118,7 @@ module.exports = {
       6: 'GUN',
       7: 'ELECTRICITY',
       8: 'SPRAY',
+      9: 'SPRAY2',
     };
 
     if (player.characterdata.equipment.data[3] !== undefined) {
@@ -137,8 +139,8 @@ module.exports = {
     }
 
 
-    projectile.x = player.x + (16);
-    projectile.y = player.y + (16);
+    projectile.x = payload.projectile.x;
+    projectile.y = payload.projectile.y;
     projectile.angle = payload.projectile.angle % 360;
     projectile.shape = new SAT.Box(new SAT.Vector(projectile.x, projectile.y), projectile.width, projectile.height);
 
@@ -187,7 +189,7 @@ module.exports = {
     const invReference = player.characterdata.inventory.data;
     // Check jos on jo olemassa
     for (let i = 1; i <= 20; i++) {
-      if (invReference[i] !== undefined) {
+      if (invReference[i] !== undefined && itemwrapper.data.stackable) {
         if (invReference[i].uniqueid === itemwrapper.uniqueid) {
           invReference[i].amount += itemwrapper.amount;
           return true;

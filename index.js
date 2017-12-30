@@ -8,8 +8,12 @@ const userlogin = require('./src/db/userlogin.js');
 const serverconfig = require('./config/serverconfig.js');
 
 const app = express();
-// app.use(express.static(path.join(__dirname, 'webapp')));
+
+app.use(express.static(path.join(__dirname, 'webapp')));
 app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'webapp', 'index.html'));
+});
+app.get('/datadashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'webapp', 'index.html'));
 });
 

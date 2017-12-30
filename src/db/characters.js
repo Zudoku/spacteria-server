@@ -2,129 +2,52 @@ const dbHandler = require('./databaseHandler.js');
 
 module.exports = {
   listCharacters(userid) {
-    return new Promise((resolve) => {
-      dbHandler.getConnection().then((connection) => {
-        if (connection.err) {
-          connection.done();
-          resolve({ success: false });
-        }
-        connection.client.query('SELECT * FROM gamecharacter WHERE userid = $1', [userid], (err, result) => {
-          connection.done(err);
-          if (err) {
-            resolve({ success: false, msg: 'DB error' });
-          } else {
-            resolve({ success: true, characters: result.rows });
-          }
-        });
-      });
+    return dbHandler.simpleQuery('SELECT * FROM gamecharacter WHERE userid = $1', [userid], false, (result, resolve) => {
+      resolve({ success: true, characters: result.rows });
     });
   },
   getCharacter(characterId) {
-    return new Promise((resolve) => {
-      dbHandler.getConnection().then((connection) => {
-        if (connection.err) {
-          connection.done();
-          resolve({ success: false });
-        }
-        connection.client.query('SELECT * FROM gamecharacter WHERE uniqueid = $1', [characterId], (err, result) => {
-          connection.done(err);
-          if (err) {
-            resolve({ success: false, msg: 'DB error' });
-          }
-          if (result.rows.length <= 0) {
-            resolve({ success: false, msg: 'no such characterid' });
-          } else {
-            const gamecharacter = result.rows[0];
-            resolve({ success: true, character: gamecharacter });
-          }
-        });
-      });
+    return dbHandler.simpleQuery('SELECT * FROM gamecharacter WHERE uniqueid = $1', [characterId], false, (result, resolve) => {
+      if (result.rows.length <= 0) {
+        resolve({ success: false, msg: 'no such characterid' });
+      } else {
+        const gamecharacter = result.rows[0];
+        resolve({ success: true, character: gamecharacter });
+      }
     });
   },
-  getTopTen(){
-    return new Promise((resolve) => {
-      dbHandler.getConnection().then((connection) => {
-        if (connection.err) {
-          connection.done(connection.err);
-          resolve({ success: false });
-        }
-        connection.client.query('SELECT * FROM gamecharacter ORDER BY level DESC, experience DESC LIMIT 10;', [], (err, result) => {
-          connection.done(err);
-          if (err) {
-            resolve({ success: false, msg: 'DB error' });
-          } else {
-            resolve({ success: true, chars: result.rows });
-          }
-        });
-      });
+  getTopTen() {
+    return dbHandler.simpleQuery('SELECT * FROM gamecharacter ORDER BY level DESC, experience DESC LIMIT 10;', [], false, (result, resolve) => {
+      resolve({ success: true, chars: result.rows });
     });
   },
   addCharacter(characterName, userid) {
-    return new Promise((resolve) => {
-      dbHandler.getConnection().then((connection) => {
-        if (connection.err) {
+    return dbHandler.simpleQuery(
+      'INSERT INTO gamecharacter (userid, name, level, experience, created) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING uniqueid',
+      [userid, characterName, 1, 0], true, (result, resolve, connection) => {
+        const createdCharacterId = result.rows[0].uniqueid;
+        Promise.all([
+          connection.client.query('INSERT INTO gamecharactercurrency (characterid, coin, bugbounty, rollticket) VALUES ($1, $2, $3, $4)',
+        [createdCharacterId, 0, 0, 0]),
+          connection.client.query('INSERT INTO gameinventory (characterid, itemid, quantity, slot) VALUES ($1, 1, 1, 1)', [createdCharacterId]),
+        ]).then(() => {
           connection.done();
-          resolve({ success: false });
-        }
-        const arguments = [userid, characterName, 1, 0];
-        connection.client.query('INSERT INTO gamecharacter (userid, name, level, experience, created) VALUES ($1, $2, $3, $4, CURRENT_TIMESTAMP) RETURNING uniqueid', arguments , (err, result) => {
-          if(err){
-            connection.done(err);
-            resolve({ success: false });
-            return;
-          } else {
-            Promise.all([
-              connection.client.query('INSERT INTO gamecharactercurrency (characterid, coin, bugbounty, rollticket) VALUES ($1, $2, $3, $4)', [result.rows[0].uniqueid, 0, 0, 0]),
-              connection.client.query('INSERT INTO gameinventory (characterid, itemid, quantity, slot) VALUES ($1, 1, 1, 1)', [result.rows[0].uniqueid])
-            ]).then( (data) => {
-              connection.done();
-            }).catch( (error) => {
-              connection.done(error);
-            });
-            if (err) {
-              resolve({ success: false, msg: 'DB error' });
-            } else {
-              resolve({ success: true });
-            }
-          }
+          resolve({ success: true });
+        }).catch((error) => {
+          connection.done(error);
+          resolve({ success: false, msg: 'DB error' });
         });
       });
-    });
   },
   deleteCharacter(characterId) {
-    return new Promise((resolve) => {
-      dbHandler.getConnection().then((connection) => {
-        if (connection.err) {
-          connection.done();
-          resolve({ success: false });
-        }
-        connection.client.query('DELETE FROM gamecharacter WHERE uniqueid = $1', [characterId], (err, result) => {
-          connection.done(err);
-          if (err) {
-            resolve({ success: false, msg: 'DB error' });
-          } else {
-            resolve({ success: true });
-          }
-        });
-      });
+    return dbHandler.simpleQuery('DELETE FROM gamecharacter WHERE uniqueid = $1', [characterId], false, (result, resolve) => {
+      resolve({ success: true });
     });
   },
   updateCharacter(characterObj) {
-    return new Promise((resolve) => {
-      dbHandler.getConnection().then((connection) => {
-        if (connection.err) {
-          connection.done();
-          resolve({ success: false });
-        }
-        connection.client.query('UPDATE gamecharacter SET level = $1, experience = $2 WHERE uniqueid = $3', [characterObj.level, characterObj.experience, characterObj.uniqueid], (err, result) => {
-          connection.done(err);
-          if (err) {
-            resolve({ success: false, msg: 'DB error' });
-          } else {
-            resolve({ success: true });
-          }
-        });
-      });
+    return dbHandler.simpleQuery('UPDATE gamecharacter SET level = $1, experience = $2 WHERE uniqueid = $3',
+    [characterObj.level, characterObj.experience, characterObj.uniqueid], false, (result, resolve) => {
+      resolve({ success: true });
     });
   },
 };

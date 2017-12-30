@@ -92,6 +92,10 @@ module.exports = {
     const currentPlayer = worldContainer.getPlayers()[socket.id];
     const currentRoom = worldContainer.getRooms().find(x => x.name === currentPlayer.room);
     const nextMapDescription = gamemapDescriptions.getDescs()[`${payload.to}`];
+    if (!nextMapDescription || currentRoom.roomState === 'PAUSED') {
+      return;
+    }
+    currentRoom.roomState = 'PAUSED';
     if (!maputil.isDynamicMap(payload.to)) {
       worldSimulator.init(nextMapDescription.filename, currentRoom, true, true);
       return;

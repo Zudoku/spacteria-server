@@ -50,4 +50,24 @@ module.exports = {
   getConfig() {
     return pgconfig;
   },
+  simpleQuery(queryString, queryParams, needConnection, cb) {
+    return new Promise((resolve) => {
+      module.exports.getConnection().then((connection) => {
+        if (connection.err) {
+          connection.done(connection.err);
+          resolve({ success: false });
+        }
+        connection.client.query(queryString, queryParams, (err, result) => {
+          if (err) {
+            resolve({ success: false, msg: 'DB error' });
+          } else if (!needConnection) {
+            connection.done(err);
+            cb(result, resolve);
+          } else {
+            cb(result, resolve, connection);
+          }
+        });
+      });
+    });
+  },
 };
