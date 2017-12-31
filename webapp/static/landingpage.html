@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta rel="manifest" href="/manifest.json">
+    <title>Spacteria game</title>
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    <link rel="stylesheet" href="//cdn.muicss.com/mui-0.9.35/extra/mui-colors.min.css">
+    <script src="//cdn.muicss.com/mui-0.9.35/extra/mui-combined.min.js"></script>
+    <link rel="stylesheet" href="/landingpage.css">
+    <link rel="icon" sizes="16x16" href="/favicon-16x16.png">
+    <script>
+      const xmlHttp = new XMLHttpRequest();
+      xmlHttp.onreadystatechange = function() {
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200){
+          const content = JSON.stringify(JSON.parse(xmlHttp.responseText), null, 1);
+          console.log(content);
+          document.getElementById("changelog").innerHTML = content;
+        }
+      }
+      xmlHttp.open("GET", "/changelog.json", true); // true for asynchronous
+      xmlHttp.send(null);
+    </script>
+  </head>
+  <body class="mui--bg-primary-light">
+    <div id="content-wrapper" class="mui--text-center">
+      <div class="mui--appbar-height"></div>
+      <br>
+      <br>
+      <div class="mui--text-display3 row wow zoomInDown">Spacteria</div>
+      <br>
+      <br>
+      <div class="mui-text-headline wow zoomInDown">Scientists have found a way to shrink you so small that you can be inserted into a weird alienlike species in a special capsule.
+        <br>You are sent into the alienlike creature to learn more about it. Prepare to fight for your life after the immune system of the alien starts to attack you!</div>
+      <br>
+      <br>
+      <div class="mui-text-display1 wow zoomInDown"> <strong>1-4 player Hack and Slash-RPG with a hint of roguelike flavours.
+        <br>Spacteria offers procedurally generated maps, unlimited difficulty settings and the ability to affect the way the game is developed. </strong></div>
+      <br>
+      <br>
+      <div class="mui-container-fluid">
+        <div class="mui-row">
+          <div class="mui-col-md-1"></div>
+          <div class="mui-col-md-2"><img src="/ms-icon-310x310.png"/></div>
+          <div class="mui-col-md-2"><img src="/ms-icon-310x310.png"/></div>
+          <div class="mui-col-md-2"><img src="/ms-icon-310x310.png"/></div>
+          <div class="mui-col-md-2"><img src="/ms-icon-310x310.png"/></div>
+          <div class="mui-col-md-2"><img src="/ms-icon-310x310.png"/></div>
+          <div class="mui-col-md-1"></div>
+        </div>
+      </div>
+      <div class="mui-container-fluid">
+        <div class="mui-row">
+          <div class="mui-col-md-1"></div>
+          <div class="mui-col-md-3">
+            <div class="mui-panel">
+              <div class="mui--text-headline"><i class="fa fa-pencil-square" aria-hidden="true"></i>  Changelog</div><hr/>
+              <pre id="changelog" class="mui--text-left" style="white-space: pre-wrap"></pre>
+            </div>
+          </div>
+          <div class="mui-col-md-4">
+            <div class="mui-panel">
+              <div class="mui--text-headline"><i class="fa fa-comments" aria-hidden="true"></i> A community-friendly game for free</div><hr/>
+              <div class="mui--text-left" >
+                <ul>
+                  <li> Join our <a href="https://discord.gg/zcYCrcY">Discord</a> if you have any questions! </li>
+                  <li>Completely free to join, all you need is a confirmed Google account to register.</li>
+                  <li>The game is constantly evolving and your feedback is wanted.</li>
+                  <li>Report bugs to the developers and earn bug bounty credits. Spend these ingame for cosmetic coolness!</li>
+                  <li>Made with Java and LWGL2 using Slick2D</li>
+                  <li>Made by Arap, <small> Arttu Siren &ltarttu.siren@gmail.com&gt </small> </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="mui-col-md-3">
+            <div class="mui-panel">
+              <div class="mui--text-headline"> <i class="fa fa-download" aria-hidden="true"></i> Download and Registering</div><hr/>
+              <button class="mui-btn bui-btn--raised mui-btn--danger" disabled>Download game client</button>
+              <div class="mui--text-left" >
+                The game client will come available to download very soon. If you really want to try it out, pop in our discord and ask me for it!
+              </div><br>
+              <div class="mui--text-subhead">Registering</div><br>
+              <div class="mui--text-left" >
+                Registering to the game is super easy.
+                <ol>
+                  <li> Download the game</li>
+                  <li> Click the register button in the game client</li>
+                  <li> Allow Spacteria to retrieve your email from google.</li>
+                  <li> Done!</li>
+                </ol>
+              </div>
+            </div>
+          </div>
+          <div class="mui-col-md-1"></div>
+        </div>
+      </div>
+    </div>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js"></script>
+    <script>
+    new WOW().init();
+    </script>
+  </body>
+</html>

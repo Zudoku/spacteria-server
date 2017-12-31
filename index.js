@@ -7,14 +7,20 @@ const gameserver = require('./src/gameserver.js');
 const userlogin = require('./src/db/userlogin.js');
 const serverconfig = require('./config/serverconfig.js');
 
+const changelog = require('./documentation/changelog.js');
+
 const app = express();
 
-app.use(express.static(path.join(__dirname, 'webapp')));
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'webapp', 'index.html'));
+  res.sendFile(path.join(__dirname, 'webapp', 'static', 'landingpage.html'));
 });
+app.use(express.static(path.join(__dirname, 'webapp', 'static')));
 app.get('/datadashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'webapp', 'index.html'));
+});
+
+app.get('/changelog.json', (req, res) => {
+  res.json(changelog.changelog);
 });
 
 app.get('/register', (req, res) => {
@@ -25,11 +31,11 @@ app.get('/register', (req, res) => {
         /* eslint max-len: "off"*/
         res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?client_id=${serverconfig.google_oauth_client_id}&redirect_uri=${serverconfig.google_oauth_callback_uri}&scope=email&access_type=online&state=${registerToken}&response_type=code`);
       } else {
-        res.sendFile(path.join(__dirname, 'webapp', 'registererror.html'));
+        res.sendFile(path.join(__dirname, 'webapp', 'static', 'registererror.html'));
       }
     });
   } else {
-    res.sendFile(path.join(__dirname, 'webapp', 'registererror.html'));
+    res.sendFile(path.join(__dirname, 'webapp', 'static', 'registererror.html'));
   }
 });
 
