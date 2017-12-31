@@ -15,9 +15,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'webapp', 'static', 'landingpage.html'));
 });
 app.use(express.static(path.join(__dirname, 'webapp', 'static')));
+/**
 app.get('/datadashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'webapp', 'index.html'));
-});
+});*/
 
 app.get('/changelog.json', (req, res) => {
   res.json(changelog.changelog);

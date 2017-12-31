@@ -4,7 +4,7 @@ module.exports = {
   entry: './webapp/index.js',
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'webapp')
+    path: path.resolve(__dirname, 'webapp', 'static')
   },
   module: {
     loaders: [
