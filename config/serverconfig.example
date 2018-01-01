@@ -14,6 +14,8 @@ config.google_oauth_client_id = '';
 config.google_oauth_client_secret = '';
 config.google_oauth_callback_uri = '';
 
+config.client_version = 10;
+
 config.profile = 'debug';
 
 module.exports = config;
