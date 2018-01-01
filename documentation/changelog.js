@@ -17,6 +17,7 @@ module.exports = {
         'Minor fixes',
         'Version data gets parsed straight from changelog.js',
         'Fixed login screen flickering when using autologin',
+        'Updater for game client',
       ],
     },
   ],
