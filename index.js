@@ -73,18 +73,18 @@ app.get('/google/redirect', (req, res) => {
           userlogin.tryRegisteringUser(jsonBody2, registerToken).then((result) => {
             if (result.success) {
               gameserver.sendPasswordToken(result.token, result.socketid);
-              res.sendFile(path.join(__dirname, 'webapp', 'registersuccess.html'));
+              res.sendFile(path.join(__dirname, 'webapp', 'static', 'registersuccess.html'));
             } else {
-              res.sendFile(path.join(__dirname, 'webapp', 'registererror.html'));
+              res.sendFile(path.join(__dirname, 'webapp', 'static', 'registererror.html'));
             }
           });
         });
       } else {
-        res.sendFile(path.join(__dirname, 'webapp', 'registererror.html'));
+        res.sendFile(path.join(__dirname, 'webapp', 'static', 'registererror.html'));
       }
     });
   } else {
-    res.sendFile(path.join(__dirname, 'webapp', 'registererror.html'));
+    res.sendFile(path.join(__dirname, 'webapp', 'static', 'registererror.html'));
   }
 });
 
